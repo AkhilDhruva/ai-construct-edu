@@ -11,6 +11,11 @@ export function contentFilesFromGlob(modules: Record<string, unknown>): ContentF
   return files
 }
 
+/** The raw files as shipped, for the content studio to edit and re-validate. */
+export function getContentFiles(): ContentFiles {
+  return contentFilesFromGlob(raw)
+}
+
 let cached: ContentRegistry | undefined
 
 export function getRegistry(): ContentRegistry {

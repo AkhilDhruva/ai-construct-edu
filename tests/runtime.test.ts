@@ -5,8 +5,9 @@ import { openDexieStore } from '../src/mantle/store/dexie-store'
 import { fakeClock, realRegistry } from './helpers'
 
 const reg = realRegistry()
-const allCorrect = Object.fromEntries(reg.diagnostic.map((d) => [d.id, d.answer]))
-const allWrong = Object.fromEntries(reg.diagnostic.map((d) => [d.id, d.options.find((o) => o.id !== d.answer)!.id]))
+const technical = reg.diagnostics.technical!.items
+const allCorrect = Object.fromEntries(technical.map((d) => [d.id, d.answer]))
+const allWrong = Object.fromEntries(technical.map((d) => [d.id, d.options.find((o) => o.id !== d.answer)!.id]))
 const onboarding = { goal: 'interview' as const, role: 'engineer' as const, weeklyMinutes: 300, horizonWeeks: 6 }
 
 async function boot(clock = fakeClock()) {

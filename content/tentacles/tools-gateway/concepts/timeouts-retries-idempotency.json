@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "timeouts-retries-idempotency",
+  "tentacle": "tools-gateway",
+  "title": "Timeouts, retries and idempotency",
+  "point": "Every tool call needs a timeout under the loop's wall clock, and only idempotent or keyed calls may be retried, with backoff, jitter and a budget.",
+  "definition": "A call policy sets a per-call timeout below the loop's wall-clock bound and decides what to retry. Only UNAVAILABLE results are retried, with exponential backoff and jitter, and only for idempotent operations or calls with an idempotency key.",
+  "level": 2,
+  "objective": {
+    "id": "timeouts-retries-idempotency-obj",
+    "text": "Given a tool's latency profile and the loop budget, set its timeout and retry policy, classify results as retryable or not, and attach an idempotency key to each side-effecting call."
+  },
+  "misconceptions": [
+    {
+      "claim": "Retrying a failed call three times is always safe.",
+      "correction": "A refund that timed out may still have succeeded upstream. Retrying it without an idempotency key can refund twice, so retry side effects only with a key the upstream deduplicates."
+    },
+    {
+      "claim": "Every error is worth a retry because it might be transient.",
+      "correction": "INVALID and DENIED fail the same way on every attempt. Only UNAVAILABLE is retryable; retrying the others wastes loop budget and adds load for nothing."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Every call has a timeout, and it must sit below the loop's wall-clock bound. A tool allowed to wait forever turns one slow dependency into a stuck run.",
+      "Retry only UNAVAILABLE. INVALID and DENIED are not retryable, because the same arguments from the same caller get the same answer.",
+      "Retry with exponential backoff and jitter, and only for idempotent operations or calls carrying an idempotency key. Count every retry against the loop's step, token and time budget."
+    ],
+    "l2": [
+      "A loop has a 60-second wall clock. An order lookup has a 2-second timeout and up to two retries, with backoff of 200 ms then 400 ms, each plus up to 100 ms of jitter.",
+      "The worst case is three 2-second attempts, 600 ms of backoff and up to 200 ms of jitter, or 6.8 seconds. That fits inside the 60-second loop with room for other steps.",
+      "A refund call carries an idempotency key built from the run ID and order ID. If the first attempt timed out after succeeding upstream, the retry returns the original refund instead of issuing a second."
+    ],
+    "l3": [
+      "Retries raise success but multiply load. If a dependency fails 5 per cent of calls independently, two retries lift success from 0.95 to 0.999875.",
+      "During an outage, though, every call retries twice and traffic to a failing service triples. Jitter spreads those retries out, and a retry budget caps them.",
+      "A common cap keeps retries under 10 per cent of calls over a minute. Above that, return UNAVAILABLE at once and let the orchestrator degrade instead of piling on."
+    ]
+  },
+  "prerequisites": ["gateway-order", "bounded-loop"],
+  "labs": [],
+  "drills": ["tgw-drill-tool-platform"],
+  "goals": ["interview", "capstone"],
+  "minutes": 13
+}

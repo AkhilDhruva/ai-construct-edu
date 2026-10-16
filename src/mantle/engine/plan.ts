@@ -23,9 +23,15 @@ export function plan(inputs: PlanInputs, graph: ConceptGraph, rules: Rules): Omi
   const nowMs = Date.parse(inputs.now)
   const m = (id: string) => inputs.mastery[id]?.mastery ?? rules.bkt.prior
 
-  const mastered = graph.topo.filter((id) => m(id) >= T)
-  const remaining = new Set(graph.topo.filter((id) => m(id) < T))
-  const satisfied = new Set(mastered)
+  // Audience rule: a concept is in scope when the learner's role is in its tentacle's
+  // audience, or the concept serves the learner's goal. Out-of-scope prerequisites
+  // count as satisfied so they never block an in-scope concept.
+  const inScope = (id: string) =>
+    (graph.audience.get(id) ?? []).includes(learner.role) || graph.concepts.get(id)!.goals.includes(learner.goal)
+  const outOfScope = graph.topo.filter((id) => !inScope(id))
+  const mastered = graph.topo.filter((id) => inScope(id) && m(id) >= T)
+  const remaining = new Set(graph.topo.filter((id) => inScope(id) && m(id) < T))
+  const satisfied = new Set([...mastered, ...outOfScope])
 
   const maxDesc = Math.max(1, ...graph.descendants.values())
   const maxDrills = Math.max(1, ...[...graph.concepts.values()].map((c) => c.drills.length))
@@ -128,6 +134,7 @@ export function plan(inputs: PlanInputs, graph: ConceptGraph, rules: Rules): Omi
     contentVersions: graph.contentVersions,
     items,
     mastered,
+    outOfScope,
     dueCards: inputs.dueCards,
     weeklyMinutes: learner.weeklyMinutes,
     reservedCardMinutes,
@@ -169,9 +176,9 @@ export function explainChanges(
  * Any strategy (for example a tutor-proposed plan in API mode) is accepted only if
  * it keeps every prerequisite order. The model proposes; the engine decides.
  */
-export function validatePlan(p: Pick<CurriculumPlan, 'items' | 'mastered'>, graph: ConceptGraph): string[] {
+export function validatePlan(p: Pick<CurriculumPlan, 'items' | 'mastered' | 'outOfScope'>, graph: ConceptGraph): string[] {
   const problems: string[] = []
-  const seen = new Set(p.mastered)
+  const seen = new Set([...p.mastered, ...(p.outOfScope ?? [])])
   for (const item of p.items) {
     const c = graph.concepts.get(item.conceptId)
     if (!c) {

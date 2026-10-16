@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "gateway-order",
+  "tentacle": "tools-gateway",
+  "title": "The gateway order",
+  "point": "The gateway authorises, then validates, then executes with a timeout, then returns a typed result, and each stage protects the one after it.",
+  "definition": "The tool gateway turns a call the model proposed into a call that runs. It applies four stages in a fixed order under the caller's identity: authorise, validate arguments, execute with a per-call timeout, and type the result.",
+  "level": 1,
+  "objective": {
+    "id": "gateway-order-obj",
+    "text": "Order the four gateway stages, and for each wrong order name the hazard it creates: a schema leak, an unauthorised side effect, execution on invalid input or an untyped result."
+  },
+  "misconceptions": [
+    {
+      "claim": "Validation should run first because it is cheap and rejects most bad calls early.",
+      "correction": "Validating before authorising tells a denied caller which fields and types the tool expects. Authorisation is just as cheap, so run it first and return DENIED with no schema detail."
+    },
+    {
+      "claim": "Once the model emits a call, the gateway should run it with the agent's own service credentials.",
+      "correction": "The model only proposes. The gateway decides and executes under the identity of the principal the agent acts for, so permissions follow that principal, not a broad service account."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Authorise: check the calling principal against the tool's allowlist. A denied caller gets DENIED and nothing else, so it never learns the argument schema from a validation error.",
+      "Validate: check the arguments against the JSON Schema. Bad input returns INVALID, so the tool never runs on it.",
+      "Execute: run the tool under the caller's identity with a per-call timeout. Type the result: map the raw outcome to SUCCESS, EMPTY or UNAVAILABLE, so the orchestrator knows who acts next."
+    ],
+    "l2": [
+      "Send six calls to a refund tool through a gateway with a 2,000 ms timeout. A support agent with valid arguments and a 400 ms response gets SUCCESS.",
+      "The same agent refunding an order with nothing left to refund gets EMPTY. A marketing bot gets DENIED at the first stage, whether its arguments are valid or not.",
+      "A negative amount from the support agent gets INVALID before anything runs. A valid call whose upstream needs 3,500 ms is cut off at 2,000 ms and typed UNAVAILABLE.",
+      "Now swap the first two stages: the marketing bot's bad call returns a validation error that describes the schema. Put execute first, and the marketing bot's refund actually happens."
+    ],
+    "l3": [
+      "Each stage adds latency. A cached allowlist check might cost 1 ms and schema validation 2 ms, so 3 ms on a 400 ms tool call is under 1 per cent.",
+      "Skipping both checks saves 3 ms per call. At 300 calls a minute that is 0.9 seconds of compute a minute, while one unauthorised $200 refund is a real loss.",
+      "Keep all four stages in the gateway rather than in each tool. A new tool then inherits them and cannot ship without them."
+    ]
+  },
+  "prerequisites": ["tool-contracts", "typed-tool-results"],
+  "labs": ["gateway-walkthrough"],
+  "drills": ["tgw-drill-tool-platform"],
+  "goals": ["interview", "capstone"],
+  "minutes": 12
+}

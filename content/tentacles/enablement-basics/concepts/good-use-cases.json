@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "good-use-cases",
+  "tentacle": "enablement-basics",
+  "title": "Choosing good use cases",
+  "point": "The best AI tasks are high volume, low risk and easy to verify, in an area where you are expert enough to judge the output.",
+  "definition": "A use case is a specific, repeated task you hand to an AI assistant. A good one saves time without creating harm you cannot catch.",
+  "level": 1,
+  "objective": {
+    "id": "good-use-cases-obj",
+    "text": "Choose and justify the two best AI use cases from a list of six team tasks, using volume, risk, ease of checking and your own expertise."
+  },
+  "misconceptions": [
+    {
+      "claim": "The hardest tasks are the best place to use AI, because that is where help is needed most.",
+      "correction": "Hard tasks are often the ones you cannot check. Start with routine tasks you understand well, where you can spot a mistake at a glance."
+    },
+    {
+      "claim": "If the assistant is right most of the time, it is fine for decisions about people.",
+      "correction": "Hiring, pay, performance and discipline decisions affect people's lives and carry legal duties. A person must make them, whatever the tool's accuracy."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Look for four signs of a good use case: high volume, low risk, easy to verify, and you are the expert who can judge the result.",
+      "Poor use cases include final decisions about people, legal or medical advice, and anything you cannot check.",
+      "Good examples include first drafts of routine emails, meeting summaries from your own notes, and reformatting a list into a table."
+    ],
+    "l2": [
+      "A sales team lists tasks: drafting follow-up emails, summarising call notes, setting discount levels for key accounts, and interpreting a contract clause.",
+      "Follow-up emails and call summaries are frequent, low risk and easy for the salesperson to check, so they are good starts.",
+      "Discount levels and contract clauses carry financial and legal risk. They need a manager or the legal team, not an assistant."
+    ],
+    "l3": [
+      "Score each task by minutes saved per week minus minutes spent checking. A task saving 60 minutes with 10 minutes of checking nets 50 minutes.",
+      "A task saving 20 minutes that needs 25 minutes of careful checking loses time, so drop it even if it looks impressive.",
+      "Pick the tasks with the highest net saving and the lowest harm if something slips through."
+    ]
+  },
+  "prerequisites": ["prompt-anatomy"],
+  "labs": [],
+  "drills": [],
+  "goals": ["enablement"],
+  "minutes": 10
+}

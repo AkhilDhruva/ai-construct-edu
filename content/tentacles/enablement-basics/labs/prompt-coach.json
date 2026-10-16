@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "engine": "prompt-coach",
+  "id": "prompt-coach",
+  "brief": [
+    "A clear prompt answers four questions before the assistant has to guess: who it should act as, what exactly it should do, what background it needs, and what shape the answer should take. That is Role, Task, Context and Format, or RTCF.",
+    "Pick a workplace scenario, read the weak prompt, then write your own improved version. The coach checks your prompt for each RTCF element and flags anything that looks like sensitive data, such as email addresses, card numbers or the word confidential.",
+    "Aim to include at least three of the four elements with no red flags. Then compare your version with the model answer and notice which phrase supplies each element."
+  ],
+  "elements": [
+    {
+      "id": "role",
+      "label": "Role",
+      "question": "Who should the assistant act as?",
+      "patterns": [
+        "\\byou are (an?|the) [a-z]+",
+        "\\byou're (an?|the) [a-z]+",
+        "\\bact as\\b",
+        "\\bas an? ([a-z]+ ){1,2}(expert|manager|assistant|specialist|analyst|editor|recruiter|consultant|coordinator|writer|adviser|advisor)\\b",
+        "\\b(imagine|pretend) (you are|you're)\\b",
+        "\\bin the role of\\b"
+      ],
+      "tip": "Start with a role, such as: you are an experienced recruiter. It sets the voice, vocabulary and level of detail."
+    },
+    {
+      "id": "task",
+      "label": "Task",
+      "question": "What exactly should the assistant do?",
+      "patterns": [
+        "\\b(write|draft|rewrite|redraft|edit|proofread)\\b",
+        "\\b(summari[sz]e|outline|list|explain|translate)\\b",
+        "\\b(create|prepare|compare|review|suggest|propose|turn)\\b"
+      ],
+      "tip": "Use one clear action verb, such as draft, summarise, rewrite or compare, and name the thing you want back."
+    },
+    {
+      "id": "context",
+      "label": "Context",
+      "question": "What background, audience and constraints does the assistant need?",
+      "patterns": [
+        "\\b(audience|background|context|purpose)\\b",
+        "\\b(because|so that|the goal is|the aim is|in order to)\\b",
+        "\\bfor (our|my|the)( [a-z]+)? (team|department|board|customers?|clients?|staff|managers?|employees|readers|leadership)\\b",
+        "\\b(we are|we're|our (company|organisation|organization|team|customers|clients|staff))\\b",
+        "\\b(readers?|recipients?|attendees|candidates|customers?|employees|staff) (are|is|will|need|want)\\b",
+        "\\b(avoid|do not mention|don't mention|must not|do not promise|don't promise)\\b"
+      ],
+      "tip": "Add the background the assistant cannot know: who will read it, why it matters, and anything to avoid."
+    },
+    {
+      "id": "format",
+      "label": "Format",
+      "question": "What shape should the output take?",
+      "patterns": [
+        "\\bbullet(s| points?)?\\b|\\bnumbered list\\b",
+        "\\b(table|columns?|headings?|subject line|json|paragraphs?)\\b",
+        "\\b(one|two|three|four|five|six|seven|eight|nine|ten|\\d+) (words|sentences|bullets|bullet points|points|paragraphs|lines|items|questions|ideas|options|examples)\\b",
+        "\\b(under|no more than|at most|up to|maximum of) \\d+\\b",
+        "\\b(tone|plain language|plain english)\\b",
+        "\\bformat(ted)?\\b"
+      ],
+      "tip": "Say what shape you want back, such as five bullets, a table, or an email under 150 words in a friendly tone."
+    }
+  ],
+  "redFlags": [
+    {
+      "id": "email-address",
+      "label": "Email address",
+      "pattern": "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}",
+      "advice": "Remove the email address or replace it with a placeholder such as customer email. The assistant does not need it to write a good draft."
+    },
+    {
+      "id": "card-number",
+      "label": "Card or long account number",
+      "pattern": "\\b(\\d[ -]?){12,15}\\d\\b",
+      "advice": "This looks like a payment card or account number. Never paste it into an AI tool; describe the situation instead."
+    },
+    {
+      "id": "sensitive-words",
+      "label": "Sensitive wording",
+      "pattern": "\\b(confidential|internal only|salary|salaries|password|passcode|api[ _-]?key)\\b",
+      "advice": "Words like confidential, salary or password suggest sensitive material. Check your data classification and use only the approved tool, or leave the detail out."
+    },
+    {
+      "id": "national-id",
+      "label": "National ID number",
+      "pattern": "\\b(\\d{3}-\\d{2}-\\d{4}|[a-z]{2} ?\\d{2} ?\\d{2} ?\\d{2} ?[a-d])\\b",
+      "advice": "This looks like a national insurance or social security number. Remove it; personal identifiers must never go into a prompt."
+    },
+    {
+      "id": "bank-details",
+      "label": "Bank details",
+      "pattern": "\\b(iban|sort code)\\b|\\baccount (no|number)\\W{0,3}\\d{6,}",
+      "advice": "Bank details are financial personal data. Replace them with a placeholder and add the real details yourself after drafting."
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "meeting-summary",
+      "title": "Meeting summary",
+      "situation": "You took rough notes during a 45-minute project meeting. Half the project team could not attend, and you need to send them a summary by the end of the day.",
+      "weakPrompt": "Summarise these notes.",
+      "strongPrompt": "You are an experienced project coordinator. Summarise the meeting notes below into a short update for the project team, who missed the meeting and need to know what was decided. Use three headings: decisions, actions with owners, and open questions. Keep it under 200 words.",
+      "notes": [
+        "The role sets an organised, practical voice, and the context tells the assistant the readers were absent, so it should not assume they know the background.",
+        "Three named headings make the update easy to scan and stop the assistant from padding it with discussion that did not lead anywhere.",
+        "The word limit keeps the summary short enough that people will read it."
+      ]
+    },
+    {
+      "id": "customer-reply",
+      "title": "Late delivery reply",
+      "situation": "A customer has written in, upset that their order arrived two weeks late. You want a reply that apologises, explains the new delivery checks, and offers a goodwill gesture you are allowed to give.",
+      "weakPrompt": "Write a reply to this angry customer.",
+      "strongPrompt": "Act as a friendly customer service specialist. Draft a reply to a customer whose order arrived two weeks late. The goal is to apologise sincerely, explain that we have added extra delivery checks, and offer free delivery on their next order. Do not promise a refund. Use a warm, plain tone and keep it under 150 words.",
+      "notes": [
+        "The prompt describes the customer's situation in general terms, so no name, address or order number is pasted in.",
+        "The constraint do not promise a refund keeps the draft within what you are allowed to offer.",
+        "Tone and length are set up front, which saves a round of edits."
+      ]
+    },
+    {
+      "id": "job-ad",
+      "title": "Job advert",
+      "situation": "Your team is hiring a part-time office administrator, and HR has asked you to draft the advert for the careers page.",
+      "weakPrompt": "Write a job ad for an admin.",
+      "strongPrompt": "You are an experienced recruiter. Write a job advert for a part-time office administrator, working three days a week. Our team is a friendly ten-person office, and the audience is local candidates returning to work. Avoid jargon and gendered language. Use a short opening paragraph, then five bullet points for duties and four for requirements.",
+      "notes": [
+        "The audience detail steers the advert towards welcoming, plain wording for people returning to work.",
+        "Asking the assistant to avoid gendered language builds a fairness check into the draft, though you should still read it for bias.",
+        "The bullet structure matches a typical careers page, so the draft needs little reformatting."
+      ]
+    },
+    {
+      "id": "policy-faq",
+      "title": "Policy FAQ",
+      "situation": "HR has updated the hybrid working policy. You need a short staff FAQ for the intranet that answers the questions people ask most often.",
+      "weakPrompt": "Explain the new hybrid policy.",
+      "strongPrompt": "Act as an HR communications specialist. Turn the hybrid working policy text below into a staff FAQ. The readers are employees who want quick answers about office days, equipment and how to request changes. Write six questions, each with an answer of no more than 50 words, in plain language.",
+      "notes": [
+        "Naming the readers and their three main concerns tells the assistant which parts of the policy to prioritise.",
+        "Six questions with a word limit keep the FAQ short enough to scan on a phone.",
+        "Because the policy text is pasted in, the assistant summarises what is actually there instead of inventing rules, but you should still check each answer against the policy."
+      ]
+    }
+  ],
+  "passScore": 0.75
+}

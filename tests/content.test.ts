@@ -13,13 +13,14 @@ describe('content registry', () => {
     expect(f.checks).toHaveLength(12)
     expect(f.drills).toHaveLength(2)
     expect(f.labs.map((l) => l.ref.engine).sort()).toEqual(['eight-numbers', 'sequence-stepper'])
-    expect(reg.diagnostic).toHaveLength(12)
+    expect(reg.diagnostics.technical?.items).toHaveLength(12)
   })
 
   it('plugs in a second tentacle from files alone, with cross-tentacle prerequisites', () => {
     const reg = loadContent({ ...contentFiles(), ...fixtureTentacle() })
     expect(reg.errors).toEqual([])
-    expect(reg.packages.map((p) => p.manifest.id)).toEqual(['foundations', 'memory-retrieval'])
+    expect(reg.packages.map((p) => p.manifest.id)).toContain('memory-retrieval')
+    expect(reg.packages.map((p) => p.manifest.id)).toContain('foundations')
     expect(reg.concepts.get('memory-tiers')?.prerequisites).toEqual(['six-components'])
   })
 
@@ -27,21 +28,26 @@ describe('content registry', () => {
     const bad = fixtureTentacle('broken-one')
     ;(bad['tentacles/broken-one/manifest.json'] as Record<string, unknown>).version = 'one'
     const reg = loadContent({ ...contentFiles(), ...bad })
-    expect(reg.packages.map((p) => p.manifest.id)).toEqual(['foundations'])
+    expect(reg.packages.map((p) => p.manifest.id)).not.toContain('broken-one')
+    expect(reg.packages.map((p) => p.manifest.id)).toContain('foundations')
     expect(reg.errors.some((e) => e.where.includes('broken-one') && e.message.includes('semver'))).toBe(true)
   })
 
   it('rejects unresolved prerequisites and unknown lab engines', () => {
     const files = { ...contentFiles(), ...fixtureTentacle('memory-retrieval', 'no-such-concept') }
     const reg = loadContent(files)
-    expect(reg.packages.map((p) => p.manifest.id)).toEqual(['foundations'])
+    expect(reg.packages.map((p) => p.manifest.id)).not.toContain('memory-retrieval')
+    expect(reg.packages.map((p) => p.manifest.id)).toContain('foundations')
     expect(reg.errors.some((e) => e.message.includes('no-such-concept'))).toBe(true)
 
     const files2 = contentFiles()
     const m = files2['tentacles/foundations/manifest.json'] as { labs: Array<{ engine: string }> }
     m.labs[0].engine = 'warp-drive'
     const reg2 = loadContent(files2)
-    expect(reg2.packages).toHaveLength(0)
+    const ids2 = reg2.packages.map((p) => p.manifest.id)
+    expect(ids2).not.toContain('foundations')
+    // Dropping a package cascades to every package whose prerequisites it provided.
+    expect(ids2).not.toContain('tools-gateway')
     expect(reg2.errors.some((e) => e.message.includes('warp-drive'))).toBe(true)
   })
 

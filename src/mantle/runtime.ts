@@ -1,7 +1,7 @@
 import { monotonicFactory } from 'ulid'
 import { newCardState, reviewCard, dueNow, selectDue, type ReviewRating } from './cards/scheduler'
 import type { ContentRegistry } from './content/load'
-import type { Audience, Depth, Goal } from './content/schemas'
+import type { Audience, Depth, DiagnosticTrack, Goal } from './content/schemas'
 import { bktUpdate, diagnosticPrior, lapse } from './engine/bkt'
 import { buildGraph, type ConceptGraph } from './engine/graph'
 import { explainChanges, plan as planRulesV1 } from './engine/plan'
@@ -93,6 +93,9 @@ export class MantleRuntime {
     const existing = current ? await store.learners.get(current) : undefined
     rt.learner = existing ?? (await rt.mintLearner())
     await rt.resumeOrBeginSession()
+    // A content update (new tentacle or version) changes the inputs hash, so an
+    // existing learner's plan re-plans and explains why on their next visit.
+    if (rt.learner.onboarded) await rt.replan()
     return rt
   }
 
@@ -258,8 +261,16 @@ export class MantleRuntime {
   }
 
   // ── Onboarding ─────────────────────────────────────────────────────────────
+  /** Which readiness check a learner takes: enablement for non-technical roles or goals. */
+  diagnosticTrack(role: Audience, goal: Goal): DiagnosticTrack {
+    const wanted: DiagnosticTrack = role === 'non-technical' || goal === 'enablement' ? 'enablement' : 'technical'
+    if (this.content.diagnostics[wanted]) return wanted
+    return wanted === 'technical' ? 'enablement' : 'technical'
+  }
+
   async completeOnboarding(input: OnboardingInput): Promise<CurriculumPlan> {
-    const items = this.content.diagnostic
+    const track = this.diagnosticTrack(input.role, input.goal)
+    const items = this.content.diagnostics[track]?.items ?? []
     const at = this.now().toISOString()
     let score = 0
     const perConcept = new Map<string, { correct: number; total: number }>()
@@ -279,7 +290,7 @@ export class MantleRuntime {
       role: input.role,
       weeklyMinutes: input.weeklyMinutes,
       horizonWeeks: input.horizonWeeks,
-      diagnostic: { score, total: items.length, at, answers: input.answers },
+      diagnostic: { track, score, total: items.length, at, answers: input.answers },
     })
     const diagAttemptId = this.id()
     await this.store.attempts.append({

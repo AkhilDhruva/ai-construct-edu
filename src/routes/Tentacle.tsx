@@ -5,7 +5,7 @@ import { usePackage } from './usePackage'
 
 export function Tentacle() {
   const pkg = usePackage()
-  const { content, mastery, plan, attempts, rt } = useMantle()
+  const { content, mastery, plan, attempts, rt, learner } = useMantle()
   if (!pkg) return <p>Unknown tentacle.</p>
   const { manifest } = pkg
   const T = content.rules.masteryThreshold
@@ -90,6 +90,7 @@ export function Tentacle() {
         </section>
       </div>
 
+      {learner?.role !== 'non-technical' && pkg.drills.length > 0 && (
       <section className="card stack" aria-labelledby="drills-h">
         <h2 id="drills-h">Design drills</h2>
         <p className="small muted">Timed, open-ended, scored against a four-criterion rubric. 9 of 12 passes.</p>
@@ -109,6 +110,7 @@ export function Tentacle() {
           })}
         </div>
       </section>
+      )}
     </div>
   )
 }

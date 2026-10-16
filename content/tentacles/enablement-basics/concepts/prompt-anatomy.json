@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "prompt-anatomy",
+  "tentacle": "enablement-basics",
+  "title": "Prompt anatomy: Role, Task, Context, Format",
+  "point": "A clear prompt names a Role, a precise Task, the Context and the Format you want, and you improve it by iterating.",
+  "definition": "A prompt is the request you type into an AI assistant. RTCF is a checklist for it: Role, Task, Context and Format. Iterating means refining the prompt or the reply in follow-up messages.",
+  "level": 0,
+  "objective": {
+    "id": "prompt-anatomy-obj",
+    "text": "Rewrite a vague workplace prompt so that it contains all four RTCF elements, and identify which element each added phrase supplies."
+  },
+  "misconceptions": [
+    {
+      "claim": "Shorter prompts are better because the assistant knows what I mean.",
+      "correction": "The assistant only knows what you type. A short prompt forces it to guess the audience, purpose and length, so you spend longer fixing the reply."
+    },
+    {
+      "claim": "If the first reply is poor, the tool is not useful for this task.",
+      "correction": "The first reply is a draft. Telling the assistant what to change, such as tone, length or missing points, usually fixes it in one or two turns."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Role says who the assistant should act as, for example an experienced recruiter or a careful editor.",
+      "Task says exactly what to do, using a clear verb such as draft, summarise, rewrite or compare.",
+      "Context gives the background and constraints, such as the audience, the goal and what to avoid. Format sets the shape, such as five bullets, a table or a 120-word email.",
+      "Iterate means you read the reply, then ask for specific changes rather than starting again."
+    ],
+    "l2": [
+      "Marco in operations types: write something about the office move. The reply is long, generic and aimed at nobody in particular.",
+      "He rewrites it: You are an internal communications specialist. Draft an email telling staff the office moves on 3 March. The audience is busy staff who need dates and parking details. Keep it under 150 words with a clear subject line.",
+      "Each sentence adds one element. The second reply needs one small edit instead of a full rewrite."
+    ],
+    "l3": [
+      "Adding the four elements takes about one extra minute of typing per prompt.",
+      "If that minute saves even five minutes of rewriting, a person who prompts ten times a day gains about 40 minutes daily.",
+      "Defend RTCF with that ratio: one minute in, several minutes back, every time the task is worth more than a quick question."
+    ]
+  },
+  "prerequisites": ["ai-assistant-basics"],
+  "labs": ["prompt-coach"],
+  "drills": [],
+  "goals": ["enablement"],
+  "minutes": 12
+}

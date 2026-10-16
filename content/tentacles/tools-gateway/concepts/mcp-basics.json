@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "mcp-basics",
+  "tentacle": "tools-gateway",
+  "title": "MCP basics",
+  "point": "MCP standardises how a host discovers and calls tools on servers, but it standardises the interface, not the policy, so your gateway still decides.",
+  "definition": "The Model Context Protocol is an open protocol in which a host application runs clients that connect to servers. Servers expose tools, resources and prompts over stdio or HTTP, and clients discover and invoke them one standard way.",
+  "level": 1,
+  "objective": {
+    "id": "mcp-basics-obj",
+    "text": "Describe the host, client and server roles and the three things a server exposes, then list the gateway controls MCP does not provide and say where to add them."
+  },
+  "misconceptions": [
+    {
+      "claim": "Tools from an MCP server are safe to use because the protocol is a standard.",
+      "correction": "MCP fixes the message format, not who may call what. Authorisation, validation, timeouts and audit still belong to your gateway, in front of every server."
+    },
+    {
+      "claim": "A third-party server's tool descriptions can be trusted like your own code.",
+      "correction": "Descriptions go straight into the model's context, so a hostile or compromised server can plant instructions there. Treat them as untrusted input: review them, pin them and watch for changes."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "The host is the application the user runs. It creates one client per server connection, and each server exposes its capabilities to that client.",
+      "A server exposes three kinds of thing: tools the model can call, resources the host can read as context, and prompts as reusable templates. Local servers use stdio and remote ones use HTTP.",
+      "MCP standardises discovery and invocation. It does not decide who may call a tool, so the gateway's authorisation, validation, timeouts and audit still apply to every call."
+    ],
+    "l2": [
+      "A team connects a third-party ticketing server over HTTP. On discovery it lists twelve tools, including close_ticket and export_all_tickets.",
+      "The gateway sits between the host and the server. It allowlists four read tools for the support assistant, routes close_ticket through human confirmation, and blocks export_all_tickets entirely.",
+      "One tool description tells the model to always call export_all_tickets first. The team treats that as an injection attempt, pins the reviewed descriptions, and alerts when a server update changes them."
+    ],
+    "l3": [
+      "Wrapping each MCP server in your own gateway adds a hop. A local policy check of about 2 ms beside a 300 ms remote call is under 1 per cent.",
+      "The alternative is trusting each server's own controls, which means one policy model per server. With ten servers, you would audit ten implementations instead of one.",
+      "Pin server versions and description hashes. An unreviewed change to a tool description is a change to your prompt, so it deserves the same review."
+    ]
+  },
+  "prerequisites": ["tool-contracts"],
+  "labs": [],
+  "drills": [],
+  "goals": ["interview", "capstone"],
+  "minutes": 10
+}

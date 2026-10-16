@@ -721,3 +721,77 @@ th {
     scroll-behavior: auto !important;
   }
 }
+
+/* ── Concept map ───────────────────────────────────────────────────────── */
+.react-flow {
+  --xy-background-color: var(--surface);
+  --xy-edge-stroke: var(--text-muted);
+  --xy-controls-button-background-color: var(--surface);
+  --xy-controls-button-color: var(--text);
+  --xy-controls-button-border-color: var(--border);
+}
+.react-flow__node.cmap-node {
+  width: 190px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  padding: 8px 10px;
+}
+.cmap-new {
+  border-color: var(--border) !important;
+  background: var(--surface) !important;
+  color: var(--text) !important;
+}
+.cmap-progress {
+  border-color: var(--warn) !important;
+  background: var(--warn-soft) !important;
+  color: var(--text) !important;
+}
+.cmap-mastered {
+  border-color: var(--ok) !important;
+  background: var(--ok-soft) !important;
+  color: var(--text) !important;
+}
+.cmap-legend {
+  border: 2px solid;
+}
+.react-flow__node.cmap-dim {
+  opacity: 0.4;
+}
+.react-flow__edge.cmap-edge path {
+  stroke: var(--text-muted);
+}
+
+/* ── Prompt diff ───────────────────────────────────────────────────────── */
+.diff {
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+.diff ins {
+  background: var(--ok-soft);
+  color: var(--ok);
+  text-decoration: none;
+  border-radius: 3px;
+}
+.diff del {
+  background: var(--danger-soft);
+  color: var(--danger);
+  border-radius: 3px;
+}
+
+.react-flow__node.cmap-lane {
+  width: 190px;
+  background: none;
+  border: none;
+  box-shadow: none;
+  text-align: right;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  pointer-events: none;
+}

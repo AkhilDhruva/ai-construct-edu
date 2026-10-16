@@ -24,6 +24,8 @@ export interface CurriculumPlan {
   contentVersions: Record<string, string>
   items: PlanItem[]
   mastered: string[]
+  /** Concepts outside the learner's role and goal; not planned, never blocking. */
+  outOfScope: string[]
   dueCards: number
   weeklyMinutes: number
   reservedCardMinutes: number

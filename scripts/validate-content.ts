@@ -20,7 +20,8 @@ for (const p of registry.packages) {
       `${p.drills.length} drills, ${p.labs.length} labs`,
   )
 }
-console.log(`ok    diagnostic: ${registry.diagnostic.length} items; rules: ${registry.rules.strategy}`)
+for (const [track, d] of Object.entries(registry.diagnostics)) console.log(`ok    diagnostic ${track}: ${d!.items.length} items`)
+console.log(`ok    rules: ${registry.rules.strategy}`)
 
 const failures = registry.errors.length + publication.length
 if (failures > 0) {

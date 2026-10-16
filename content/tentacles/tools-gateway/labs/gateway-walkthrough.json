@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "engine": "gateway-pipeline",
+  "id": "gateway-walkthrough",
+  "brief": [
+    "Every tool call the model proposes passes through the gateway before anything happens. The gateway has four stages, and the order they run in decides what can go wrong.",
+    "The pipeline below starts in a deliberately wrong order. Validation runs first and leaks the schema to callers who should be denied, and the raw tool output is never typed.",
+    "Send six calls to the refund_order tool and watch what each stage does. Then reorder the stages until every call returns its expected typed result with no hazards."
+  ],
+  "stages": [
+    { "id": "authorize", "label": "Authorise", "description": "Check the calling principal against the tool's allowlist and stop with DENIED if it is not listed." },
+    { "id": "validate", "label": "Validate", "description": "Check the arguments against the tool's schema and stop with INVALID if they do not match." },
+    { "id": "execute", "label": "Execute", "description": "Run the tool under the caller's identity and cut it off when the per-call timeout expires." },
+    { "id": "type-result", "label": "Type the result", "description": "Map the raw outcome to SUCCESS, EMPTY or UNAVAILABLE so the orchestrator knows who acts next." }
+  ],
+  "correctOrder": ["authorize", "validate", "execute", "type-result"],
+  "startOrder": ["validate", "type-result", "execute", "authorize"],
+  "timeoutMs": 2000,
+  "tool": {
+    "name": "refund_order",
+    "description": "Refunds part or all of one paid order to the original payment method. Use only when a support case confirms a refund is due. Not for order lookups or cancellations.",
+    "argsSchema": "{ order_id: string (required), amount: number > 0 (required), reason: one of damaged | late | not_received | duplicate_charge }",
+    "allowedPrincipals": ["support-agent"]
+  },
+  "calls": [
+    {
+      "id": "refund-ok",
+      "title": "Valid refund by a support agent",
+      "principal": "support-agent",
+      "args": "order_id: ORD-4812, amount: 25.00, reason: damaged",
+      "argsValid": true,
+      "latencyMs": 400,
+      "upstream": "ok",
+      "expected": "SUCCESS"
+    },
+    {
+      "id": "refund-nothing-left",
+      "title": "Order already fully refunded",
+      "principal": "support-agent",
+      "args": "order_id: ORD-3307, amount: 18.50, reason: duplicate_charge",
+      "argsValid": true,
+      "latencyMs": 300,
+      "upstream": "empty",
+      "expected": "EMPTY"
+    },
+    {
+      "id": "marketing-bad-args",
+      "title": "Unlisted bot probes with bad arguments",
+      "principal": "marketing-bot",
+      "args": "order: 4812, refund: all",
+      "argsValid": false,
+      "latencyMs": 350,
+      "upstream": "ok",
+      "expected": "DENIED"
+    },
+    {
+      "id": "marketing-valid-args",
+      "title": "Unlisted bot sends a well-formed refund",
+      "principal": "marketing-bot",
+      "args": "order_id: ORD-5120, amount: 40.00, reason: late",
+      "argsValid": true,
+      "latencyMs": 350,
+      "upstream": "ok",
+      "expected": "DENIED"
+    },
+    {
+      "id": "negative-amount",
+      "title": "Support agent sends a negative amount",
+      "principal": "support-agent",
+      "args": "order_id: ORD-4812, amount: -50.00, reason: damaged",
+      "argsValid": false,
+      "latencyMs": 400,
+      "upstream": "ok",
+      "expected": "INVALID"
+    },
+    {
+      "id": "slow-upstream",
+      "title": "Payment provider responds too slowly",
+      "principal": "support-agent",
+      "args": "order_id: ORD-6031, amount: 12.00, reason: not_received",
+      "argsValid": true,
+      "latencyMs": 3500,
+      "upstream": "ok",
+      "expected": "UNAVAILABLE"
+    }
+  ],
+  "challenge": {
+    "instruction": "Reorder the four stages so that all six calls return their expected typed result with zero hazards."
+  }
+}

@@ -17,6 +17,8 @@ const Review = lazy(() => import('./routes/Review').then((m) => ({ default: m.Re
 const Settings = lazy(() => import('./routes/Settings').then((m) => ({ default: m.Settings })))
 const Tentacle = lazy(() => import('./routes/Tentacle').then((m) => ({ default: m.Tentacle })))
 const Trace = lazy(() => import('./routes/Trace').then((m) => ({ default: m.Trace })))
+const MapPage = lazy(() => import('./routes/Map').then((m) => ({ default: m.MapPage })))
+const Studio = lazy(() => import('./routes/Studio').then((m) => ({ default: m.Studio })))
 
 function SessionBanner() {
   const { sessionEnd, dismissSessionEnd } = useMantle()
@@ -33,7 +35,7 @@ function SessionBanner() {
 }
 
 function Shell({ children }: { children: React.ReactNode }) {
-  const { rung, due, learner } = useMantle()
+  const { rung, due, learner, authorMode } = useMantle()
   const { pathname } = useLocation()
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -60,7 +62,9 @@ function Shell({ children }: { children: React.ReactNode }) {
               <NavLink to="/review">
                 Review{due.length > 0 && <span className="count" aria-label={`${due.length} cards due`}>{due.length}</span>}
               </NavLink>
+              <NavLink to="/map">Map</NavLink>
               <NavLink to="/trace">Trace</NavLink>
+              {authorMode && <NavLink to="/studio">Studio</NavLink>}
               <NavLink to="/settings">Settings</NavLink>
             </nav>
           )}
@@ -112,6 +116,8 @@ export function App() {
             <Route path="/" element={<Home />} />
             <Route path="/review" element={<Review />} />
             <Route path="/trace" element={<Trace />} />
+            <Route path="/map" element={<MapPage />} />
+            <Route path="/studio" element={<Studio />} />
             <Route path="/t/:tentacle" element={<Tentacle />} />
             <Route path="/t/:tentacle/c/:concept" element={<Concept />} />
             <Route path="/t/:tentacle/lab/:lab" element={<Lab />} />

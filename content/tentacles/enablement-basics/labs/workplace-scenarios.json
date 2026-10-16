@@ -1,0 +1,261 @@
+{
+  "schemaVersion": 1,
+  "engine": "scenario-sim",
+  "id": "workplace-scenarios",
+  "brief": [
+    "Each scenario is a short, realistic moment at work where an AI assistant is involved. At every step, choose what you would actually do, then read what happens next.",
+    "Choices are rated best, acceptable or risky. You pass a scenario when your path avoids every risky choice. Try a second run to see how a different decision changes the outcome."
+  ],
+  "scenarios": [
+    {
+      "id": "pasted-customer-data",
+      "title": "The complaint thread",
+      "setting": "You work in customer support. A long complaint thread includes the customer's full name, home address, account number and order history. You want an AI assistant to help you draft a calm reply.",
+      "start": "choose-tool",
+      "steps": [
+        {
+          "id": "choose-tool",
+          "prompt": "How do you get help with the draft?",
+          "choices": [
+            {
+              "id": "approved-anonymised",
+              "text": "Open the approved company assistant and describe the complaint in general terms, with no names, address or account number.",
+              "quality": "best",
+              "outcome": "The assistant has everything it needs to draft a good reply, and no personal data leaves your control. You will add the real details yourself afterwards.",
+              "next": "review-draft"
+            },
+            {
+              "id": "write-myself",
+              "text": "Skip the assistant and write the reply yourself.",
+              "quality": "acceptable",
+              "outcome": "Completely safe, though slower. Next time, an anonymised request in the approved tool would give you a head start without any data risk."
+            },
+            {
+              "id": "paste-public",
+              "text": "Paste the whole thread into a free public chatbot, because it is quicker.",
+              "quality": "risky",
+              "outcome": "The customer's personal data and account number have now been sent to a tool your organisation has not approved. You cannot pull it back.",
+              "next": "after-paste"
+            }
+          ]
+        },
+        {
+          "id": "review-draft",
+          "prompt": "The draft is polite and clear, but it promises a 30-day no-questions refund. You are not sure your policy says that.",
+          "choices": [
+            {
+              "id": "check-policy",
+              "text": "Check the refund wording against the published policy, correct it, then add the customer's details in your email client.",
+              "quality": "best",
+              "outcome": "The policy actually allows 14 days. You fix the line before it goes out, so the customer gets an accurate promise you can keep."
+            },
+            {
+              "id": "cut-refund",
+              "text": "Delete the refund paragraph and send the rest.",
+              "quality": "acceptable",
+              "outcome": "You avoided a false promise, but the customer asked about refunds and now has no answer. Expect a follow-up email."
+            },
+            {
+              "id": "send-as-is",
+              "text": "Add the customer's name and send it as drafted.",
+              "quality": "risky",
+              "outcome": "The customer now holds a written promise your company does not offer. Your team must either honour it or retract it, and both cost trust."
+            }
+          ]
+        },
+        {
+          "id": "after-paste",
+          "prompt": "A minute later you realise the tool is not approved and the thread contained personal data. What now?",
+          "choices": [
+            {
+              "id": "report-now",
+              "text": "Report it straight away through your data protection or IT security contact, following the incident process.",
+              "quality": "best",
+              "outcome": "Early reporting lets the right people assess the risk and meet any legal deadlines. Prompt, honest reporting is what policies expect."
+            },
+            {
+              "id": "tell-manager",
+              "text": "Tell your manager and ask what to do.",
+              "quality": "acceptable",
+              "outcome": "Honest, and your manager will likely route it to the right team. Going straight to the incident process would have been faster."
+            },
+            {
+              "id": "delete-quietly",
+              "text": "Delete the chat and say nothing.",
+              "quality": "risky",
+              "outcome": "Deleting your copy does not delete the provider's copy. Hiding an incident usually turns a manageable mistake into a serious one."
+            }
+          ]
+        }
+      ],
+      "debrief": "Data safety starts before you type. Use the approved tool, describe the situation without identifying details, and add the specifics yourself at the end. If data does slip out, report it at once; speed and honesty limit the harm far more than deleting a chat. Even with a safe prompt, check every promise the draft makes against real policy."
+    },
+    {
+      "id": "confident-wrong-number",
+      "title": "The confident figure",
+      "setting": "You are preparing a slide for a leadership meeting. You asked an AI assistant to summarise a 40-page annual report, and it says revenue grew 18 per cent, citing page 12.",
+      "start": "use-figure",
+      "steps": [
+        {
+          "id": "use-figure",
+          "prompt": "The meeting is in two hours. What do you do with the 18 per cent figure?",
+          "choices": [
+            {
+              "id": "open-report",
+              "text": "Open the report at page 12 and read the figure yourself.",
+              "quality": "best",
+              "outcome": "It takes two minutes. Page 12 says revenue grew 8 per cent, not 18.",
+              "next": "found-mismatch"
+            },
+            {
+              "id": "ask-for-quote",
+              "text": "Ask the assistant to quote the exact sentence it used, then search the report for that sentence.",
+              "quality": "acceptable",
+              "outcome": "A sensible route, as long as you check the report itself. The search shows the real sentence says 8 per cent.",
+              "next": "found-mismatch"
+            },
+            {
+              "id": "trust-it",
+              "text": "Put it on the slide. It cited a page, so it must be right.",
+              "quality": "risky",
+              "outcome": "A citation is a lead to check, not proof. The slide now carries an unverified number into a leadership meeting.",
+              "next": "questioned"
+            }
+          ]
+        },
+        {
+          "id": "found-mismatch",
+          "prompt": "The report says 8 per cent. The summary also includes three other figures and a quote from the chief financial officer.",
+          "choices": [
+            {
+              "id": "check-all",
+              "text": "Correct the slide, then check the other three figures and the quote as well.",
+              "quality": "best",
+              "outcome": "One error is a warning sign. You find the quote was paraphrased, so you use the exact words from the report instead."
+            },
+            {
+              "id": "fix-one",
+              "text": "Correct the 18 per cent and leave the rest.",
+              "quality": "acceptable",
+              "outcome": "The known error is fixed, but the other figures and the quote are still unchecked. One mistake often means there are more."
+            },
+            {
+              "id": "keep-ai",
+              "text": "Keep 18 per cent, because the assistant may have newer data than the report.",
+              "quality": "risky",
+              "outcome": "The assistant only saw the report you gave it. Choosing its number over the source puts a false figure in front of leadership."
+            }
+          ]
+        },
+        {
+          "id": "questioned",
+          "prompt": "In the meeting, a director says the figure looks high and asks where it came from.",
+          "choices": [
+            {
+              "id": "confirm-later",
+              "text": "Say you will confirm it against the report and reply today, then check and send a correction.",
+              "quality": "best",
+              "outcome": "You find the real figure is 8 per cent and correct it within the hour. Owning the fix quickly protects your credibility."
+            },
+            {
+              "id": "admit-unchecked",
+              "text": "Explain that it came from an AI summary you did not check, and that you will look into it.",
+              "quality": "acceptable",
+              "outcome": "Honest, but the slide was still yours. Lead with what you will do to fix it, not with where the error came from."
+            },
+            {
+              "id": "defend-it",
+              "text": "Defend the figure confidently so the meeting keeps moving.",
+              "quality": "risky",
+              "outcome": "Leadership may now act on a wrong number. When the error surfaces, it will be linked to you, not to the tool."
+            }
+          ]
+        }
+      ],
+      "debrief": "Assistants produce confident, specific and sometimes wrong figures, even when they cite a page. Check every number, name, quote and link against the source before it reaches a slide. When you find one error, check the rest, because mistakes rarely travel alone."
+    },
+    {
+      "id": "send-without-review",
+      "title": "The end-of-day reply",
+      "setting": "It is 5.45 pm. A key client has asked about renewing their contract. An AI assistant drafts a reply that offers a 15 per cent discount and agrees to remove the liability cap. Your manager has left for the day.",
+      "start": "before-sending",
+      "steps": [
+        {
+          "id": "before-sending",
+          "prompt": "The client wants an answer today. What do you do?",
+          "choices": [
+            {
+              "id": "hold-and-escalate",
+              "text": "Send the client a short note saying you will reply in full tomorrow, and flag the draft to your manager and the legal team.",
+              "quality": "best",
+              "outcome": "The client knows they have been heard, and the commitments in the draft get reviewed by the people allowed to approve them.",
+              "next": "next-morning"
+            },
+            {
+              "id": "strip-commitments",
+              "text": "Remove the discount and liability lines, read the rest carefully, and send it.",
+              "quality": "acceptable",
+              "outcome": "You avoided making promises you cannot approve. The client's renewal question is only partly answered, so a follow-up will still be needed."
+            },
+            {
+              "id": "send-now",
+              "text": "Send it as drafted. The client is important and wants a quick answer.",
+              "quality": "risky",
+              "outcome": "You have committed the company to a discount and a legal change that nobody approved. Your name is on the email.",
+              "next": "client-accepts"
+            }
+          ]
+        },
+        {
+          "id": "next-morning",
+          "prompt": "Legal approves the discount but not the liability change. Your manager asks whether AI drafted the reply.",
+          "choices": [
+            {
+              "id": "disclose-and-own",
+              "text": "Say yes, explain what you checked, update the reply with legal's wording, and send it under your name.",
+              "quality": "best",
+              "outcome": "You disclosed AI use as policy expects, used the approved wording, and kept ownership of the client relationship."
+            },
+            {
+              "id": "hand-to-legal",
+              "text": "Say yes, and ask legal to send the reply to the client instead.",
+              "quality": "acceptable",
+              "outcome": "Safe, but you have handed off a conversation that is yours to own. Legal approves the wording; you normally send it."
+            },
+            {
+              "id": "hide-ai",
+              "text": "Say you wrote it yourself, since you edited it.",
+              "quality": "risky",
+              "outcome": "Where policy requires disclosure, hiding AI use breaks it and damages trust if it comes out later."
+            }
+          ]
+        },
+        {
+          "id": "client-accepts",
+          "prompt": "The next morning, the client replies that they are delighted to accept both terms.",
+          "choices": [
+            {
+              "id": "escalate-now",
+              "text": "Tell your manager and legal at once, explain that the reply was AI-drafted and unreviewed, and let them handle the correction.",
+              "quality": "best",
+              "outcome": "The people with authority can now limit the damage. Owning the mistake early gives them the most options."
+            },
+            {
+              "id": "self-correct",
+              "text": "Email the client to say the liability line was sent in error, then tell your manager.",
+              "quality": "acceptable",
+              "outcome": "You acted quickly and honestly, but correcting a legal term without legal advice can create new problems. Escalate first next time."
+            },
+            {
+              "id": "stay-quiet",
+              "text": "Say nothing and hope the contracts team spots it.",
+              "quality": "risky",
+              "outcome": "The longer the error sits, the harder and more costly it is to reverse. Accountability means raising it yourself."
+            }
+          ]
+        }
+      ],
+      "debrief": "The assistant drafts and you decide. Anything that commits your organisation to money, legal terms or a decision about a person needs the right approver before it goes out. A short holding reply buys time without risk. Disclose AI use where policy requires it, and raise mistakes yourself as soon as you find them."
+    }
+  ]
+}

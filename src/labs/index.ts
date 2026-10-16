@@ -6,4 +6,7 @@ import type { LabProps } from './types'
 export const LAB_COMPONENTS: Record<string, LazyExoticComponent<ComponentType<LabProps<any>>>> = {
   'sequence-stepper': lazy(() => import('./sequence-stepper/SequenceStepperLab')),
   'eight-numbers': lazy(() => import('./eight-numbers/EightNumbersLab')),
+  'gateway-pipeline': lazy(() => import('./gateway-pipeline/GatewayPipelineLab')),
+  'prompt-coach': lazy(() => import('./prompt-coach/PromptCoachLab')),
+  'scenario-sim': lazy(() => import('./scenario-sim/ScenarioSimLab')),
 }

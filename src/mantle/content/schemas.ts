@@ -143,8 +143,12 @@ export const diagnosticItemSchema = z
     concepts: z.array(slug).min(1),
   })
   .refine((i) => i.options.some((o) => o.id === i.answer), { message: 'answer must be an option id' })
+/** One readiness check per track; onboarding picks the track from role and goal. */
+export const diagnosticTrack = z.enum(['technical', 'enablement'])
 export const diagnosticFileSchema = z.object({
   schemaVersion: z.literal(SCHEMA_VERSION),
+  track: diagnosticTrack,
+  title: prose,
   items: z.array(diagnosticItemSchema).length(12),
 })
 
@@ -198,6 +202,7 @@ export type Card = z.infer<typeof cardSchema>
 export type CheckItem = z.infer<typeof checkItemSchema>
 export type Drill = z.infer<typeof drillSchema>
 export type DiagnosticItem = z.infer<typeof diagnosticItemSchema>
+export type DiagnosticTrack = z.infer<typeof diagnosticTrack>
 export type Rules = z.infer<typeof rulesSchema>
 export type Depth = z.infer<typeof depth>
 export type Audience = z.infer<typeof audience>

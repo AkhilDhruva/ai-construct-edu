@@ -1,4 +1,4 @@
-import type { Audience, Depth, Goal } from '../content/schemas'
+import type { Audience, Depth, DiagnosticTrack, Goal } from '../content/schemas'
 import type { CurriculumPlan } from '../engine/types'
 
 // Canonical model. Every adapter (Dexie offline, Postgres in API mode, the in-memory
@@ -13,7 +13,7 @@ export interface Learner {
   horizonWeeks: number
   role: Audience
   weeklyMinutes: number
-  diagnostic?: { score: number; total: number; at: string; answers: Record<string, string> }
+  diagnostic?: { track?: DiagnosticTrack; score: number; total: number; at: string; answers: Record<string, string> }
   /** Concepts whose explainer the learner has opened; their cards enter review. */
   introduced: string[]
 }

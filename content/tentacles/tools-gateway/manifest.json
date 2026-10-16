@@ -1,0 +1,23 @@
+{
+  "id": "tools-gateway",
+  "version": "1.0.0",
+  "schemaVersion": 1,
+  "title": "Tools, Gateway & MCP",
+  "summary": "How to write tool contracts the model can choose from, run every call through an authorising gateway with timeouts and typed results, and expose tools safely over MCP at catalogue scale.",
+  "route": "/t/tools-gateway",
+  "bookSource": "Part II, Ch 5 and 10",
+  "audience": ["engineer", "architect"],
+  "order": 3,
+  "concepts": "concepts/*.json",
+  "labs": [
+    { "id": "gateway-walkthrough", "title": "Gateway Walkthrough", "engine": "gateway-pipeline", "scenario": "labs/gateway-walkthrough.json", "concepts": ["gateway-order", "least-privilege-tools"] }
+  ],
+  "cards": "cards.json",
+  "checks": "checks.json",
+  "drills": "drills.json",
+  "prerequisites": ["foundations"],
+  "depthLevels": [1, 2, 3],
+  "capabilities": { "coach": false, "tutor": true },
+  "estimatedMinutes": 150,
+  "passMark": 0.8
+}

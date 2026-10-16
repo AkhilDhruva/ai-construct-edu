@@ -1,0 +1,283 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {
+      "id": "enb-chk-01",
+      "conceptId": "ai-assistant-basics",
+      "depth": 1,
+      "kind": "mcq",
+      "stem": "Which of these tasks is the best fit for a general AI assistant?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Finding out what a competitor announced this morning.",
+          "feedback": "Poor fit. Recent events may be missing from what the assistant learned, and it may invent an answer rather than admit it does not know."
+        },
+        {
+          "id": "b",
+          "text": "Turning your rough meeting notes into a tidy summary with action points.",
+          "feedback": "Correct. Summarising and reformatting text you supply is a core strength, and you can check the result against your own notes."
+        },
+        {
+          "id": "c",
+          "text": "Calculating the exact VAT owed across 300 invoices.",
+          "feedback": "Poor fit. Assistants are unreliable at arithmetic, and an error across 300 invoices would be costly. Use a spreadsheet or the finance system."
+        },
+        {
+          "id": "d",
+          "text": "Telling you how many unread emails are in your manager's inbox.",
+          "feedback": "Poor fit. The assistant cannot see anything it has not been given access to, so any number would be invented."
+        }
+      ],
+      "answer": "b",
+      "explanation": "Assistants are strong at working with text you give them: drafting, summarising, reformatting and brainstorming. They are weak at maths, recent events and anything they cannot see."
+    },
+    {
+      "id": "enb-chk-02",
+      "conceptId": "prompt-anatomy",
+      "depth": 1,
+      "kind": "mcq",
+      "stem": "In the prompt below, which phrase supplies the Context? You are a recruiter. Write a job advert for a payroll officer. Our team is small and values flexible hours. Use five bullet points.",
+      "options": [
+        {
+          "id": "a",
+          "text": "You are a recruiter.",
+          "feedback": "That is the Role. It tells the assistant who to act as, not the background to the request."
+        },
+        {
+          "id": "b",
+          "text": "Write a job advert for a payroll officer.",
+          "feedback": "That is the Task. It names the action and the deliverable."
+        },
+        {
+          "id": "c",
+          "text": "Use five bullet points.",
+          "feedback": "That is the Format. It sets the shape of the output."
+        },
+        {
+          "id": "d",
+          "text": "Our team is small and values flexible hours.",
+          "feedback": "Correct. This is background the assistant could not know, and it shapes what the advert should stress."
+        }
+      ],
+      "answer": "d",
+      "explanation": "Context is the background and constraints: the audience, the goal, the situation and anything to avoid. Here it is the detail about the team."
+    },
+    {
+      "id": "enb-chk-03",
+      "conceptId": "prompt-anatomy",
+      "depth": 2,
+      "kind": "multi",
+      "stem": "A colleague types: write a message about the system outage. Which additions would most improve the prompt? Select all that apply.",
+      "options": [
+        {
+          "id": "add-role",
+          "text": "Add: you are an IT service desk lead writing to non-technical staff.",
+          "feedback": "Yes. A Role sets the voice and level of detail for the reader."
+        },
+        {
+          "id": "add-context",
+          "text": "Add: the outage lasted two hours, is now fixed, and staff need to know if any work was lost.",
+          "feedback": "Yes. Context gives the facts and the reader's main concern, so the assistant does not have to guess."
+        },
+        {
+          "id": "add-please",
+          "text": "Add: please, this is really important.",
+          "feedback": "Not helpful. Politeness is fine, but it gives the assistant no information about what to write."
+        },
+        {
+          "id": "add-format",
+          "text": "Add: under 100 words with a clear subject line.",
+          "feedback": "Yes. Format controls length and layout, which saves editing time."
+        }
+      ],
+      "answers": ["add-role", "add-context", "add-format"],
+      "explanation": "The original prompt has only a vague Task. Adding Role, Context and Format gives the assistant what it needs; urgency words add nothing it can use."
+    },
+    {
+      "id": "enb-chk-04",
+      "conceptId": "verify-outputs",
+      "depth": 1,
+      "kind": "mcq",
+      "stem": "An assistant gives you a statistic and a link to a source. What is the right way to verify it?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Open the link and find the exact figure on the page.",
+          "feedback": "Correct. Only the source itself confirms the figure. Assistants can cite real pages that say something different, or links that do not exist."
+        },
+        {
+          "id": "b",
+          "text": "Ask the assistant whether it is sure.",
+          "feedback": "Not enough. The assistant may simply repeat or rephrase the same claim with equal confidence."
+        },
+        {
+          "id": "c",
+          "text": "Check that the link looks like a real website address.",
+          "feedback": "Not enough. A plausible address can be invented, and a real page may not contain the figure."
+        },
+        {
+          "id": "d",
+          "text": "Accept it, because the answer included a source.",
+          "feedback": "Risky. A cited source is a lead to check, not proof."
+        }
+      ],
+      "answer": "a",
+      "explanation": "Verification means comparing the claim with a source you have opened yourself. Confidence and plausible links are not evidence."
+    },
+    {
+      "id": "enb-chk-05",
+      "conceptId": "verify-outputs",
+      "depth": 2,
+      "kind": "order",
+      "stem": "Put these steps for checking an AI-drafted customer email in the best order before you send it.",
+      "items": [
+        { "id": "read-full", "text": "Read the whole draft to check it answers what the customer actually asked." },
+        { "id": "check-facts", "text": "Check every name, number, date and link against the customer record or policy." },
+        { "id": "fix-tone", "text": "Adjust the tone and remove anything you would not say yourself." },
+        { "id": "final-read", "text": "Do a final read as the customer would see it, then send." }
+      ],
+      "answer": ["read-full", "check-facts", "fix-tone", "final-read"],
+      "explanation": "Start with the big question of whether the draft answers the request, then confirm facts, then polish tone. A final read catches anything the edits introduced."
+    },
+    {
+      "id": "enb-chk-06",
+      "conceptId": "data-safety",
+      "depth": 1,
+      "kind": "mcq",
+      "stem": "Which of these is safe to paste into a free public AI tool your organisation has not approved?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A spreadsheet of customer names, email addresses and order totals.",
+          "feedback": "Unsafe. This is personal data and customer records, which must never go into an unapproved tool."
+        },
+        {
+          "id": "b",
+          "text": "The draft quarterly results before they are announced.",
+          "feedback": "Unsafe. Unpublished financials are confidential and could be market-sensitive."
+        },
+        {
+          "id": "c",
+          "text": "A request to suggest five titles for a public blog post about recycling at work.",
+          "feedback": "Correct. It contains no personal, customer, financial, legal or credential data, and the topic is already public."
+        },
+        {
+          "id": "d",
+          "text": "The login details for a shared supplier portal, so it can help you navigate it.",
+          "feedback": "Unsafe. Passwords and credentials must never be shared with any AI tool."
+        }
+      ],
+      "answer": "c",
+      "explanation": "Public, non-identifying material is fine. Personal data, customer records, credentials, confidential financials and legal matters stay out of unapproved tools."
+    },
+    {
+      "id": "enb-chk-07",
+      "conceptId": "data-safety",
+      "depth": 2,
+      "kind": "multi",
+      "stem": "You want help replying to an angry complaint from a named customer. Which steps keep the request safe? Select all that apply.",
+      "options": [
+        {
+          "id": "approved",
+          "text": "Use your organisation's approved enterprise assistant.",
+          "feedback": "Yes. Approved tools have agreed rules on how your data is stored and used."
+        },
+        {
+          "id": "anonymise",
+          "text": "Replace the customer's name, account number and address with placeholders.",
+          "feedback": "Yes. Anonymising means the draft can be written without revealing who the customer is."
+        },
+        {
+          "id": "summarise",
+          "text": "Describe the complaint in general terms instead of pasting the full email thread.",
+          "feedback": "Yes. A short description gives the assistant enough context without copying personal details."
+        },
+        {
+          "id": "delete-after",
+          "text": "Paste the full thread into a public chatbot, then delete the chat.",
+          "feedback": "No. Deleting your copy does not undo sending the data, which may already be stored by the provider."
+        }
+      ],
+      "answers": ["approved", "anonymise", "summarise"],
+      "explanation": "Use the approved tool, share the minimum and remove identifying details. Deleting a chat afterwards does not reverse a disclosure."
+    },
+    {
+      "id": "enb-chk-08",
+      "conceptId": "good-use-cases",
+      "depth": 2,
+      "kind": "mcq",
+      "stem": "Your finance team wants to start using an AI assistant. Which task is the best first use case?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Deciding which suppliers to stop paying when cash is tight.",
+          "feedback": "Poor choice. This is a high-stakes business decision with legal and relationship consequences. A person must make it."
+        },
+        {
+          "id": "b",
+          "text": "Interpreting a new tax regulation for the annual return.",
+          "feedback": "Poor choice. This is specialist legal and tax advice that the team may not be able to check, and errors carry penalties."
+        },
+        {
+          "id": "c",
+          "text": "Calculating month-end accruals from the ledger.",
+          "feedback": "Poor choice. Assistants are unreliable at maths, and the ledger system or a spreadsheet does this accurately."
+        },
+        {
+          "id": "d",
+          "text": "Drafting standard reminder emails for routine late payments.",
+          "feedback": "Correct. It is frequent, low risk and easy for the team to check, and they know exactly what a good reminder looks like."
+        }
+      ],
+      "answer": "d",
+      "explanation": "Good first use cases are high volume, low risk, easy to verify and within your expertise. Decisions, specialist advice and calculations do not qualify."
+    },
+    {
+      "id": "enb-chk-09",
+      "conceptId": "human-accountability",
+      "depth": 2,
+      "kind": "mcq",
+      "stem": "An AI-drafted report you sent to a client contained a wrong figure. The client complains. Who is accountable?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The company that makes the AI assistant.",
+          "feedback": "No. The supplier provides a tool. The work you send is yours."
+        },
+        {
+          "id": "b",
+          "text": "You, as the person who sent the report.",
+          "feedback": "Correct. You chose to send it, so you own the error. Apologise, correct it and tighten your checking."
+        },
+        {
+          "id": "c",
+          "text": "Nobody, because AI errors are expected.",
+          "feedback": "No. Expecting errors is the reason you check. It does not remove responsibility."
+        },
+        {
+          "id": "d",
+          "text": "The IT team, because they approved the tool.",
+          "feedback": "No. Approving a tool means it is safe to use, not that its output is correct."
+        }
+      ],
+      "answer": "b",
+      "explanation": "The assistant drafts and you decide. Whoever sends, signs or acts on the work is accountable for it."
+    },
+    {
+      "id": "enb-chk-10",
+      "conceptId": "human-accountability",
+      "depth": 2,
+      "kind": "order",
+      "stem": "An assistant drafts a reply that would commit your company to a refund well above your approval limit. Put the steps in the right order.",
+      "items": [
+        { "id": "pause", "text": "Hold the draft rather than sending it." },
+        { "id": "escalate", "text": "Send the draft to your manager, noting that AI wrote the first version and the refund exceeds your limit." },
+        { "id": "revise", "text": "Update the reply to match the decision your manager makes." },
+        { "id": "send", "text": "Send the approved reply under your own name." }
+      ],
+      "answer": ["pause", "escalate", "revise", "send"],
+      "explanation": "High stakes mean escalation before sending. Disclose AI use to the reviewer, apply their decision, and then you send and own the final reply."
+    }
+  ]
+}

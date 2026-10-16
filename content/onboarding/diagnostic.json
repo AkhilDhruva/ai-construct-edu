@@ -1,149 +1,322 @@
 {
   "schemaVersion": 1,
+  "track": "technical",
+  "title": "Agentic AI system design readiness check",
   "items": [
     {
       "id": "dx-01",
       "stem": "Which feature most clearly separates an agent from a single model call?",
       "options": [
-        { "id": "a", "text": "It uses a large model that follows complex, multi-part instructions reliably." },
-        { "id": "b", "text": "It has access to several tools, even if each request calls only one." },
-        { "id": "c", "text": "It loops: it chooses an action, observes the result and decides again until a stop condition." },
-        { "id": "d", "text": "It returns structured JSON that downstream code can parse and act on." }
+        {
+          "id": "a",
+          "text": "It uses a large model that follows complex, multi-part instructions reliably."
+        },
+        {
+          "id": "b",
+          "text": "It has access to several tools, even if each request calls only one."
+        },
+        {
+          "id": "c",
+          "text": "It loops: it chooses an action, observes the result and decides again until a stop condition."
+        },
+        {
+          "id": "d",
+          "text": "It returns structured JSON that downstream code can parse and act on."
+        }
       ],
       "answer": "c",
-      "concepts": ["what-is-an-agent"]
+      "concepts": [
+        "what-is-an-agent"
+      ]
     },
     {
       "id": "dx-02",
       "stem": "A system sends every document to a model once to extract a date, then stores it. What is it?",
       "options": [
-        { "id": "a", "text": "A fixed pipeline step." },
-        { "id": "b", "text": "An agent." },
-        { "id": "c", "text": "A planner and executor." },
-        { "id": "d", "text": "A multi-agent system." }
+        {
+          "id": "a",
+          "text": "A fixed pipeline step."
+        },
+        {
+          "id": "b",
+          "text": "An agent."
+        },
+        {
+          "id": "c",
+          "text": "A planner and executor."
+        },
+        {
+          "id": "d",
+          "text": "A multi-agent system."
+        }
       ],
       "answer": "a",
-      "concepts": ["what-is-an-agent", "agency-spectrum"]
+      "concepts": [
+        "what-is-an-agent",
+        "agency-spectrum"
+      ]
     },
     {
       "id": "dx-03",
       "stem": "When deciding how much autonomy to give a model, what is the safest default?",
       "options": [
-        { "id": "a", "text": "Maximum autonomy, so it can handle any case." },
-        { "id": "b", "text": "Whatever level the chosen framework provides." },
-        { "id": "c", "text": "A level the model chooses for itself at run time." },
-        { "id": "d", "text": "The lowest level of autonomy that meets the requirement." }
+        {
+          "id": "a",
+          "text": "Maximum autonomy, so it can handle any case."
+        },
+        {
+          "id": "b",
+          "text": "Whatever level the chosen framework provides."
+        },
+        {
+          "id": "c",
+          "text": "A level the model chooses for itself at run time."
+        },
+        {
+          "id": "d",
+          "text": "The lowest level of autonomy that meets the requirement."
+        }
       ],
       "answer": "d",
-      "concepts": ["agency-spectrum"]
+      "concepts": [
+        "agency-spectrum"
+      ]
     },
     {
       "id": "dx-04",
       "stem": "A model emits a tool call to delete a customer record. What should happen next?",
       "options": [
-        { "id": "a", "text": "The record is deleted immediately, since the model asked for it." },
-        { "id": "b", "text": "The orchestrator decides whether to act, and the tool gateway checks permission before anything executes." },
-        { "id": "c", "text": "The model is asked to confirm its own call, then the record is deleted." },
-        { "id": "d", "text": "The call is logged and executed in parallel with the next model step." }
+        {
+          "id": "a",
+          "text": "The record is deleted immediately, since the model asked for it."
+        },
+        {
+          "id": "b",
+          "text": "The orchestrator decides whether to act, and the tool gateway checks permission before anything executes."
+        },
+        {
+          "id": "c",
+          "text": "The model is asked to confirm its own call, then the record is deleted."
+        },
+        {
+          "id": "d",
+          "text": "The call is logged and executed in parallel with the next model step."
+        }
       ],
       "answer": "b",
-      "concepts": ["six-components"]
+      "concepts": [
+        "six-components"
+      ]
     },
     {
       "id": "dx-05",
       "stem": "Each step of a 10-step agent succeeds 98 per cent of the time, independently. Roughly how often does the whole run succeed?",
       "options": [
-        { "id": "a", "text": "About 98 per cent." },
-        { "id": "b", "text": "About 90 per cent." },
-        { "id": "c", "text": "About 82 per cent." },
-        { "id": "d", "text": "About 50 per cent." }
+        {
+          "id": "a",
+          "text": "About 98 per cent."
+        },
+        {
+          "id": "b",
+          "text": "About 90 per cent."
+        },
+        {
+          "id": "c",
+          "text": "About 82 per cent."
+        },
+        {
+          "id": "d",
+          "text": "About 50 per cent."
+        }
       ],
       "answer": "c",
-      "concepts": ["reliability-arithmetic"]
+      "concepts": [
+        "reliability-arithmetic"
+      ]
     },
     {
       "id": "dx-06",
       "stem": "A search tool returns HTTP 200 with no results for a valid query. How should the system represent that?",
       "options": [
-        { "id": "a", "text": "As a distinct EMPTY result that the model can reason about." },
-        { "id": "b", "text": "As SUCCESS with an empty string, since the HTTP call itself worked." },
-        { "id": "c", "text": "As UNAVAILABLE, so the orchestrator retries the search with backoff." },
-        { "id": "d", "text": "As an exception that ends the run." }
+        {
+          "id": "a",
+          "text": "As a distinct EMPTY result that the model can reason about."
+        },
+        {
+          "id": "b",
+          "text": "As SUCCESS with an empty string, since the HTTP call itself worked."
+        },
+        {
+          "id": "c",
+          "text": "As UNAVAILABLE, so the orchestrator retries the search with backoff."
+        },
+        {
+          "id": "d",
+          "text": "As an exception that ends the run."
+        }
       ],
       "answer": "a",
-      "concepts": ["typed-tool-results"]
+      "concepts": [
+        "typed-tool-results"
+      ]
     },
     {
       "id": "dx-07",
       "stem": "An agent keeps calling the same search with exactly the same arguments. Which safeguard targets this most directly?",
       "options": [
-        { "id": "a", "text": "A larger context window." },
-        { "id": "b", "text": "A higher sampling temperature." },
-        { "id": "c", "text": "A higher step ceiling." },
-        { "id": "d", "text": "A no-progress detector." }
+        {
+          "id": "a",
+          "text": "A larger context window."
+        },
+        {
+          "id": "b",
+          "text": "A higher sampling temperature."
+        },
+        {
+          "id": "c",
+          "text": "A higher step ceiling."
+        },
+        {
+          "id": "d",
+          "text": "A no-progress detector."
+        }
       ],
       "answer": "d",
-      "concepts": ["bounded-loop"]
+      "concepts": [
+        "bounded-loop"
+      ]
     },
     {
       "id": "dx-08",
       "stem": "Which statement of requirements lets you rule a design in or out before building it?",
       "options": [
-        { "id": "a", "text": "It must be fast and cheap." },
-        { "id": "b", "text": "Under 20 seconds at p95 and $0.02 per task, at 40,000 tasks a day." },
-        { "id": "c", "text": "It must beat the current system." },
-        { "id": "d", "text": "It must be scalable and reliable." }
+        {
+          "id": "a",
+          "text": "It must be fast and cheap."
+        },
+        {
+          "id": "b",
+          "text": "Under 20 seconds at p95 and $0.02 per task, at 40,000 tasks a day."
+        },
+        {
+          "id": "c",
+          "text": "It must beat the current system."
+        },
+        {
+          "id": "d",
+          "text": "It must be scalable and reliable."
+        }
       ],
       "answer": "b",
-      "concepts": ["design-envelope"]
+      "concepts": [
+        "design-envelope"
+      ]
     },
     {
       "id": "dx-09",
       "stem": "Tasks arrive at 4 per second at peak, and each takes 5 seconds on average. How many tasks are in flight at peak?",
       "options": [
-        { "id": "a", "text": "4" },
-        { "id": "b", "text": "9" },
-        { "id": "c", "text": "20" },
-        { "id": "d", "text": "0.8" }
+        {
+          "id": "a",
+          "text": "4"
+        },
+        {
+          "id": "b",
+          "text": "9"
+        },
+        {
+          "id": "c",
+          "text": "20"
+        },
+        {
+          "id": "d",
+          "text": "0.8"
+        }
       ],
       "answer": "c",
-      "concepts": ["design-envelope"]
+      "concepts": [
+        "design-envelope"
+      ]
     },
     {
       "id": "dx-10",
       "stem": "Your model provider starts rate-limiting requests at peak. Which response best fits a degradation ladder?",
       "options": [
-        { "id": "a", "text": "Route to a smaller standby model with shorter output, and tell users answers are briefer for now." },
-        { "id": "b", "text": "Show an error page with a retry button until the provider fully recovers." },
-        { "id": "c", "text": "Retry every rate-limited request with backoff until each one succeeds." },
-        { "id": "d", "text": "Keep the primary model but quietly truncate prompts so requests cost less." }
+        {
+          "id": "a",
+          "text": "Route to a smaller standby model with shorter output, and tell users answers are briefer for now."
+        },
+        {
+          "id": "b",
+          "text": "Show an error page with a retry button until the provider fully recovers."
+        },
+        {
+          "id": "c",
+          "text": "Retry every rate-limited request with backoff until each one succeeds."
+        },
+        {
+          "id": "d",
+          "text": "Keep the primary model but quietly truncate prompts so requests cost less."
+        }
       ],
       "answer": "a",
-      "concepts": ["degradation-ladder"]
+      "concepts": [
+        "degradation-ladder"
+      ]
     },
     {
       "id": "dx-11",
       "stem": "Why should a tool gateway authorise the caller before validating the arguments?",
       "options": [
-        { "id": "a", "text": "Authorisation is cheaper, so running it first saves latency on every call." },
-        { "id": "b", "text": "It lets the model retry with corrected arguments once access is granted." },
-        { "id": "c", "text": "The order does not matter, provided both checks run before execution." },
-        { "id": "d", "text": "So a denied caller never learns the tool's schema from validation errors." }
+        {
+          "id": "a",
+          "text": "Authorisation is cheaper, so running it first saves latency on every call."
+        },
+        {
+          "id": "b",
+          "text": "It lets the model retry with corrected arguments once access is granted."
+        },
+        {
+          "id": "c",
+          "text": "The order does not matter, provided both checks run before execution."
+        },
+        {
+          "id": "d",
+          "text": "So a denied caller never learns the tool's schema from validation errors."
+        }
       ],
       "answer": "d",
-      "concepts": ["six-components", "typed-tool-results"]
+      "concepts": [
+        "six-components",
+        "typed-tool-results"
+      ]
     },
     {
       "id": "dx-12",
       "stem": "Steps succeed 0.99 of the time, independently. What is the most steps a run can have while keeping end-to-end success at or above 0.90?",
       "options": [
-        { "id": "a", "text": "5" },
-        { "id": "b", "text": "10" },
-        { "id": "c", "text": "20" },
-        { "id": "d", "text": "90" }
+        {
+          "id": "a",
+          "text": "5"
+        },
+        {
+          "id": "b",
+          "text": "10"
+        },
+        {
+          "id": "c",
+          "text": "20"
+        },
+        {
+          "id": "d",
+          "text": "90"
+        }
       ],
       "answer": "b",
-      "concepts": ["reliability-arithmetic", "bounded-loop"]
+      "concepts": [
+        "reliability-arithmetic",
+        "bounded-loop"
+      ]
     }
   ]
 }

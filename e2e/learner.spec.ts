@@ -1,6 +1,5 @@
-import AxeBuilder from '@axe-core/playwright'
-import { expect, test, type Page } from '@playwright/test'
-import { readFileSync } from 'node:fs'
+import { expect, test } from '@playwright/test'
+import { axe, onboard, readContent } from './helpers'
 
 interface CheckFixture {
   stem: string
@@ -10,28 +9,8 @@ interface CheckFixture {
   options?: Array<{ id: string; text: string }>
   items?: Array<{ id: string; text: string }>
 }
-const CHECKS: CheckFixture[] = JSON.parse(readFileSync(new URL('../content/tentacles/foundations/checks.json', import.meta.url), 'utf8')).items
+const CHECKS = readContent<{ items: CheckFixture[] }>('tentacles/foundations/checks.json').items
 const optionText = (item: CheckFixture, id: string) => item.options!.find((o) => o.id === id)!.text
-
-async function onboard(page: Page) {
-  await page.goto('/')
-  await expect(page).toHaveURL(/\/onboarding$/)
-  await expect(page.getByTestId('learner-id')).toHaveText(/^[0-9A-Z]{26}$/)
-  await page.getByRole('button', { name: 'Start the readiness check' }).click()
-  for (let i = 0; i < 12; i++) {
-    await page.getByTestId('diagnostic').getByRole('radio').first().check()
-    await page.getByRole('button', { name: i === 11 ? 'Finish the check' : 'Next' }).click()
-  }
-  await page.getByRole('button', { name: 'Build my plan' }).click()
-  await expect(page).toHaveURL(/\/$/)
-  await expect(page.getByTestId('plan-week').getByRole('listitem').first()).toBeVisible()
-}
-
-async function axe(page: Page) {
-  const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze()
-  const where = (n: (typeof results.violations)[number]['nodes'][number]) => `${n.target.join(' ')} (${n.failureSummary?.split('\n')[1]?.trim() ?? ''})`
-  expect(results.violations.map((v) => `${v.id}: ${v.help} @ ${v.nodes.map(where).join(' | ')}`)).toEqual([])
-}
 
 test('onboarding mints an ID, runs the diagnostic and builds a plan', async ({ page }) => {
   await onboard(page)

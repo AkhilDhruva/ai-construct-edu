@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "track": "enablement",
+  "title": "Workplace AI readiness check",
+  "items": [
+    {
+      "id": "dxe-01",
+      "stem": "Which task is an AI assistant most reliably good at?",
+      "options": [
+        { "id": "a", "text": "Turning a long document you provide into a short summary." },
+        { "id": "b", "text": "Telling you the latest share price of a competitor." },
+        { "id": "c", "text": "Adding up a column of 200 invoice totals exactly." },
+        { "id": "d", "text": "Reporting what was said in a meeting it did not attend." }
+      ],
+      "answer": "a",
+      "concepts": ["ai-assistant-basics"]
+    },
+    {
+      "id": "dxe-02",
+      "stem": "An AI assistant gives you a specific, confident answer that turns out to be made up. What is this called?",
+      "options": [
+        { "id": "a", "text": "A bias." },
+        { "id": "b", "text": "A hallucination." },
+        { "id": "c", "text": "A prompt." },
+        { "id": "d", "text": "A data breach." }
+      ],
+      "answer": "b",
+      "concepts": ["ai-assistant-basics", "verify-outputs"]
+    },
+    {
+      "id": "dxe-03",
+      "stem": "Which prompt is most likely to get a useful first draft?",
+      "options": [
+        { "id": "a", "text": "Write something about the new expenses process." },
+        { "id": "b", "text": "Expenses email please, make it good." },
+        { "id": "c", "text": "You are an internal communications writer. Draft an email telling staff about the new expenses process, for people who submit claims monthly. Use five bullets." },
+        { "id": "d", "text": "Can you help with an email?" }
+      ],
+      "answer": "c",
+      "concepts": ["prompt-anatomy"]
+    },
+    {
+      "id": "dxe-04",
+      "stem": "In a prompt, what does the Format element describe?",
+      "options": [
+        { "id": "a", "text": "Who the assistant should act as." },
+        { "id": "b", "text": "The background and constraints for the task." },
+        { "id": "c", "text": "The action you want the assistant to take." },
+        { "id": "d", "text": "The shape of the output, such as a table or a word limit." }
+      ],
+      "answer": "d",
+      "concepts": ["prompt-anatomy"]
+    },
+    {
+      "id": "dxe-05",
+      "stem": "The assistant's first draft is too long and too formal. What is usually the quickest fix?",
+      "options": [
+        { "id": "a", "text": "Give up and write it from scratch." },
+        { "id": "b", "text": "Reply asking for a friendlier version under 100 words." },
+        { "id": "c", "text": "Start a new chat with the same prompt." },
+        { "id": "d", "text": "Switch to a different AI tool." }
+      ],
+      "answer": "b",
+      "concepts": ["prompt-anatomy"]
+    },
+    {
+      "id": "dxe-06",
+      "stem": "An AI summary includes a figure and a link to its source. What should you do before using the figure?",
+      "options": [
+        { "id": "a", "text": "Nothing, because it gave a source." },
+        { "id": "b", "text": "Ask the assistant if it is sure." },
+        { "id": "c", "text": "Check that the link starts with https." },
+        { "id": "d", "text": "Open the source and find the figure yourself." }
+      ],
+      "answer": "d",
+      "concepts": ["verify-outputs"]
+    },
+    {
+      "id": "dxe-07",
+      "stem": "Which details in an AI-drafted document most need checking against a source?",
+      "options": [
+        { "id": "a", "text": "Names, numbers, quotes and links." },
+        { "id": "b", "text": "Headings and paragraph order." },
+        { "id": "c", "text": "Spelling and punctuation only." },
+        { "id": "d", "text": "The font and layout." }
+      ],
+      "answer": "a",
+      "concepts": ["verify-outputs"]
+    },
+    {
+      "id": "dxe-08",
+      "stem": "Which of these is safe to paste into a free public AI tool your organisation has not approved?",
+      "options": [
+        { "id": "a", "text": "A customer's complaint email, including their address." },
+        { "id": "b", "text": "Your team's unreleased budget figures." },
+        { "id": "c", "text": "A request for ideas for a team-building day." },
+        { "id": "d", "text": "The password for a shared reporting tool." }
+      ],
+      "answer": "c",
+      "concepts": ["data-safety"]
+    },
+    {
+      "id": "dxe-09",
+      "stem": "You need help drafting a letter about a specific employee's situation. What is the safest approach?",
+      "options": [
+        { "id": "a", "text": "Use the approved company assistant and describe the situation without names or identifying details." },
+        { "id": "b", "text": "Use any tool, then delete the chat afterwards." },
+        { "id": "c", "text": "Paste the employee's file so the draft is accurate." },
+        { "id": "d", "text": "Remove only the employee's surname." }
+      ],
+      "answer": "a",
+      "concepts": ["data-safety"]
+    },
+    {
+      "id": "dxe-10",
+      "stem": "Which is the best first use of an AI assistant for a sales team?",
+      "options": [
+        { "id": "a", "text": "Deciding which salesperson to let go." },
+        { "id": "b", "text": "Drafting routine follow-up emails after calls." },
+        { "id": "c", "text": "Interpreting a tricky contract clause for a client." },
+        { "id": "d", "text": "Setting the discount for the biggest account." }
+      ],
+      "answer": "b",
+      "concepts": ["good-use-cases"]
+    },
+    {
+      "id": "dxe-11",
+      "stem": "You send a client an AI-drafted report that contains an error. Who is accountable?",
+      "options": [
+        { "id": "a", "text": "The company that makes the AI tool." },
+        { "id": "b", "text": "The IT team that approved the tool." },
+        { "id": "c", "text": "No one, since AI errors are expected." },
+        { "id": "d", "text": "You, as the person who sent it." }
+      ],
+      "answer": "d",
+      "concepts": ["human-accountability"]
+    },
+    {
+      "id": "dxe-12",
+      "stem": "An AI draft would commit your company to a legal term you are unsure about. What should you do?",
+      "options": [
+        { "id": "a", "text": "Send it, because the assistant is usually right." },
+        { "id": "b", "text": "Ask the assistant whether the term is legal." },
+        { "id": "c", "text": "Hold it and escalate to your manager or the legal team." },
+        { "id": "d", "text": "Send it and correct it later if needed." }
+      ],
+      "answer": "c",
+      "concepts": ["human-accountability", "good-use-cases"]
+    }
+  ]
+}
