@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "tool-selection-scaling",
+  "tentacle": "tools-gateway",
+  "title": "Tool selection at scale",
+  "point": "Selection accuracy falls as the catalogue grows, so show the model fewer and clearer tools, and measure accuracy on an eval set.",
+  "definition": "Tool selection at scale is the problem of keeping the model's choice of tool accurate as the catalogue grows. The mitigations are namespacing, routing a task to a subset, retrieving tools by description similarity and consolidating overlapping tools.",
+  "level": 2,
+  "objective": {
+    "id": "tool-selection-scaling-obj",
+    "text": "Given a growing catalogue and a selection eval set, choose between namespacing, routing, retrieval and consolidation, and state the accuracy threshold that triggers each."
+  },
+  "misconceptions": [
+    {
+      "claim": "Modern models cope with any number of tools, so give them the whole catalogue.",
+      "correction": "Accuracy falls as near-duplicate tools compete and definitions crowd the context. Show each call only the tools its task needs."
+    },
+    {
+      "claim": "When the model picks the wrong tool, the fix is a stronger model.",
+      "correction": "Most selection errors come from overlapping or vague tools. Consolidating duplicates and sharpening descriptions is usually cheaper, and an eval set shows which fix worked."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "As the catalogue grows, more tools look plausible for each task, so selection accuracy drops. Every definition also uses context on every call.",
+      "Namespacing groups tools by team or domain, as in billing.refund_order. Routing sends a task to its domain's subset. Retrieval picks the few tools whose descriptions best match the task.",
+      "Consolidation merges overlapping tools, such as three searches that differ only by index, into one tool with an enum argument. Measure selection accuracy on an eval set before and after each change."
+    ],
+    "l2": [
+      "A platform grows from 12 to 60 tools. On a 400-case eval set, correct-tool selection falls from 96 per cent to 81 per cent, which is 76 misses.",
+      "The misses cluster: 45 of the 76 confuse four overlapping search tools. Consolidating them into one search tool with a source enum removes that confusion.",
+      "Routing each task to its domain subset of about 15 tools brings accuracy back to 94 per cent on the same eval set. The eval set, not intuition, shows which change paid off."
+    ],
+    "l3": [
+      "Retrieval adds a lookup of perhaps 20 ms and a new failure: the right tool may not be retrieved. If recall in the top 8 is 97 per cent, selection accuracy cannot exceed 97 per cent.",
+      "Routing to a fixed subset loses no recall but needs a correct domain label. Prefer routing while domains are clear, and add retrieval only once one domain exceeds about 20 tools.",
+      "Track retrieval recall and end-to-end selection accuracy separately, so a drop points to the stage that needs fixing."
+    ]
+  },
+  "prerequisites": ["tool-contracts", "mcp-basics"],
+  "labs": [],
+  "drills": ["tgw-drill-tool-platform"],
+  "goals": ["interview", "capstone"],
+  "minutes": 11
+}

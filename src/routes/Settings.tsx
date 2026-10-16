@@ -6,7 +6,7 @@ import { useMantle } from '../state/useMantle'
 import { RungBadge } from '../ui/primitives'
 
 export function Settings() {
-  const { learner, rung, flags, storage, run, content } = useMantle()
+  const { learner, rung, flags, storage, run, content, authorMode, setAuthorMode } = useMantle()
   const navigate = useNavigate()
   const [exportPass, setExportPass] = useState('')
   const [importPass, setImportPass] = useState('')
@@ -120,6 +120,18 @@ export function Settings() {
         <p className="small muted">
           Storage: {storage === 'dexie' ? 'IndexedDB in this browser' : 'memory only (IndexedDB is blocked here, so progress is lost on reload)'} · content:{' '}
           {content.packages.map((p) => `${p.manifest.id}@${p.manifest.version}`).join(', ')} · engine: {content.rules.strategy}
+        </p>
+      </section>
+
+      <section className="card stack" aria-labelledby="author-h">
+        <h2 id="author-h">Author tools</h2>
+        <label className="row" style={{ gap: 8, fontWeight: 400 }}>
+          <input type="checkbox" checked={authorMode} onChange={(e) => setAuthorMode(e.target.checked)} data-testid="author-mode" />
+          Show the content studio in navigation
+        </label>
+        <p className="small muted">
+          The studio validates and previews content drafts and shows item health. In API mode it is limited to the admin role; offline it is a local view of the
+          content that ships with the app.
         </p>
       </section>
 

@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "least-privilege-tools",
+  "tentacle": "tools-gateway",
+  "title": "Least privilege for tools",
+  "point": "Give each principal the smallest set of tools and the narrowest, shortest-lived credentials it needs, and put a human in front of anything irreversible.",
+  "definition": "Least privilege for tools combines per-principal allowlists, scoped short-lived credentials, separate read and write tools, human confirmation for irreversible side effects, and no ambient credentials anywhere the agent runs.",
+  "level": 2,
+  "objective": {
+    "id": "least-privilege-tools-obj",
+    "text": "Given a tool catalogue and three principals, write their allowlists and credential scopes, split read from write tools, and mark which calls need human confirmation."
+  },
+  "misconceptions": [
+    {
+      "claim": "One broad service account is fine if the system prompt tells the agent to be careful.",
+      "correction": "A prompt is not a control. One injected instruction can use every permission the account holds, so scope credentials per principal and per call."
+    },
+    {
+      "claim": "One update_ticket tool with a mode argument is as safe as separate read and write tools.",
+      "correction": "A combined tool forces you to grant write to anyone who needs read. Separate tools let the allowlist grant read widely and write narrowly."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Per-principal allowlists: each agent or role can call only the tools it is listed for. Every other call returns DENIED.",
+      "Scoped short-lived credentials: the gateway mints a token for one tool, one principal and a few minutes. No ambient credentials sit in environment variables for model-written code to find.",
+      "Separate read tools from write tools. Require human confirmation for irreversible side effects, such as refunds, outbound emails or account deletions."
+    ],
+    "l2": [
+      "A support platform has three principals: a triage bot, a support assistant and a billing assistant. The triage bot may only read tickets and orders.",
+      "The support assistant may also draft emails and change ticket status. Only the billing assistant may call refund_order, and refunds above $100 wait for a human to approve them.",
+      "Suppose a ticket injects an instruction telling the triage bot to issue a refund. The gateway returns DENIED, and the bot holds no refund credential for the injection to use."
+    ],
+    "l3": [
+      "Human confirmation costs staff time. If 2 per cent of 10,000 daily refunds exceed $100, staff review 200 a day, about 3.3 hours at one minute each.",
+      "Raising the threshold to $500 might cut reviews to 40 a day, but it makes the largest unreviewed refund five times bigger.",
+      "Set the threshold from the cost of a wrong refund and the measured error rate, not from reviewer convenience, and revisit it when either changes."
+    ]
+  },
+  "prerequisites": ["gateway-order"],
+  "labs": ["gateway-walkthrough"],
+  "drills": ["tgw-drill-tool-platform"],
+  "goals": ["interview", "capstone"],
+  "minutes": 12
+}

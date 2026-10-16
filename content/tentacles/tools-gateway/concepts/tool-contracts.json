@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "tool-contracts",
+  "tentacle": "tools-gateway",
+  "title": "Tool contracts",
+  "point": "A tool contract is a name, a description, an argument schema and a typed result, and the description is a prompt the model reads to choose.",
+  "definition": "A tool contract is the published interface of one tool: a unique name, a plain-language description, a JSON Schema for its arguments and a typed result. The model selects and fills a tool from the contract alone.",
+  "level": 1,
+  "objective": {
+    "id": "tool-contracts-obj",
+    "text": "Given a vague tool definition, rewrite its name, description and argument schema so a model selects it correctly, and list the typed results it can return."
+  },
+  "misconceptions": [
+    {
+      "claim": "The description is documentation for humans, so a short phrase is enough.",
+      "correction": "The model chooses tools from the description. A vague one, such as gets data, causes wrong selection, so write it as a prompt: when to use it, when not to, and what it returns."
+    },
+    {
+      "claim": "A JSON Schema for the arguments makes a tool safe to call.",
+      "correction": "The schema checks shape, not intent or permission. A well-formed refund for the wrong order still passes, so authorisation and business rules belong in the gateway."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "A tool contract has four parts: a name, a description, a JSON Schema for the arguments and a typed result. The model reads the first three; the orchestrator relies on the fourth.",
+      "The description is effectively a prompt. The model reads it to decide whether the tool fits the task, so a vague description leads to the wrong tool being chosen.",
+      "The schema constrains arguments with types, required fields, enums and ranges. The typed result is SUCCESS, EMPTY, DENIED, UNAVAILABLE or INVALID, so no caller has to parse free text."
+    ],
+    "l2": [
+      "Take a tool named get_data, described as gets customer data, with one free-text query argument. The model calls it for orders, invoices and profiles alike, and fills the query with guesses.",
+      "Rewrite it as get_order_status. The description says it returns the status and last update of one order by ID, and that it is not for refunds or invoices. The only argument is an order_id string.",
+      "The result is SUCCESS with a status and timestamp, EMPTY when no order matches, or INVALID when the ID breaks the pattern. The model now picks it only for order status and repairs malformed IDs itself."
+    ],
+    "l3": [
+      "Every tool definition sits in the context of every model call. Forty tools at 150 tokens each add 6,000 input tokens to each call.",
+      "At 300 model calls a minute, that is 1.8 million tokens a minute spent on definitions. Trimming each definition to 80 tokens saves 2,800 tokens per call.",
+      "So spend description tokens where selection actually fails. Find the tools an eval set shows being confused with each other, and lengthen only those with a line saying when not to use them."
+    ]
+  },
+  "prerequisites": ["six-components"],
+  "labs": [],
+  "drills": ["tgw-drill-tool-platform"],
+  "goals": ["interview", "capstone"],
+  "minutes": 10
+}

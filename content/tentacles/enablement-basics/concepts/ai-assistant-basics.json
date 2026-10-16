@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "ai-assistant-basics",
+  "tentacle": "enablement-basics",
+  "title": "What an AI assistant is good and bad at",
+  "point": "An AI assistant is excellent at working with words you give it, and unreliable at facts, sums and anything it cannot see.",
+  "definition": "An AI assistant, such as Copilot or ChatGPT, is a tool that predicts likely text in reply to your request. It writes fluent language quickly, but fluent does not mean correct.",
+  "level": 0,
+  "objective": {
+    "id": "ai-assistant-basics-obj",
+    "text": "Given eight workplace tasks, classify each as a good fit or a poor fit for an AI assistant and name the weakness behind every poor fit."
+  },
+  "misconceptions": [
+    {
+      "claim": "The assistant looks things up in a trusted database, so its facts are reliable.",
+      "correction": "Unless it is connected to a search or company documents, it generates answers from patterns it learned. It can produce a confident, specific and completely wrong fact."
+    },
+    {
+      "claim": "If the assistant can write a polished report, it can also do the maths in it.",
+      "correction": "Writing and calculating are different skills. Assistants often slip on arithmetic, percentages and totals, so check every number with a calculator or spreadsheet."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "An AI assistant is strong at four jobs: drafting new text, summarising long text, reformatting text into another shape, and brainstorming options.",
+      "It is weak at four things: facts with no source, maths, recent events, and anything it cannot see, such as your inbox or your team's private files.",
+      "A hallucination is an answer that sounds right but is made up. It is the main reason the weak areas matter."
+    ],
+    "l2": [
+      "Priya in HR needs to turn a two-page leave policy into a short staff FAQ. That is summarising and reformatting, which suits an assistant well.",
+      "She also wants to know how many leave days the average employee took last year. The assistant cannot see the HR system, so any figure it gives would be invented.",
+      "The useful split is clear: let the assistant draft the FAQ, and pull the leave figure from the HR report herself."
+    ],
+    "l3": [
+      "Suppose drafting a weekly client update takes you 40 minutes by hand and 10 minutes with an assistant, plus 10 minutes of checking.",
+      "You save 20 minutes a week, about 16 hours a year. That is worth it because the checking time is included in the sum.",
+      "Now suppose the task is a weekly sales total. Checking it fully takes as long as doing it, so the assistant saves nothing and adds risk."
+    ]
+  },
+  "prerequisites": [],
+  "labs": [],
+  "drills": [],
+  "goals": ["enablement"],
+  "minutes": 10
+}

@@ -1,0 +1,24 @@
+{
+  "id": "enablement-basics",
+  "version": "1.0.0",
+  "schemaVersion": 1,
+  "title": "Enablement Basics",
+  "summary": "Use AI assistants well and safely at work: know their limits, write clear prompts, check the output, keep sensitive data out and own the result.",
+  "route": "/t/enablement-basics",
+  "bookSource": "Workplace AI enablement (portfolio programmes)",
+  "audience": ["non-technical"],
+  "order": 2,
+  "concepts": "concepts/*.json",
+  "labs": [
+    { "id": "prompt-coach", "title": "Prompt Coach", "engine": "prompt-coach", "scenario": "labs/prompt-coach.json", "concepts": ["prompt-anatomy"] },
+    { "id": "workplace-scenarios", "title": "Workplace Scenarios", "engine": "scenario-sim", "scenario": "labs/workplace-scenarios.json", "concepts": ["data-safety", "verify-outputs", "human-accountability"] }
+  ],
+  "cards": "cards.json",
+  "checks": "checks.json",
+  "drills": "drills.json",
+  "prerequisites": [],
+  "depthLevels": [1, 2],
+  "capabilities": { "coach": true, "tutor": false },
+  "estimatedMinutes": 120,
+  "passMark": 0.8
+}

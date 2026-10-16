@@ -1,0 +1,294 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {
+      "id": "tgw-chk-01",
+      "conceptId": "tool-contracts",
+      "depth": 2,
+      "kind": "mcq",
+      "stem": "The model keeps calling the wrong tool for order status questions. Which rewritten description of get_order_status is most likely to fix selection?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Gets order data.",
+          "feedback": "Too vague. It does not say which order data, when to use the tool or what comes back, so the model still has to guess."
+        },
+        {
+          "id": "b",
+          "text": "Returns the status and last update time of one order, given its order ID. Use for delivery and progress questions. Do not use for refunds or invoices.",
+          "feedback": "Correct. It states the purpose, the input, the output and when not to use it, which is what the model reads when choosing a tool."
+        },
+        {
+          "id": "c",
+          "text": "Calls the orders service over HTTPS with retry and caching enabled.",
+          "feedback": "Not helpful for selection. Implementation details tell the model nothing about which tasks the tool fits."
+        },
+        {
+          "id": "d",
+          "text": "IMPORTANT: always use this tool first for any customer question.",
+          "feedback": "Harmful. It pushes the model to call the tool for unrelated tasks, which makes selection worse across the whole catalogue."
+        }
+      ],
+      "answer": "b",
+      "explanation": "The description is effectively a prompt. A good one says what the tool does, what it needs, what it returns and when not to use it."
+    },
+    {
+      "id": "tgw-chk-02",
+      "conceptId": "gateway-order",
+      "depth": 2,
+      "kind": "order",
+      "stem": "Put the four tool gateway stages in the order they must run for every call.",
+      "items": [
+        { "id": "execute", "text": "Execute the tool under the caller's identity with a per-call timeout." },
+        { "id": "type-result", "text": "Map the outcome to a typed result such as SUCCESS, EMPTY or UNAVAILABLE." },
+        { "id": "authorise", "text": "Check the calling principal against the tool's allowlist." },
+        { "id": "validate", "text": "Check the arguments against the tool's JSON Schema." }
+      ],
+      "answer": ["authorise", "validate", "execute", "type-result"],
+      "explanation": "Authorising first means a denied caller never sees a validation error. Validating before execution means the tool never runs on bad input. Typing last gives the orchestrator a result it can route."
+    },
+    {
+      "id": "tgw-chk-03",
+      "conceptId": "gateway-order",
+      "depth": 2,
+      "kind": "mcq",
+      "stem": "Why does the gateway authorise a call before it validates the arguments?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Authorisation is cheaper than validation, so it saves latency.",
+          "feedback": "Not the reason. Both checks cost a few milliseconds; the order is about what each stage reveals, not speed."
+        },
+        {
+          "id": "b",
+          "text": "So a denied caller never learns the argument schema from a validation error.",
+          "feedback": "Correct. Validating first would tell an unauthorised caller which fields and types the tool expects."
+        },
+        {
+          "id": "c",
+          "text": "Because validation needs the caller's credentials to run.",
+          "feedback": "Incorrect. Schema validation checks the arguments alone and needs no credentials."
+        },
+        {
+          "id": "d",
+          "text": "The order does not matter as long as both stages run before execution.",
+          "feedback": "Incorrect. Both orders block execution, but only authorise-first avoids leaking the schema to a denied caller."
+        }
+      ],
+      "answer": "b",
+      "explanation": "A denied caller should see DENIED and nothing else. Any validation error returned to them describes the tool's interface."
+    },
+    {
+      "id": "tgw-chk-04",
+      "conceptId": "least-privilege-tools",
+      "depth": 2,
+      "kind": "multi",
+      "stem": "Which practices apply least privilege to agent tools? Select all that apply.",
+      "options": [
+        {
+          "id": "allowlist",
+          "text": "Each principal has an allowlist of the tools it may call.",
+          "feedback": "Correct. Anything not on the list returns DENIED at the first gateway stage."
+        },
+        {
+          "id": "short-lived",
+          "text": "The gateway mints a credential scoped to one tool and principal that expires in minutes.",
+          "feedback": "Correct. A leaked or misused token is useful for one tool and a short window only."
+        },
+        {
+          "id": "env-key",
+          "text": "A broad API key sits in an environment variable so every tool can reach it.",
+          "feedback": "Incorrect. That is an ambient credential, which any injected or model-written code can find and use."
+        },
+        {
+          "id": "split",
+          "text": "Reading a ticket and changing a ticket are separate tools.",
+          "feedback": "Correct. Separate tools let read access be granted widely and write access narrowly."
+        },
+        {
+          "id": "prompt",
+          "text": "The system prompt tells the agent never to issue refunds above $100.",
+          "feedback": "Incorrect. A prompt is not a control, and an injected instruction can override it. Enforce the limit in the gateway."
+        }
+      ],
+      "answers": ["allowlist", "short-lived", "split"],
+      "explanation": "Least privilege is enforced mechanically by the gateway and credentials, never by asking the model to behave."
+    },
+    {
+      "id": "tgw-chk-05",
+      "conceptId": "least-privilege-tools",
+      "depth": 3,
+      "kind": "mcq",
+      "stem": "A billing assistant may issue refunds. Refunds above $100 need human approval, and 2 per cent of 10,000 daily refunds exceed $100. Finance proposes raising the threshold to $500. What is the best response?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Accept it: 200 reviews a day is too many, and the model is usually right.",
+          "feedback": "Weak. The model being usually right is not a number, and it ignores that the largest unreviewed refund grows fivefold."
+        },
+        {
+          "id": "b",
+          "text": "Reject it: every refund should have human approval.",
+          "feedback": "Too costly. Reviewing all 10,000 refunds at one minute each is about 167 staff hours a day, for mostly small amounts."
+        },
+        {
+          "id": "c",
+          "text": "Compare the saved review time with the expected loss from wrong refunds between $100 and $500, using the measured error rate.",
+          "feedback": "Correct. Today's 200 reviews cost about 3.3 hours a day, and the decision rests on what wrong refunds in the new band would cost."
+        },
+        {
+          "id": "d",
+          "text": "Remove the threshold and rely on the refund tool's JSON Schema to reject large amounts.",
+          "feedback": "Incorrect. A schema checks shape, not judgement; a valid $450 refund to the wrong customer still passes."
+        }
+      ],
+      "answer": "c",
+      "explanation": "Human confirmation is a cost traded against risk. Set the threshold from the cost of a wrong refund and the measured error rate, not from convenience alone."
+    },
+    {
+      "id": "tgw-chk-06",
+      "conceptId": "timeouts-retries-idempotency",
+      "depth": 2,
+      "kind": "multi",
+      "stem": "Which of these calls may the gateway retry automatically? Select all that apply.",
+      "options": [
+        {
+          "id": "lookup-timeout",
+          "text": "An order lookup that timed out and was typed UNAVAILABLE.",
+          "feedback": "Correct. A read is idempotent and UNAVAILABLE is retryable, with backoff and jitter."
+        },
+        {
+          "id": "refund-keyed",
+          "text": "A refund typed UNAVAILABLE that carries an idempotency key the upstream deduplicates.",
+          "feedback": "Correct. The key makes a repeat safe: if the first attempt succeeded, the retry returns the original refund."
+        },
+        {
+          "id": "refund-unkeyed",
+          "text": "A refund typed UNAVAILABLE with no idempotency key.",
+          "feedback": "Incorrect. The first attempt may have succeeded upstream, so a blind retry can refund the customer twice."
+        },
+        {
+          "id": "invalid",
+          "text": "A search typed INVALID because a date field was malformed.",
+          "feedback": "Incorrect. The same arguments fail the same way every time. The model should repair the argument instead."
+        },
+        {
+          "id": "denied",
+          "text": "A ticket update typed DENIED for the calling principal.",
+          "feedback": "Incorrect. Permissions do not change between attempts, so a retry only wastes budget."
+        }
+      ],
+      "answers": ["lookup-timeout", "refund-keyed"],
+      "explanation": "Retry only UNAVAILABLE, and only when the operation is idempotent or carries an idempotency key. INVALID and DENIED are never retryable."
+    },
+    {
+      "id": "tgw-chk-07",
+      "conceptId": "timeouts-retries-idempotency",
+      "depth": 3,
+      "kind": "mcq",
+      "stem": "A tool has a 4-second timeout and up to two retries, with backoff of 500 ms then 1,000 ms and no jitter. What is the worst-case time for one logical call?",
+      "options": [
+        {
+          "id": "a",
+          "text": "4 seconds.",
+          "feedback": "Too low. That is one attempt only; the two retries and both backoff waits are missing."
+        },
+        {
+          "id": "b",
+          "text": "8 seconds.",
+          "feedback": "Too low. Two retries make three attempts, not two, and the backoff waits also count."
+        },
+        {
+          "id": "c",
+          "text": "12 seconds.",
+          "feedback": "Close, but the 1.5 seconds of backoff between attempts is missing."
+        },
+        {
+          "id": "d",
+          "text": "13.5 seconds.",
+          "feedback": "Correct. Three attempts of 4 seconds give 12 seconds, plus 500 ms and 1,000 ms of backoff."
+        }
+      ],
+      "answer": "d",
+      "explanation": "Worst case is attempts times timeout plus all backoff waits. With a 20-second loop wall clock, only one such call fits in the worst case, so retries must count against the loop budget."
+    },
+    {
+      "id": "tgw-chk-08",
+      "conceptId": "mcp-basics",
+      "depth": 2,
+      "kind": "mcq",
+      "stem": "A team plans to connect a third-party MCP server and skip its own gateway because the protocol is standard. What is wrong with this plan?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Nothing. MCP servers enforce authorisation and timeouts as part of the protocol.",
+          "feedback": "Incorrect. MCP standardises discovery and invocation; it does not decide who may call which tool or how long a call may take."
+        },
+        {
+          "id": "b",
+          "text": "MCP only works over stdio, so a remote server cannot be used.",
+          "feedback": "Incorrect. MCP supports stdio for local servers and HTTP for remote ones."
+        },
+        {
+          "id": "c",
+          "text": "MCP standardises the interface, not the policy, so authorisation, validation, timeouts and audit must still come from the gateway.",
+          "feedback": "Correct. The gateway stays in front of every server, and the server's tool descriptions are treated as untrusted input."
+        },
+        {
+          "id": "d",
+          "text": "MCP servers can expose only resources, not tools, so the agent cannot act through them.",
+          "feedback": "Incorrect. Servers can expose tools, resources and prompts."
+        }
+      ],
+      "answer": "c",
+      "explanation": "A standard interface makes tools easy to connect, not safe to call. Policy still lives in your gateway, in one place for every server."
+    },
+    {
+      "id": "tgw-chk-09",
+      "conceptId": "tool-selection-scaling",
+      "depth": 3,
+      "kind": "mcq",
+      "stem": "A catalogue grows from 12 to 60 tools, and eval accuracy falls from 96 to 81 per cent on 400 cases. Of the 76 misses, 45 confuse four overlapping search tools. What should you do first?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Switch to a larger model and rerun the eval.",
+          "feedback": "Expensive and indirect. The misses cluster on overlapping tools, which a larger model may still confuse."
+        },
+        {
+          "id": "b",
+          "text": "Consolidate the four search tools into one with a source enum, then rerun the same eval set.",
+          "feedback": "Correct. It removes the cause of 45 of 76 misses directly, and the same eval set shows whether it worked."
+        },
+        {
+          "id": "c",
+          "text": "Add retrieval that shows the top 3 tools by description similarity.",
+          "feedback": "Premature. The four near-identical search tools would still compete inside the top 3, and retrieval adds its own recall loss."
+        },
+        {
+          "id": "d",
+          "text": "Lengthen every tool description to at least 300 tokens.",
+          "feedback": "Costly and unfocused. Sixty definitions at 300 tokens add 18,000 tokens to every call, mostly for tools that are not confused."
+        }
+      ],
+      "answer": "b",
+      "explanation": "Fix the largest error cluster at its cause, then measure on the same eval set. Routing or retrieval can follow if accuracy is still below target."
+    },
+    {
+      "id": "tgw-chk-10",
+      "conceptId": "timeouts-retries-idempotency",
+      "depth": 2,
+      "kind": "order",
+      "stem": "A refund call hangs. Put the steps for handling it safely in order.",
+      "items": [
+        { "id": "backoff", "text": "Wait an exponential backoff interval plus random jitter." },
+        { "id": "timeout", "text": "The per-call timeout fires and the gateway stops waiting." },
+        { "id": "retry", "text": "Resend the refund with the same idempotency key." },
+        { "id": "typed", "text": "The gateway returns UNAVAILABLE to the orchestrator." },
+        { "id": "budget", "text": "The orchestrator checks that the retry fits the loop's remaining budget." }
+      ],
+      "answer": ["timeout", "typed", "budget", "backoff", "retry"],
+      "explanation": "The timeout produces a typed UNAVAILABLE, the orchestrator decides whether budget remains, and only then does a jittered, keyed retry go out."
+    }
+  ]
+}

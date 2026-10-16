@@ -1,8 +1,10 @@
 import type { ContentRegistry } from '../content/load'
-import type { Concept } from '../content/schemas'
+import type { Audience, Concept } from '../content/schemas'
 
 export interface ConceptGraph {
   concepts: Map<string, Concept>
+  /** Audiences of each concept's tentacle (from its manifest). */
+  audience: Map<string, Audience[]>
   /** Topological order (prerequisites first), stable by tentacle order then id. */
   topo: string[]
   /** How many concepts transitively depend on each concept. */
@@ -12,10 +14,12 @@ export interface ConceptGraph {
 
 export function buildGraph(registry: Pick<ContentRegistry, 'packages'>): ConceptGraph {
   const concepts = new Map<string, Concept>()
+  const audience = new Map<string, Audience[]>()
   const rank = new Map<string, number>()
   registry.packages.forEach((p, i) =>
     p.concepts.forEach((c) => {
       concepts.set(c.id, c)
+      audience.set(c.id, p.manifest.audience)
       rank.set(c.id, i)
     }),
   )
@@ -51,5 +55,5 @@ export function buildGraph(registry: Pick<ContentRegistry, 'packages'>): Concept
   for (const id of concepts.keys()) descendants.set(id, reach(id, new Set()).size)
 
   const contentVersions = Object.fromEntries(registry.packages.map((p) => [p.manifest.id, p.manifest.version]))
-  return { concepts, topo, descendants, contentVersions }
+  return { concepts, audience, topo, descendants, contentVersions }
 }

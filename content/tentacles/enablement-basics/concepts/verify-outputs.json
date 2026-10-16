@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "verify-outputs",
+  "tentacle": "enablement-basics",
+  "title": "Verify before you trust",
+  "point": "Treat every name, number, quote and link from an AI assistant as unconfirmed until you have checked it against a real source.",
+  "definition": "Verifying means comparing what the assistant wrote with a source you trust, such as the original document, a system of record or an official website. Spot-checking means verifying a sample when a full check is impractical.",
+  "level": 1,
+  "objective": {
+    "id": "verify-outputs-obj",
+    "text": "Given an AI-drafted document, list the claims that must be checked, choose a source for each, and justify which ones can be spot-checked."
+  },
+  "misconceptions": [
+    {
+      "claim": "If the assistant gives a source or link, the fact must be true.",
+      "correction": "Assistants can invent sources, or cite a real page that does not say what they claim. Open the link and find the exact sentence before you rely on it."
+    },
+    {
+      "claim": "A confident, detailed answer is more likely to be correct.",
+      "correction": "Confidence is a writing style, not a signal of accuracy. Made-up answers are often the most specific and the most fluent."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Four things need checking every time: names, numbers, quotes and links.",
+      "Ask the assistant for its sources, then open them yourself. A source you have not opened is not a check.",
+      "When you cannot check everything, spot-check a sample, and check every item that would cause harm if wrong."
+    ],
+    "l2": [
+      "Lena in marketing asks an assistant to summarise a 30-page market report. The summary says the market grew 14 per cent last year.",
+      "She searches the report for the figure and finds it says 4 per cent. One wrong digit would have reached the board slide.",
+      "She also checks the two named competitors and the one quoted analyst, because names and quotes are easy to get wrong."
+    ],
+    "l3": [
+      "Suppose an assistant drafts 50 product descriptions and you can tolerate at most one error reaching customers.",
+      "Prices and safety claims are high harm, so you check all of them. Style and wording are low harm, so you spot-check ten.",
+      "If the ten show more than one error, the error rate is above what you can tolerate, so you check all 50."
+    ]
+  },
+  "prerequisites": ["ai-assistant-basics"],
+  "labs": ["workplace-scenarios"],
+  "drills": [],
+  "goals": ["enablement"],
+  "minutes": 12
+}

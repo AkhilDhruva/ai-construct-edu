@@ -23,11 +23,23 @@ export interface MantleState {
   due: CardState[]
   attempts: Attempt[]
   sessionEnd?: { reason: SessionEndReason; at: string }
+  /** Shows the content studio in navigation. A per-browser convenience, not a permission. */
+  authorMode: boolean
+  setAuthorMode(on: boolean): void
   boot(): Promise<void>
   refresh(): Promise<void>
   /** Run an action against the runtime, then refresh the view. */
   run<T>(fn: (rt: MantleRuntime) => Promise<T>): Promise<T>
   dismissSessionEnd(): void
+}
+
+const AUTHOR_KEY = 'mantle:author-mode'
+function readAuthorMode(): boolean {
+  try {
+    return localStorage.getItem(AUTHOR_KEY) === '1'
+  } catch {
+    return false
+  }
 }
 
 export const useMantle = create<MantleState>((set, get) => ({
@@ -38,6 +50,16 @@ export const useMantle = create<MantleState>((set, get) => ({
   mastery: {},
   due: [],
   attempts: [],
+  authorMode: readAuthorMode(),
+
+  setAuthorMode(on) {
+    try {
+      localStorage.setItem(AUTHOR_KEY, on ? '1' : '0')
+    } catch {
+      /* storage blocked: the toggle lasts for this tab only */
+    }
+    set({ authorMode: on })
+  },
 
   async boot() {
     try {

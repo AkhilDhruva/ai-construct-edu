@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "drills": [
+    {
+      "id": "tgw-drill-tool-platform",
+      "title": "Design the gateway for an internal tool platform",
+      "prompt": "Design the tool gateway for an internal agent platform. It serves 40 tools owned by 3 teams. Of these, 25 are read-only and 8 have external side effects, such as refunds, customer emails and ticket changes. Peak load is 300 agent runs per minute, and each tool call has a p95 budget of 2 seconds. State your numbers, the gateway stages, the permission model, the timeout and retry policy, and how the model chooses among 40 tools.",
+      "minutes": 45,
+      "concepts": ["tool-contracts", "gateway-order", "least-privilege-tools", "timeouts-retries-idempotency", "tool-selection-scaling"],
+      "rubric": [
+        {
+          "id": "requirements-as-numbers",
+          "criterion": "Requirements are stated as numbers before any architecture is chosen.",
+          "levels": [
+            "No numbers; requirements are adjectives such as fast, safe or scalable.",
+            "Some numbers are given, but key ones are missing, such as calls per second at peak or the per-call latency budget.",
+            "Load, latency and tool counts are stated, but derived figures such as calls in flight or worst-case retry time are missing or wrong.",
+            "Load, latency and tool counts are stated, and calls per second, calls in flight and worst-case retry time are derived correctly."
+          ]
+        },
+        {
+          "id": "architecture-with-decision-rule",
+          "criterion": "The architecture is chosen with an explicit decision rule tied to the numbers.",
+          "levels": [
+            "A gateway is named with no stages, or tools are called directly by the model.",
+            "Gateway stages are listed, but in the wrong order or with no reason for the order.",
+            "The four stages are in the right order with reasons, but permissions, retries or tool selection are left unspecified.",
+            "The four stages are ordered with reasons, and allowlists, credential scope, retry rules and selection strategy are each tied to a stated number."
+          ]
+        },
+        {
+          "id": "trade-off-named",
+          "criterion": "A trade-off is named and accepted explicitly, with its cost quantified.",
+          "levels": [
+            "No trade-off is mentioned; the design is presented as having no downside.",
+            "A trade-off is mentioned in general terms, without saying what is given up.",
+            "A specific trade-off is named and accepted, but its cost is not quantified.",
+            "A specific trade-off is named, accepted and quantified, and the rejected alternative is stated."
+          ]
+        },
+        {
+          "id": "measurement-named",
+          "criterion": "A measurement is named that would show the choice was wrong.",
+          "levels": [
+            "No measurement or success signal is given.",
+            "A vague signal is given, such as monitoring tool errors, with no metric or threshold.",
+            "A specific metric is named, but without a threshold or the time window that would trigger a rethink.",
+            "A specific metric, threshold and window are named, together with the decision that would change."
+          ]
+        }
+      ],
+      "passMark": 9,
+      "outline": [
+        "Derive the load: 300 runs a minute is 5 runs a second, and at 4 tool calls per run that is 20 calls a second. At 400 ms average latency, about 8 calls are in flight, rising to 40 if every call hits a 2-second timeout.",
+        "Fix the gateway order for all 40 tools: authorise, validate, execute with a timeout, type the result. At about 5 ms, gateway overhead is 0.25 per cent of the 2-second budget.",
+        "Permissions: one namespace and allowlist per team, short-lived credentials minted per call, and the 7 internal write tools and 8 side-effect tools kept separate from the 25 read tools.",
+        "Side effects: every refund, email and ticket change carries an idempotency key, and refunds above a set amount wait for human confirmation. No ambient credentials exist anywhere an agent runs.",
+        "Timeouts and retries: reads get an 800 ms timeout and one retry after 100 ms backoff plus up to 100 ms jitter, so the worst case is 1.8 seconds. Side effects retry only with their key, against a retry budget of 10 per cent.",
+        "Selection: route each run to its team namespace of about 13 tools rather than all 40, and keep a 300-case selection eval set with a 95 per cent accuracy target.",
+        "Trade-off and measurement: accept confirmation delay on large refunds over the risk of wrong ones. Revisit if weekly selection accuracy falls below 95 per cent or any tool's UNAVAILABLE rate exceeds 2 per cent over an hour."
+      ]
+    }
+  ]
+}

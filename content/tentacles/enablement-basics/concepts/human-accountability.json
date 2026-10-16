@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "human-accountability",
+  "tentacle": "enablement-basics",
+  "title": "You stay accountable",
+  "point": "The assistant drafts and you decide: you own everything you send, sign or act on, whoever wrote the first version.",
+  "definition": "Accountability means you answer for the result of your work. Using an AI assistant does not transfer that responsibility to the tool or its supplier.",
+  "level": 2,
+  "objective": {
+    "id": "human-accountability-obj",
+    "text": "Given three AI-assisted work situations, identify who is accountable, list when AI use must be disclosed, and choose when to escalate to a manager or specialist."
+  },
+  "misconceptions": [
+    {
+      "claim": "If the AI made the mistake, it is not my fault.",
+      "correction": "Your name is on the email, report or decision. Customers, managers and regulators hold the sender responsible, not the software."
+    },
+    {
+      "claim": "Disclosing AI use makes my work look less professional.",
+      "correction": "Where policy or the client requires disclosure, hiding it breaks trust and may break rules. Disclosure shows you used a tool responsibly and checked the result."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "You own what you send. Read every AI draft in full before it leaves your hands.",
+      "Disclose AI use where your policy, your client or the situation requires it.",
+      "Escalate when the stakes are high, such as legal exposure, large sums, safety or decisions about a person.",
+      "The assistant drafts, you decide. It never has the final word."
+    ],
+    "l2": [
+      "Aisha in legal operations uses an assistant to draft a reply to a supplier dispute. The draft concedes a point the company has not agreed.",
+      "Because the reply has legal consequences, she does not send it. She passes the draft to the contracts lawyer and notes that AI produced the first version.",
+      "The lawyer corrects the concession, and Aisha sends the approved text under her own name."
+    ],
+    "l3": [
+      "A reasonable escalation rule uses a threshold. For example, escalate any AI-drafted message that commits the company to more than a set sum or a legal position.",
+      "If a team sends 200 AI-assisted messages a month and 5 cross the threshold, escalation adds review time to only 2.5 per cent of them.",
+      "That small cost protects against the few messages where one mistake could cost far more than the time saved."
+    ]
+  },
+  "prerequisites": ["verify-outputs", "data-safety"],
+  "labs": ["workplace-scenarios"],
+  "drills": [],
+  "goals": ["enablement"],
+  "minutes": 12
+}

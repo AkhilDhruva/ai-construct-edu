@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "cards": [
+    {
+      "id": "enb-001",
+      "conceptId": "ai-assistant-basics",
+      "depth": 1,
+      "front": "Name the four jobs an AI assistant does well.",
+      "back": "Drafting new text, summarising long text, reformatting text into a new shape, and brainstorming options.",
+      "kind": "recall",
+      "tags": ["strengths"]
+    },
+    {
+      "id": "enb-002",
+      "conceptId": "ai-assistant-basics",
+      "depth": 1,
+      "front": "An answer that sounds right but is made up is called a ____.",
+      "back": "Hallucination. It is the main reason you check facts, figures and sources from an assistant.",
+      "kind": "cloze",
+      "tags": ["hallucination", "weaknesses"]
+    },
+    {
+      "id": "enb-003",
+      "conceptId": "ai-assistant-basics",
+      "depth": 1,
+      "front": "Name four things an AI assistant is unreliable at.",
+      "back": "Facts with no source, maths, recent events, and anything it cannot see, such as your inbox or private team files.",
+      "kind": "recall",
+      "tags": ["weaknesses"]
+    },
+    {
+      "id": "enb-004",
+      "conceptId": "ai-assistant-basics",
+      "depth": 2,
+      "front": "You ask an assistant for last quarter's total refunds. It replies with a precise figure. What should you conclude?",
+      "back": "Treat it as invented unless the assistant was connected to the refunds system. It cannot see your data by default, so take the figure from the finance report instead.",
+      "kind": "apply",
+      "tags": ["weaknesses", "data"]
+    },
+    {
+      "id": "enb-005",
+      "conceptId": "prompt-anatomy",
+      "depth": 1,
+      "front": "What do the letters RTCF stand for in a prompt?",
+      "back": "Role, Task, Context and Format: who the assistant acts as, what exactly to do, the background and constraints, and the shape of the output.",
+      "kind": "recall",
+      "tags": ["rtcf"]
+    },
+    {
+      "id": "enb-006",
+      "conceptId": "prompt-anatomy",
+      "depth": 1,
+      "front": "In RTCF, the part that sets the shape of the output, such as five bullets or a 100-word email, is the ____.",
+      "back": "Format. It tells the assistant how long the reply should be and how to lay it out.",
+      "kind": "cloze",
+      "tags": ["rtcf", "format"]
+    },
+    {
+      "id": "enb-007",
+      "conceptId": "prompt-anatomy",
+      "depth": 2,
+      "front": "Which RTCF element is missing? Draft a reply to a customer asking about delivery times, for a frustrated first-time buyer, in under 120 words.",
+      "back": "Role. Task, context and format are present, so add who the assistant should act as, for example a friendly customer service specialist.",
+      "kind": "apply",
+      "tags": ["rtcf", "role"]
+    },
+    {
+      "id": "enb-008",
+      "conceptId": "prompt-anatomy",
+      "depth": 2,
+      "front": "The first draft is too formal and too long. What is the best next step?",
+      "back": "Iterate. Reply with a specific change, such as: make it friendlier and cut it to 80 words. This is faster than writing a new prompt.",
+      "kind": "apply",
+      "tags": ["iterate"]
+    },
+    {
+      "id": "enb-009",
+      "conceptId": "verify-outputs",
+      "depth": 1,
+      "front": "Which four kinds of detail must you always check in AI output?",
+      "back": "Names, numbers, quotes and links. Each one can look convincing while being wrong.",
+      "kind": "recall",
+      "tags": ["checking"]
+    },
+    {
+      "id": "enb-010",
+      "conceptId": "verify-outputs",
+      "depth": 1,
+      "front": "Checking a sample of items when a full check is impractical is called ____.",
+      "back": "Spot-checking. Still check every item that would cause harm if wrong.",
+      "kind": "cloze",
+      "tags": ["spot-check"]
+    },
+    {
+      "id": "enb-011",
+      "conceptId": "verify-outputs",
+      "depth": 2,
+      "front": "An AI summary quotes your chief executive and gives a link as its source. What do you do before using the quote?",
+      "back": "Open the link and find the exact words. If the page does not contain them, remove the quote or replace it with one you have confirmed.",
+      "kind": "apply",
+      "tags": ["quotes", "sources"]
+    },
+    {
+      "id": "enb-012",
+      "conceptId": "data-safety",
+      "depth": 1,
+      "front": "List five kinds of data that must never go into an unapproved AI tool.",
+      "back": "Personal data, customer records, passwords or keys, confidential financials, and legal matters.",
+      "kind": "recall",
+      "tags": ["sensitive-data"]
+    },
+    {
+      "id": "enb-013",
+      "conceptId": "data-safety",
+      "depth": 1,
+      "front": "Replacing names and identifying details with placeholders such as Customer A is called ____.",
+      "back": "Anonymising. Remove every detail that could identify a person, not only the name.",
+      "kind": "cloze",
+      "tags": ["anonymise"]
+    },
+    {
+      "id": "enb-014",
+      "conceptId": "data-safety",
+      "depth": 2,
+      "front": "A colleague pastes an employee's sick-leave record into a free public chatbot to draft a return-to-work letter. What should they have done?",
+      "back": "Use the approved enterprise assistant, and anonymise the request anyway. Health details are especially sensitive, so describe the situation in general terms and add specifics afterwards.",
+      "kind": "apply",
+      "tags": ["personal-data", "approved-tool"]
+    },
+    {
+      "id": "enb-015",
+      "conceptId": "good-use-cases",
+      "depth": 1,
+      "front": "Name the four signs of a good AI use case.",
+      "back": "High volume, low risk, easy to verify, and you have the expertise to judge the output.",
+      "kind": "recall",
+      "tags": ["use-cases"]
+    },
+    {
+      "id": "enb-016",
+      "conceptId": "good-use-cases",
+      "depth": 2,
+      "front": "Which is the better first use case for an HR team: drafting interview invitation emails or ranking candidates for a shortlist?",
+      "back": "Drafting invitations. They are frequent, low risk and easy to check. Ranking candidates is a decision about people and must stay with a person.",
+      "kind": "apply",
+      "tags": ["use-cases", "hr"]
+    },
+    {
+      "id": "enb-017",
+      "conceptId": "good-use-cases",
+      "depth": 2,
+      "front": "A task saves 30 minutes a week but needs 35 minutes of checking. Is it a good use case?",
+      "back": "No. It loses five minutes a week once checking is counted. Choose tasks where the net saving is clearly positive.",
+      "kind": "apply",
+      "tags": ["use-cases", "time-saved"]
+    },
+    {
+      "id": "enb-018",
+      "conceptId": "human-accountability",
+      "depth": 1,
+      "front": "Complete the rule: the assistant drafts, ____ decides.",
+      "back": "You. You own everything you send, sign or act on, whoever wrote the first version.",
+      "kind": "cloze",
+      "tags": ["accountability"]
+    },
+    {
+      "id": "enb-019",
+      "conceptId": "human-accountability",
+      "depth": 1,
+      "front": "Name four situations where you should escalate AI-assisted work before it goes out.",
+      "back": "Legal exposure, large sums of money, safety risks, and decisions about a person. In each case a manager or specialist should review it first.",
+      "kind": "recall",
+      "tags": ["escalation"]
+    },
+    {
+      "id": "enb-020",
+      "conceptId": "human-accountability",
+      "depth": 2,
+      "front": "An AI-drafted reply to a client accepts a penalty clause. You are unsure whether that is allowed. What do you do?",
+      "back": "Do not send it. Escalate to your manager or the legal team, because the reply creates a legal commitment. Send only the approved version, under your own name.",
+      "kind": "apply",
+      "tags": ["escalation", "legal"]
+    }
+  ]
+}

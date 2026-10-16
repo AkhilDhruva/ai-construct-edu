@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "data-safety",
+  "tentacle": "enablement-basics",
+  "title": "Keep sensitive data out",
+  "point": "Never paste personal data, customer records, credentials, confidential financials or legal matters into an AI tool your organisation has not approved.",
+  "definition": "Sensitive data is information that could harm people or the organisation if it leaked. An approved tool is one your organisation has vetted and contracted, so your data is handled under agreed rules.",
+  "level": 1,
+  "objective": {
+    "id": "data-safety-obj",
+    "text": "Classify ten pieces of workplace information as safe or unsafe to paste into an unapproved assistant, and rewrite one unsafe prompt in anonymised form."
+  },
+  "misconceptions": [
+    {
+      "claim": "Deleting the chat afterwards removes the risk.",
+      "correction": "Once data is sent, it has left your control. A public tool may store it or use it for training, and deleting your copy does not undo that."
+    },
+    {
+      "claim": "Removing the customer's name makes a record safe to paste.",
+      "correction": "Other details such as an address, an account number or a rare job title can still identify a person. Remove or replace every identifying detail."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Five kinds of data stay out of unapproved tools: personal data, customer records, passwords and keys, confidential financials, and legal matters.",
+      "Use your organisation's approved enterprise assistant for work tasks. It has contractual protections that a free public tool does not.",
+      "Anonymise before you paste: replace names, numbers and other identifying details with placeholders such as Customer A.",
+      "Know your company's classification labels, such as public, internal and confidential, and what each label allows."
+    ],
+    "l2": [
+      "Tom in finance wants help wording an email about a late invoice. He is about to paste the full thread, with the client's name, bank details and amount owed.",
+      "Instead, he writes: a client is 45 days late on an invoice, and we want a firm but polite reminder. No identifying detail is needed to get a good draft.",
+      "He then adds the real name and figures himself, inside the email client, after the draft is done."
+    ],
+    "l3": [
+      "Anonymising a prompt takes about two minutes. A single reportable data breach can take weeks of investigation and notification work.",
+      "Even if only one prompt in a thousand leaked, the expected cost of skipping anonymisation is far above two minutes per prompt.",
+      "That is why the rule is absolute for unapproved tools rather than a case-by-case judgement."
+    ]
+  },
+  "prerequisites": ["ai-assistant-basics"],
+  "labs": ["workplace-scenarios"],
+  "drills": [],
+  "goals": ["enablement"],
+  "minutes": 12
+}

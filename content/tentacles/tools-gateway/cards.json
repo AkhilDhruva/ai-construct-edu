@@ -1,0 +1,221 @@
+{
+  "schemaVersion": 1,
+  "cards": [
+    {
+      "id": "tgw-001",
+      "conceptId": "tool-contracts",
+      "depth": 1,
+      "front": "Name the four parts of a tool contract.",
+      "back": "A name, a description, a JSON Schema for the arguments and a typed result. The model reads the first three to choose and fill the call; the orchestrator relies on the typed result.",
+      "kind": "recall",
+      "tags": ["contract", "definition"]
+    },
+    {
+      "id": "tgw-002",
+      "conceptId": "tool-contracts",
+      "depth": 1,
+      "front": "A tool's description is effectively a ____ for the model.",
+      "back": "Prompt. The model chooses tools from their descriptions, so a vague description causes wrong selection.",
+      "kind": "cloze",
+      "tags": ["contract", "description"]
+    },
+    {
+      "id": "tgw-003",
+      "conceptId": "tool-contracts",
+      "depth": 2,
+      "front": "A tool called get_data, described as gets customer data, is picked for orders, invoices and profiles. How do you fix it?",
+      "back": "Split or rename it by purpose, such as get_order_status. Describe when to use it and when not to, replace free text with a typed order_id, and list the typed results it returns.",
+      "kind": "apply",
+      "tags": ["contract", "description", "schema"]
+    },
+    {
+      "id": "tgw-004",
+      "conceptId": "tool-contracts",
+      "depth": 3,
+      "front": "Forty tool definitions average 150 tokens each. What does trimming them to 80 tokens save per model call, and what is the risk?",
+      "back": "It saves 2,800 tokens per call, from 6,000 down to 3,200. The risk is losing the when-not-to-use lines that prevent confusion, so trim only where an eval set shows no selection errors.",
+      "kind": "apply",
+      "tags": ["contract", "cost", "eval"]
+    },
+    {
+      "id": "tgw-005",
+      "conceptId": "gateway-order",
+      "depth": 1,
+      "front": "List the four gateway stages in order.",
+      "back": "Authorise, validate arguments, execute with a per-call timeout, return a typed result.",
+      "kind": "recall",
+      "tags": ["gateway", "order"]
+    },
+    {
+      "id": "tgw-006",
+      "conceptId": "gateway-order",
+      "depth": 1,
+      "front": "The model ____ a tool call; the gateway decides and executes it under the caller's identity.",
+      "back": "Proposes. Nothing the model emits runs by itself; the gateway authorises, validates and executes on behalf of the principal.",
+      "kind": "cloze",
+      "tags": ["gateway", "principal"]
+    },
+    {
+      "id": "tgw-007",
+      "conceptId": "gateway-order",
+      "depth": 2,
+      "front": "What goes wrong if validation runs before authorisation?",
+      "back": "A denied caller with bad arguments gets a validation error that describes the expected fields and types. The schema leaks to someone who should only ever see DENIED.",
+      "kind": "recall",
+      "tags": ["gateway", "schema-leak"]
+    },
+    {
+      "id": "tgw-008",
+      "conceptId": "gateway-order",
+      "depth": 2,
+      "front": "A gateway runs execute before validate. A support agent sends a refund with amount -50. What happens?",
+      "back": "The refund tool runs on invalid input, which may corrupt data or fail unpredictably. Validation must run first so a negative amount returns INVALID and the tool never runs.",
+      "kind": "apply",
+      "tags": ["gateway", "validation"]
+    },
+    {
+      "id": "tgw-009",
+      "conceptId": "gateway-order",
+      "depth": 3,
+      "front": "An engineer wants to skip authorisation and validation to save latency. How do you answer with numbers?",
+      "back": "The two checks cost about 3 ms on a 400 ms call, under 1 per cent. At 300 calls a minute that is 0.9 seconds of compute a minute, far cheaper than one unauthorised refund.",
+      "kind": "apply",
+      "tags": ["gateway", "latency", "trade-off"]
+    },
+    {
+      "id": "tgw-010",
+      "conceptId": "least-privilege-tools",
+      "depth": 1,
+      "front": "Name the five least-privilege controls for agent tools.",
+      "back": "Per-principal allowlists, scoped short-lived credentials, separate read and write tools, human confirmation for irreversible side effects, and no ambient credentials.",
+      "kind": "recall",
+      "tags": ["least-privilege"]
+    },
+    {
+      "id": "tgw-011",
+      "conceptId": "least-privilege-tools",
+      "depth": 2,
+      "front": "Why split update_ticket into get_ticket and set_ticket_status?",
+      "back": "With one combined tool, anyone who needs to read must also be granted write. Separate tools let the allowlist give read access widely and write access narrowly.",
+      "kind": "recall",
+      "tags": ["least-privilege", "read-write"]
+    },
+    {
+      "id": "tgw-012",
+      "conceptId": "least-privilege-tools",
+      "depth": 2,
+      "front": "A ticket injects an instruction telling the triage bot to issue a refund. Which controls stop it?",
+      "back": "The triage bot is not on the refund allowlist, so the gateway returns DENIED. It also holds no refund credential, so there is nothing for the injected instruction to use.",
+      "kind": "apply",
+      "tags": ["least-privilege", "injection"]
+    },
+    {
+      "id": "tgw-013",
+      "conceptId": "least-privilege-tools",
+      "depth": 3,
+      "front": "2 per cent of 10,000 daily refunds exceed the $100 confirmation threshold. What is the review load, and what does raising the threshold trade?",
+      "back": "200 reviews a day, about 3.3 hours at one minute each. Raising the threshold to $500 cuts reviews but makes the largest unreviewed refund five times bigger.",
+      "kind": "apply",
+      "tags": ["least-privilege", "human-confirmation", "trade-off"]
+    },
+    {
+      "id": "tgw-014",
+      "conceptId": "timeouts-retries-idempotency",
+      "depth": 1,
+      "front": "Which typed result is retryable, and which two are not?",
+      "back": "UNAVAILABLE is retryable. INVALID and DENIED are not, because the same arguments from the same caller get the same answer every time.",
+      "kind": "recall",
+      "tags": ["retries", "typed-results"]
+    },
+    {
+      "id": "tgw-015",
+      "conceptId": "timeouts-retries-idempotency",
+      "depth": 1,
+      "front": "Every tool call's timeout must sit below the loop's ____.",
+      "back": "Wall-clock bound. Otherwise one slow dependency can consume the whole run before any bound fires.",
+      "kind": "cloze",
+      "tags": ["timeouts", "bounded-loop"]
+    },
+    {
+      "id": "tgw-016",
+      "conceptId": "timeouts-retries-idempotency",
+      "depth": 2,
+      "front": "A refund call times out, but the refund actually succeeded upstream. How do you retry safely?",
+      "back": "Send the retry with the same idempotency key, built from the run ID and order ID. The upstream recognises the key and returns the original refund instead of issuing a second.",
+      "kind": "apply",
+      "tags": ["idempotency", "side-effects"]
+    },
+    {
+      "id": "tgw-017",
+      "conceptId": "timeouts-retries-idempotency",
+      "depth": 3,
+      "front": "A tool has a 2-second timeout, two retries, backoff of 200 ms then 400 ms, and up to 100 ms jitter each. What is the worst case?",
+      "back": "Three attempts of 2 seconds, plus 600 ms of backoff and up to 200 ms of jitter: 6.8 seconds. Count that against the loop's wall clock.",
+      "kind": "apply",
+      "tags": ["timeouts", "retries", "budget"]
+    },
+    {
+      "id": "tgw-018",
+      "conceptId": "mcp-basics",
+      "depth": 1,
+      "front": "What three kinds of thing can an MCP server expose?",
+      "back": "Tools the model can call, resources the host can read as context, and prompts as reusable templates.",
+      "kind": "recall",
+      "tags": ["mcp"]
+    },
+    {
+      "id": "tgw-019",
+      "conceptId": "mcp-basics",
+      "depth": 1,
+      "front": "MCP standardises the ____, not the policy.",
+      "back": "Interface. It fixes how tools are discovered and called, but authorisation, validation, timeouts and audit still belong to your gateway.",
+      "kind": "cloze",
+      "tags": ["mcp", "gateway"]
+    },
+    {
+      "id": "tgw-020",
+      "conceptId": "mcp-basics",
+      "depth": 2,
+      "front": "A third-party MCP server's tool description tells the model to always call export_all_tickets first. What do you do?",
+      "back": "Treat it as untrusted input and a likely injection. Block the export tool at the gateway, pin the reviewed descriptions, and alert whenever a server update changes them.",
+      "kind": "apply",
+      "tags": ["mcp", "injection", "untrusted-input"]
+    },
+    {
+      "id": "tgw-021",
+      "conceptId": "mcp-basics",
+      "depth": 2,
+      "front": "Which MCP transport suits a local server, and which a remote one?",
+      "back": "Stdio for a local server started by the host, and HTTP for a remote server. The transport changes nothing about who may call which tool.",
+      "kind": "recall",
+      "tags": ["mcp", "transport"]
+    },
+    {
+      "id": "tgw-022",
+      "conceptId": "tool-selection-scaling",
+      "depth": 1,
+      "front": "Name four ways to keep tool selection accurate as the catalogue grows.",
+      "back": "Namespacing, routing a task to a subset of tools, retrieving tools by description similarity, and consolidating overlapping tools.",
+      "kind": "recall",
+      "tags": ["selection", "scale"]
+    },
+    {
+      "id": "tgw-023",
+      "conceptId": "tool-selection-scaling",
+      "depth": 2,
+      "front": "On a 400-case eval set, 45 of 76 misses confuse four overlapping search tools. What is the first fix?",
+      "back": "Consolidate the four searches into one tool with a source enum. It targets the largest error cluster directly; then rerun the same eval set to confirm the gain.",
+      "kind": "apply",
+      "tags": ["selection", "consolidation", "eval"]
+    },
+    {
+      "id": "tgw-024",
+      "conceptId": "tool-selection-scaling",
+      "depth": 3,
+      "front": "Tool retrieval has 97 per cent recall in the top 8. What does that cap, and when would you prefer routing?",
+      "back": "Selection accuracy cannot exceed 97 per cent, because a tool that is not retrieved cannot be chosen. Prefer routing to a fixed domain subset while domains are clear and stay under about 20 tools.",
+      "kind": "apply",
+      "tags": ["selection", "retrieval", "routing"]
+    }
+  ]
+}

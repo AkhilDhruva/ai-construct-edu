@@ -11,6 +11,9 @@ export function Home() {
   const next = plan?.items[0]
   const week = plan?.items.filter((i) => i.thisWeek) ?? []
   const later = plan?.items.filter((i) => !i.thisWeek) ?? []
+  const out = new Set(plan?.outOfScope ?? [])
+  const mine = content.packages.filter((p) => p.concepts.some((c) => !out.has(c.id)))
+  const others = content.packages.filter((p) => !mine.includes(p))
 
   return (
     <div className="stack">
@@ -131,22 +134,32 @@ export function Home() {
         </section>
       </div>
 
-      <section aria-labelledby="tentacles-h">
-        <h2 id="tentacles-h">Tentacles</h2>
-        <div className="grid grid-3">
-          {content.packages.map((p) => {
-            const avg = p.concepts.reduce((s, c) => s + m(c.id), 0) / p.concepts.length
-            return (
-              <Link key={p.manifest.id} to={p.manifest.route} className="card stack" style={{ textDecoration: 'none', color: 'inherit' }}>
-                <div className="eyebrow">{p.manifest.bookSource}</div>
-                <h3>{p.manifest.title}</h3>
-                <p className="small muted">{p.manifest.summary}</p>
-                <MasteryBar value={avg} label={`${p.manifest.title} mastery`} />
-              </Link>
-            )
-          })}
-        </div>
-      </section>
+      {(
+        [
+          ['tentacles-h', 'Your tentacles', mine],
+          ['other-h', 'Other tentacles (outside your track, open any time)', others],
+        ] as const
+      ).map(
+        ([hid, heading, list]) =>
+          list.length > 0 && (
+            <section key={hid} aria-labelledby={hid} data-testid={hid}>
+              <h2 id={hid}>{heading}</h2>
+              <div className="grid grid-3">
+                {list.map((p) => {
+                  const avg = p.concepts.reduce((s, c) => s + m(c.id), 0) / p.concepts.length
+                  return (
+                    <Link key={p.manifest.id} to={p.manifest.route} className="card stack" style={{ textDecoration: 'none', color: 'inherit' }}>
+                      <div className="eyebrow">{p.manifest.bookSource}</div>
+                      <h3>{p.manifest.title}</h3>
+                      <p className="small muted">{p.manifest.summary}</p>
+                      <MasteryBar value={avg} label={`${p.manifest.title} mastery`} />
+                    </Link>
+                  )
+                })}
+              </div>
+            </section>
+          ),
+      )}
     </div>
   )
 }

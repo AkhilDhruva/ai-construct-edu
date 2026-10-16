@@ -12,6 +12,7 @@ import {
   type CheckItem,
   type Concept,
   type DiagnosticItem,
+  type DiagnosticTrack,
   type Drill,
   type LabRef,
   type Manifest,
@@ -47,7 +48,8 @@ export interface ContentRegistry {
   checks: Map<string, CheckItem>
   drills: Map<string, Drill>
   labs: Map<string, TentacleLab & { tentacle: string }>
-  diagnostic: DiagnosticItem[]
+  /** Readiness checks keyed by track (technical, enablement). */
+  diagnostics: Partial<Record<DiagnosticTrack, { title: string; items: DiagnosticItem[] }>>
   rules: Rules
   /** Packages that failed validation are reported here and skipped, never a crash. */
   errors: ContentIssue[]
@@ -241,12 +243,20 @@ export function loadContent(files: ContentFiles): ContentRegistry {
   if (!rules) throw new Error(`engine/rules.json is invalid: ${errors.map((e) => e.message).join('; ')}`)
 
   const conceptMap = new Map(packages.flatMap((p) => p.concepts.map((c) => [c.id, c] as const)))
-  let diagnostic = parse(diagnosticFileSchema, files['onboarding/diagnostic.json'], 'onboarding/diagnostic.json', errors)?.items ?? []
-  diagnostic = diagnostic.map((item) => {
-    const unknown = item.concepts.filter((c) => !conceptMap.has(c))
-    if (unknown.length) warnings.push({ where: `onboarding/diagnostic.json#${item.id}`, message: `concepts not installed yet: ${unknown.join(', ')}` })
-    return item
-  })
+  const diagnostics: ContentRegistry['diagnostics'] = {}
+  for (const path of Object.keys(files).filter((p) => /^onboarding\/diagnostic[^/]*\.json$/.test(p)).sort()) {
+    const file = parse(diagnosticFileSchema, files[path], path, errors)
+    if (!file) continue
+    if (diagnostics[file.track]) {
+      errors.push({ where: path, message: `a diagnostic for track "${file.track}" already exists` })
+      continue
+    }
+    for (const item of file.items) {
+      const unknown = item.concepts.filter((c) => !conceptMap.has(c))
+      if (unknown.length) warnings.push({ where: `${path}#${item.id}`, message: `concepts not installed yet: ${unknown.join(', ')}` })
+    }
+    diagnostics[file.track] = { title: file.title, items: file.items }
+  }
 
   return {
     packages,
@@ -255,7 +265,7 @@ export function loadContent(files: ContentFiles): ContentRegistry {
     checks: new Map(packages.flatMap((p) => p.checks.map((c) => [c.id, c] as const))),
     drills: new Map(packages.flatMap((p) => p.drills.map((d) => [d.id, d] as const))),
     labs: new Map(packages.flatMap((p) => p.labs.map((l) => [l.ref.id, { ...l, tentacle: p.manifest.id }] as const))),
-    diagnostic,
+    diagnostics,
     rules,
     errors,
     warnings,

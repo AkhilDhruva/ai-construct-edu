@@ -23,7 +23,8 @@ const inputs = (over: Partial<PlanInputs> = {}, learner: Partial<PlanInputs['lea
 describe('adaptive engine rules-v1', () => {
   it('orders every unmastered concept with prerequisites first', () => {
     const p = plan(inputs(), graph, rules)
-    expect(p.items).toHaveLength(8)
+    const engineering = [...graph.concepts.values()].filter((c) => c.tentacle !== 'enablement-basics')
+    expect(p.items).toHaveLength(engineering.length)
     expect(validatePlan(p, graph)).toEqual([])
     expect(p.items[0].conceptId).toBe('what-is-an-agent')
   })
