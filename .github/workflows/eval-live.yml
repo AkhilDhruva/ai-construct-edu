@@ -1,0 +1,39 @@
+name: Grader eval (live model)
+
+# Runs the golden set against the real grader model. It spends money, so it runs only on
+# demand. Requires an ANTHROPIC_API_KEY repository secret. Safety failures fail the run;
+# quality is compared with api/evals/baseline.live.json once one has been committed.
+on:
+  workflow_dispatch:
+    inputs:
+      write_baseline:
+        description: Write a new live baseline (upload it as an artifact to commit)
+        type: boolean
+        default: false
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: api
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      MANTLE_MODEL_MODE: live
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen
+      - name: Check the secret is set
+        run: test -n "$ANTHROPIC_API_KEY" || (echo "Set the ANTHROPIC_API_KEY repository secret first." && exit 1)
+      - name: Run
+        run: uv run python -m evals.run --model live --out eval-report.json ${{ inputs.write_baseline && '--write-baseline' || '' }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: grader-eval-live
+          path: |
+            api/eval-report.json
+            api/evals/baseline.live.json
+          retention-days: 30

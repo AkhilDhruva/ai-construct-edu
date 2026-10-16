@@ -1,0 +1,40 @@
+[project]
+name = "mantle-api"
+version = "0.2.0"
+description = "VeraClause Mantle API mode: AI gateway, rubric grader, bounded tutor, sync and cost governor."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "anthropic>=1.15.0",
+    "fastapi>=0.143.2",
+    "jsonschema>=4.26.0",
+    "opentelemetry-exporter-otlp-proto-http>=1.45.1",
+    "opentelemetry-sdk>=1.45.1",
+    "psycopg[binary]>=3.3.6",
+    "pydantic>=2.14.1",
+    "pydantic-settings>=2.16.0",
+    "pyjwt[crypto]>=2.15.1",
+    "sqlalchemy>=2",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S", "SIM"]
+ignore = ["S101", "S311", "E501"]  # line length is the formatter's job; prompt prose stays unwrapped
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S105", "S106"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["postgres: needs a real Postgres (DATABASE_URL); skipped otherwise"]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=9.1.1",
+    "ruff>=0.17.1",
+]

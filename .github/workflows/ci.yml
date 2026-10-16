@@ -10,15 +10,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  gates:
+  web:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+      - uses: astral-sh/setup-uv@v6
       - run: npm ci
       - name: Lint
         run: npm run lint
@@ -26,13 +27,15 @@ jobs:
         run: npm run typecheck
       - name: Content gates (schema, references, acyclicity, coverage, language)
         run: npm run validate:content
-      - name: Unit tests (lab engines, adaptive engine, runtime, storage)
+      - name: Unit tests (lab engines, adaptive engine, runtime, storage, API client)
         run: npm test
       - name: Build (with offline service worker)
         run: npm run build
+      - name: Install API dependencies (the e2e API-mode journey starts a local API)
+        run: uv sync --directory api --frozen
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
-      - name: E2E + accessibility (axe) + offline
+      - name: E2E + accessibility (axe) + offline + API mode
         run: npm run e2e
       - uses: actions/upload-artifact@v4
         if: failure()
@@ -42,3 +45,37 @@ jobs:
             playwright-report
             test-results
           retention-days: 7
+
+  api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mantle
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    defaults:
+      run:
+        working-directory: api
+    env:
+      MANTLE_TEST_PG_URL: postgresql+psycopg://postgres:postgres@localhost:5432/mantle
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen
+      - name: Lint and format
+        run: uv run ruff check . && uv run ruff format --check .
+      - name: Tests (SQLite, plus row-level security on Postgres)
+        run: uv run pytest -q -rs
+      - name: Grader eval, mock model (safety assertions block; quality gated by a sign test)
+        run: uv run python -m evals.run --model mock --out eval-report.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: grader-eval-mock
+          path: api/eval-report.json
+          retention-days: 14

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { RUNG_INFO } from '../mantle/session/rung'
 import { useMantle } from '../state/useMantle'
+import { AiGrade } from '../ui/AiGrade'
 import { usePackage } from './usePackage'
 
 const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
@@ -9,7 +10,7 @@ const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${Str
 export function Drill() {
   const pkg = usePackage()
   const { drill: drillId } = useParams()
-  const { run, rung, flags } = useMantle()
+  const { run, rung, can } = useMantle()
   const drill = pkg?.drills.find((d) => d.id === drillId)
   const draftKey = `mantle:drill-draft:${drillId}`
   const [text, setText] = useState(() => {
@@ -124,7 +125,7 @@ export function Drill() {
         <section className="card stack" aria-labelledby="rubric-h">
           <h2 id="rubric-h">Score against the rubric</h2>
           <div className="callout small">
-            {flags?.grader
+            {can('grader')
               ? 'The AI grader will also score this and cite the sentence that earned each point.'
               : `AI grading is unavailable at rung ${rung} (${RUNG_INFO[rung].label}). Self-score honestly: the rubric is the same one the grader uses.`}
           </div>
@@ -169,6 +170,7 @@ export function Drill() {
           )}
         </section>
       )}
+      {phase !== 'write' && <AiGrade drill={drill} answer={text} />}
     </div>
   )
 }
