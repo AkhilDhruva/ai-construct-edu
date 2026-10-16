@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "engine": "trifecta",
+  "id": "trifecta-check",
+  "brief": [
+    "Each agent below starts lethal: one identity reads private data, is exposed to untrusted content and can communicate externally. An injected instruction in anything it reads could make it send your data out.",
+    "Switch off optional tools and apply mitigations until at least one leg is gone. A mitigation protects only the tools it wraps, so check every tool that carries the leg. Keep every required tool."
+  ],
+  "agents": [
+    {
+      "id": "inbox-triage",
+      "title": "Inbox triage assistant",
+      "task": "Read the sales team's inbound email, look up each sender in the CRM, label the thread, and send replies to customers on the account owner's behalf.",
+      "tools": [
+        { "id": "read-inbox", "label": "Read inbound email bodies", "legs": ["private-data", "untrusted-content"], "required": true },
+        { "id": "crm-lookup", "label": "Look up accounts and deals in the CRM", "legs": ["private-data"], "required": true },
+        { "id": "send-reply", "label": "Send replies to customers", "legs": ["external-comms"], "required": true },
+        { "id": "apply-labels", "label": "Label and route the thread", "legs": [], "required": true },
+        { "id": "read-attachments", "label": "Read attachments on inbound email", "legs": ["untrusted-content"], "required": false },
+        { "id": "open-links", "label": "Open links found in emails", "legs": ["untrusted-content", "external-comms"], "required": false },
+        { "id": "forward-external", "label": "Forward threads to partner addresses", "legs": ["external-comms"], "required": false }
+      ],
+      "mitigations": [
+        { "id": "approve-outbound", "label": "Human approval on outbound email", "neutralises": "external-comms", "appliesTo": ["send-reply", "forward-external"], "description": "Replies and forwards wait until the account owner sees the exact recipient, body and attachments and approves them. It does not wrap link opening." },
+        { "id": "quarantine-email", "label": "Quarantine email bodies", "neutralises": "untrusted-content", "appliesTo": ["read-inbox"], "description": "A model with no tools reads each email body and extracts sender, intent and order number into a schema. The planner sees only validated fields." },
+        { "id": "quarantine-attachments", "label": "Quarantine attachments", "neutralises": "untrusted-content", "appliesTo": ["read-attachments"], "description": "A converter with no tools turns attachments into typed fields such as invoice number and amount. Free text from the file never reaches the planner." }
+      ],
+      "debrief": "Approval on outbound email alone looks complete, but opening a link is also outbound: the URL itself can carry data. Approve outbound email and switch off link opening, and the external leg is gone. Quarantining bodies and attachments also works, but only once links are off as well."
+    },
+    {
+      "id": "research-browser",
+      "title": "Research browsing agent",
+      "task": "Search the public web and the internal strategy wiki to write a competitor brief, then save it to the strategy team's shared folder.",
+      "tools": [
+        { "id": "web-search", "label": "Search the public web", "legs": ["untrusted-content"], "required": true },
+        { "id": "open-url", "label": "Fetch any URL", "legs": ["untrusted-content", "external-comms"], "required": true },
+        { "id": "wiki-search", "label": "Search the internal strategy wiki", "legs": ["private-data"], "required": true },
+        { "id": "save-brief", "label": "Save the brief to the team folder", "legs": [], "required": true },
+        { "id": "crm-deals", "label": "Read open deals in the CRM", "legs": ["private-data"], "required": false },
+        { "id": "email-brief", "label": "Email the brief to any address", "legs": ["external-comms"], "required": false },
+        { "id": "submit-forms", "label": "Submit web forms", "legs": ["external-comms"], "required": false }
+      ],
+      "mitigations": [
+        { "id": "split-identity", "label": "Move wiki reading to a separate identity", "neutralises": "private-data", "appliesTo": ["wiki-search"], "description": "A writer identity with wiki access but no web access drafts the brief from typed notes. The browsing identity no longer holds the wiki tool." },
+        { "id": "egress-allowlist", "label": "Allowlisting proxy for page fetches", "neutralises": "external-comms", "appliesTo": ["open-url"], "description": "Fetches may reach only reviewed news and filing sites, as plain page requests with no query strings. It does not cover email or form submission." },
+        { "id": "quarantine-pages", "label": "Quarantine fetched pages", "neutralises": "untrusted-content", "appliesTo": ["open-url"], "description": "A model with no tools turns each fetched page into company, product, price and date fields. Search result snippets are not covered." }
+      ],
+      "debrief": "Every leg sits in a required tool, so a mitigation is unavoidable, and each one covers less than it seems. Splitting the identity works only if the CRM tool goes too. The fetch allowlist works only if email and form submission go. Page quarantine never suffices, because search snippets stay untrusted."
+    },
+    {
+      "id": "coding-agent",
+      "title": "Coding agent with repository and network access",
+      "task": "Read a bug report filed on the public issue tracker, install dependencies, fix the private repository so the tests pass, and open a pull request for review.",
+      "tools": [
+        { "id": "read-repo", "label": "Read the private repository", "legs": ["private-data"], "required": true },
+        { "id": "read-issue", "label": "Read public issue reports", "legs": ["untrusted-content"], "required": true },
+        { "id": "install-packages", "label": "Install dependencies from public registries", "legs": ["untrusted-content", "external-comms"], "required": true },
+        { "id": "edit-and-test", "label": "Edit files and run tests in a sandbox", "legs": [], "required": true },
+        { "id": "open-pr", "label": "Open a pull request on the internal host", "legs": [], "required": true },
+        { "id": "shell-internet", "label": "Run shell commands with open internet access", "legs": ["untrusted-content", "external-comms"], "required": false },
+        { "id": "comment-issue", "label": "Post comments on the public issue", "legs": ["external-comms"], "required": false },
+        { "id": "read-ci-secrets", "label": "Read CI deployment secrets", "legs": ["private-data"], "required": false }
+      ],
+      "mitigations": [
+        { "id": "package-mirror", "label": "Install only through an internal mirror", "neutralises": "external-comms", "appliesTo": ["install-packages"], "description": "Dependencies come from a reviewed internal mirror, so installs open no connection to the outside world. Other shell commands are not covered." },
+        { "id": "approve-comments", "label": "Human approval on public comments", "neutralises": "external-comms", "appliesTo": ["comment-issue"], "description": "An engineer reads each comment before it is posted to the public tracker, checking for code, paths or secrets." },
+        { "id": "quarantine-issue", "label": "Quarantine issue text", "neutralises": "untrusted-content", "appliesTo": ["read-issue"], "description": "A model with no tools extracts the failing test name, error message and version into a schema. Package install scripts are not covered." }
+      ],
+      "debrief": "Quarantining the issue looks right but leaves package installs untrusted. The external leg is the one to break: use the internal mirror, switch off open shell access, and gate or remove public comments. Remove CI secrets too: they add no new leg, but they widen the damage."
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "engine": "sorting-board",
+  "id": "memory-sorter",
+  "brief": [
+    "A support assistant is halfway through a conversation about a double charge. Below are twelve things it currently holds or could read. Each belongs in exactly one of four memory tiers.",
+    "Sort each item by asking how long it should live, who wrote it and who may read it. Working context lasts one step, session memory lasts one conversation, long-term memory holds durable facts about one user, and shared knowledge serves everyone."
+  ],
+  "buckets": [
+    { "id": "working", "label": "Working context", "description": "What is in the prompt for this model call. It lives for one step and is rebuilt every time within fixed section budgets." },
+    { "id": "session", "label": "Session memory", "description": "What belongs to this run or conversation, such as earlier turns, plans and summaries. It is dropped or archived when the session ends." },
+    { "id": "long-term", "label": "Long-term user memory", "description": "Durable facts about one user, scoped to that user in the store, each with its source and an expiry." },
+    { "id": "shared-knowledge", "label": "Shared knowledge", "description": "A curated corpus of documents that every user may read, retrieved in bounded chunks with source ids and timestamps." }
+  ],
+  "items": [
+    {
+      "id": "tool-result",
+      "text": "Tool result from the last step: 3 open tickets for this customer.",
+      "bucket": "working",
+      "explanation": "The model needs this result for the very next decision, so it sits in the prompt now. If it matters later in the conversation, the session keeps a copy."
+    },
+    {
+      "id": "current-question",
+      "text": "The user's latest message: why was I charged twice this month?",
+      "bucket": "working",
+      "explanation": "The current turn is the reason for this model call. It goes into working context in full, inside the history section's budget."
+    },
+    {
+      "id": "tool-definitions",
+      "text": "The JSON Schemas for the four tools this assistant may call.",
+      "bucket": "working",
+      "explanation": "Tool definitions are sent with every call, so they are part of working context. They rarely change, so they sit near the top where the prefix can be cached."
+    },
+    {
+      "id": "order-number",
+      "text": "The order number 55102, which the user gave two turns ago.",
+      "bucket": "session",
+      "explanation": "It matters for this conversation only. Promoting it to long-term memory would store a one-off detail with no lasting value."
+    },
+    {
+      "id": "run-plan",
+      "text": "The plan written at the start of this run: check billing, then check refunds, then reply.",
+      "bucket": "session",
+      "explanation": "A plan belongs to one run. The orchestrator reads it back each step, and it has no use once the run ends."
+    },
+    {
+      "id": "history-summary",
+      "text": "A summary of the first ten turns of today's chat, made when the history section filled up.",
+      "bucket": "session",
+      "explanation": "Summarising old turns is how history evicts within its own budget. The summary describes this conversation, so it lives and dies with the session."
+    },
+    {
+      "id": "language",
+      "text": "The user's preferred language is Spanish (confirmed 3 March).",
+      "bucket": "long-term",
+      "explanation": "A confirmed, durable preference about one user is exactly what long-term memory is for. The date and source travel with it."
+    },
+    {
+      "id": "contact-channel",
+      "text": "The user asked to be contacted by email, never by phone (stated in chat on 12 May).",
+      "bucket": "long-term",
+      "explanation": "The user stated it directly and it should apply to future conversations. It is scoped to this user and records where it was learned."
+    },
+    {
+      "id": "accessibility",
+      "text": "The user relies on a screen reader and prefers short replies without tables (stated 20 April).",
+      "bucket": "long-term",
+      "explanation": "This durable need shapes every future reply to this user. It is stored under their user id and nobody else's sessions can read it."
+    },
+    {
+      "id": "refund-article",
+      "text": "Help centre article: card refunds take five to ten working days (updated May 2026).",
+      "bucket": "shared-knowledge",
+      "explanation": "Help articles apply to every user and are curated by their owners. The agent retrieves a chunk and cites its id, but never edits it."
+    },
+    {
+      "id": "approval-policy",
+      "text": "Internal policy: refunds above $500 need a second approver.",
+      "bucket": "shared-knowledge",
+      "explanation": "A policy document is shared reference material, not a fact about one user. It is retrieved when relevant and cited like any other source."
+    },
+    {
+      "id": "release-notes",
+      "text": "Release notes for version 4.2 of the mobile app, describing the new billing screen.",
+      "bucket": "shared-knowledge",
+      "explanation": "Product documentation belongs in the shared corpus. Its timestamp lets the agent prefer it over notes for older versions."
+    }
+  ],
+  "passScore": 0.75
+}

@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "bitemporal-memory",
+  "tentacle": "memory-retrieval",
+  "title": "Bitemporal memory",
+  "point": "Record when a fact was true and when the system learned it, append corrections instead of overwriting, and you can replay exactly what the system believed at any moment.",
+  "definition": "Bitemporal memory stores two times for every fact: valid time, when it was true in the world, and system time, when the system recorded it. Corrections append a new version and mark the old one superseded.",
+  "level": 2,
+  "objective": {
+    "id": "bitemporal-memory-obj",
+    "text": "Given a history of facts and corrections, answer an as-of query: what the system believed at one system time about one valid time."
+  },
+  "misconceptions": [
+    {
+      "claim": "Updating the record in place is fine as long as the latest value is correct.",
+      "correction": "Overwriting destroys what the system believed before. You can no longer explain past answers, audit a decision or replay a learner's history."
+    },
+    {
+      "claim": "One timestamp per fact is enough.",
+      "correction": "One timestamp cannot separate a late correction from a real change. A move reported five weeks late needs both the date it happened and the date the system learned it."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Valid time says when a fact was true in the world, such as an address from 1 April. System time says when the system recorded it, such as 6 May.",
+      "A correction never edits the old record. It appends a new version and stamps the old one with the time it was superseded, so every past belief stays readable.",
+      "An as-of query takes two dates: the moment in the world you are asking about and the moment of knowledge you are asking from. It returns what the system believed then about that moment."
+    ],
+    "l2": [
+      "A customer moved on 1 April but told the company on 6 May. Before 6 May, the system believed the old address held for April; from 6 May it believes the new one.",
+      "An agent shipped a parcel on 20 April to the old address. Querying as of 20 April shows it used the best knowledge available then, which settles the complaint fairly.",
+      "A mistyped address recorded on 2 March was superseded on 16 March. Queries as of before 16 March return the error, later queries return the correction, and both records remain."
+    ],
+    "l3": [
+      "Bitemporal storage costs space, because corrections add rows rather than replacing them. A user fact that changes four times a year builds about 40 versions in ten years, which is small.",
+      "The pay-off is replay. When debugging an agent run, query memory as of the run's start time to see exactly what it read, not today's corrected values.",
+      "Deletion on request is the exception to append-only. Erase the personal values themselves, and keep only a tombstone recording that a deletion happened and when."
+    ]
+  },
+  "prerequisites": ["memory-tiers"],
+  "labs": ["bitemporal-lab"],
+  "drills": [],
+  "goals": ["interview", "capstone"],
+  "minutes": 14
+}

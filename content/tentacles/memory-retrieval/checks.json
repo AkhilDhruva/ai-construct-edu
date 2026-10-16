@@ -1,0 +1,299 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {
+      "id": "mem-chk-01",
+      "conceptId": "memory-tiers",
+      "depth": 1,
+      "kind": "mcq",
+      "stem": "During a chat, the user confirms that they want replies in Spanish from now on. Which memory tier should hold this?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Working context only.",
+          "feedback": "Not enough. Working context is rebuilt every step, so the preference would be lost as soon as the step ends."
+        },
+        {
+          "id": "b",
+          "text": "Session memory.",
+          "feedback": "Too short-lived. Session memory ends with this conversation, but the user asked for the preference to apply from now on."
+        },
+        {
+          "id": "c",
+          "text": "Long-term user memory, with its source and date.",
+          "feedback": "Correct. It is a durable, confirmed fact about one user, so it belongs in long-term memory, scoped to that user and carrying its provenance."
+        },
+        {
+          "id": "d",
+          "text": "Shared knowledge.",
+          "feedback": "Incorrect. Shared knowledge is read by every user, so a personal preference stored there would leak and would apply to the wrong people."
+        }
+      ],
+      "answer": "c",
+      "explanation": "Match each item to how long it should live and who may read it. A confirmed preference for one user is long-term memory, stored with where and when it was learned."
+    },
+    {
+      "id": "mem-chk-02",
+      "conceptId": "context-budgets",
+      "depth": 2,
+      "kind": "order",
+      "stem": "Order these prompt sections from first to last so that the longest possible prefix can be prompt-cached.",
+      "items": [
+        { "id": "retrieved", "text": "The chunks retrieved for this turn's question." },
+        { "id": "tools", "text": "The tool definitions, which change only on a release." },
+        { "id": "system", "text": "The system instructions, which change only on a release." },
+        { "id": "memory", "text": "This user's long-term facts, which stay the same for the whole session." }
+      ],
+      "answer": ["system", "tools", "memory", "retrieved"],
+      "explanation": "A cache only helps for an unchanged prefix. Put the sections that change least often first, so the per-turn retrieval at the end never breaks the cached part."
+    },
+    {
+      "id": "mem-chk-03",
+      "conceptId": "context-budgets",
+      "depth": 2,
+      "kind": "mcq",
+      "stem": "A long conversation has filled its 5,000-token history budget. This turn, retrieval used only 2,500 of its 4,000 tokens. What should happen to the history?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Let history borrow the 1,500 spare retrieval tokens for this turn.",
+          "feedback": "Tempting but wrong. The next turn may need the full retrieval budget, and borrowing makes each section's size depend on the others."
+        },
+        {
+          "id": "b",
+          "text": "Summarise or drop the oldest turns until history fits within 5,000 tokens.",
+          "feedback": "Correct. Each section evicts within itself, so history shrinks its own content and every other budget stays fixed."
+        },
+        {
+          "id": "c",
+          "text": "Drop the tool definitions to make room, since no tool may be needed.",
+          "feedback": "Incorrect. That squeezes another section, breaks the cached prefix and may stop the model calling a tool it needs."
+        },
+        {
+          "id": "d",
+          "text": "Expand the prompt to use the full 128,000-token window.",
+          "feedback": "Incorrect. That abandons the budget and multiplies cost and latency for every later turn of the conversation."
+        }
+      ],
+      "answer": "b",
+      "explanation": "Fixed section budgets keep cost predictable and stop one growing section from quietly degrading another. Eviction always happens inside the section that is full."
+    },
+    {
+      "id": "mem-chk-04",
+      "conceptId": "retrieval-grounding",
+      "depth": 2,
+      "kind": "mcq",
+      "stem": "A user asks whether the Pro plan includes phone support. None of the five retrieved chunks mentions phone support. What should the answer do?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Say yes, because premium plans usually include phone support.",
+          "feedback": "Incorrect. That is a claim with no source, drawn from the model's general knowledge, and it may be false for this product."
+        },
+        {
+          "id": "b",
+          "text": "Say the help centre does not cover this, and offer a handover to a person.",
+          "feedback": "Correct. No source, no claim. Saying not found is honest, and the handover still gets the user an answer."
+        },
+        {
+          "id": "c",
+          "text": "Answer and cite the closest chunk, which describes Pro plan pricing.",
+          "feedback": "Incorrect. A citation must support the claim it is attached to. Citing an unrelated chunk makes an unsupported answer look grounded."
+        },
+        {
+          "id": "d",
+          "text": "Raise k to 50 and answer from whatever comes back.",
+          "feedback": "Incorrect. That breaks the token budget, and more near-misses do not make the answer grounded."
+        }
+      ],
+      "answer": "b",
+      "explanation": "Grounding means every claim is backed by a retrieved, cited chunk. When nothing supports an answer, the right output is not found, not a guess."
+    },
+    {
+      "id": "mem-chk-05",
+      "conceptId": "retrieval-grounding",
+      "depth": 1,
+      "kind": "multi",
+      "stem": "Which belong in a grounded retrieval design? Select all that apply.",
+      "options": [
+        {
+          "id": "token-bound",
+          "text": "The number of chunks retrieved is bounded by a token budget.",
+          "feedback": "Correct. A bounded read keeps the retrieval section within its share of the prompt."
+        },
+        {
+          "id": "source-timestamp",
+          "text": "Each chunk carries a source id and a timestamp.",
+          "feedback": "Correct. The id makes citation possible, and the timestamp lets the answer prefer current material."
+        },
+        {
+          "id": "cite",
+          "text": "The answer cites the ids of the chunks it relies on.",
+          "feedback": "Correct. Citations let readers and evaluators check each claim against its source."
+        },
+        {
+          "id": "fill-gaps",
+          "text": "The model fills gaps from general knowledge when no chunk matches.",
+          "feedback": "Incorrect. That produces unsourced claims, which is exactly what grounding exists to prevent."
+        },
+        {
+          "id": "whole-docs",
+          "text": "Whole documents are retrieved so that no context is ever missed.",
+          "feedback": "Incorrect. Whole documents blow the token budget and bury the relevant passage among irrelevant text."
+        }
+      ],
+      "answers": ["token-bound", "source-timestamp", "cite"],
+      "explanation": "Grounded retrieval is bounded, sourced and cited. Anything the chunks do not support stays out of the answer."
+    },
+    {
+      "id": "mem-chk-06",
+      "conceptId": "bitemporal-memory",
+      "depth": 2,
+      "kind": "mcq",
+      "stem": "On 10 March an agent mistyped a customer's date of birth. The error was found and corrected on 24 March. An auditor asks what the system believed on 15 March. What does a bitemporal store return?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The corrected date, because that is the true value.",
+          "feedback": "Incorrect. That is what the system believes today. The auditor asked what it believed on 15 March, before the correction existed."
+        },
+        {
+          "id": "b",
+          "text": "The mistyped date, because on 15 March it had not yet been superseded.",
+          "feedback": "Correct. Querying as of 15 March sees only records made by then and not yet superseded, which is the mistyped one."
+        },
+        {
+          "id": "c",
+          "text": "Nothing, because the mistyped record was deleted on 24 March.",
+          "feedback": "Incorrect. A bitemporal store never deletes a record to correct it. The mistyped record is marked superseded and stays readable."
+        },
+        {
+          "id": "d",
+          "text": "Both dates, and the auditor decides which applied.",
+          "feedback": "Incorrect. An as-of query has one answer. On 15 March the correction had not been recorded, so it is not visible."
+        }
+      ],
+      "answer": "b",
+      "explanation": "An as-of query filters by system time first. Only records made by the knowledge date and not yet superseded by then are visible."
+    },
+    {
+      "id": "mem-chk-07",
+      "conceptId": "bitemporal-memory",
+      "depth": 1,
+      "kind": "mcq",
+      "stem": "How does a bitemporal store apply a correction to a fact?",
+      "options": [
+        {
+          "id": "a",
+          "text": "It updates the existing record in place.",
+          "feedback": "Incorrect. An in-place update destroys the earlier belief, so past answers can no longer be explained or replayed."
+        },
+        {
+          "id": "b",
+          "text": "It appends a new version and marks the old one superseded.",
+          "feedback": "Correct. Both versions remain, each with its system time, so any past belief can be reproduced exactly."
+        },
+        {
+          "id": "c",
+          "text": "It deletes the old record and inserts the new one.",
+          "feedback": "Incorrect. Deleting loses history just as overwriting does, which defeats audits and replay."
+        },
+        {
+          "id": "d",
+          "text": "It keeps both versions unmarked and lets the reader pick.",
+          "feedback": "Incorrect. Without a superseded marker, the store cannot say which version it believed at a given moment."
+        }
+      ],
+      "answer": "b",
+      "explanation": "Append and supersede is what makes as-of queries possible. Nothing is overwritten, and every record keeps the time it was made and the time it was replaced."
+    },
+    {
+      "id": "mem-chk-08",
+      "conceptId": "corrective-retrieval",
+      "depth": 2,
+      "kind": "order",
+      "stem": "An agent allows at most two retrieval attempts per question. Put the steps of a weak first attempt in order.",
+      "items": [
+        { "id": "grade-second", "text": "Grade the new chunks against the same relevance threshold." },
+        { "id": "retrieve", "text": "Retrieve the top-k chunks for the user's question." },
+        { "id": "not-found", "text": "If the evidence is still weak, answer not found and offer a handover." },
+        { "id": "rewrite", "text": "Rewrite the query and search a different source." },
+        { "id": "grade-first", "text": "Grade each chunk for relevance and find too few pass." }
+      ],
+      "answer": ["retrieve", "grade-first", "rewrite", "grade-second", "not-found"],
+      "explanation": "Grade before answering, correct once, grade again, and stop at the bound. The fallback is an honest not found, never a third attempt."
+    },
+    {
+      "id": "mem-chk-09",
+      "conceptId": "corrective-retrieval",
+      "depth": 3,
+      "kind": "mcq",
+      "stem": "A corrective round adds 1.1 seconds, and 15 per cent of turns need one. Turns without one have a p95 of 5.2 seconds. The p95 target is 6 seconds. What follows?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Mean latency rises by only about 0.17 seconds, so the target is safe.",
+          "feedback": "Incorrect. The mean rise is right, but the target is a p95. With 15 per cent of turns on the slow path, the p95 turn includes a corrective round."
+        },
+        {
+          "id": "b",
+          "text": "The p95 turn now includes a corrective round, roughly 6.3 seconds, so the target is missed.",
+          "feedback": "Correct. More than 5 per cent of turns take the slow path, so the tail carries the full 1.1 seconds. Shorten the round or the base path."
+        },
+        {
+          "id": "c",
+          "text": "Remove grading so that no turn ever takes the corrective path.",
+          "feedback": "Incorrect. That meets the latency target by answering from irrelevant chunks, trading a latency miss for wrong answers."
+        },
+        {
+          "id": "d",
+          "text": "Allow unlimited corrective rounds but stop at 6 seconds.",
+          "feedback": "Incorrect. A time cap is a bound, but the target would still be missed on the slow path, and unlimited rounds waste tokens before the cap."
+        }
+      ],
+      "answer": "b",
+      "explanation": "A rare slow path barely moves the mean but sets the tail once it covers more than 5 per cent of turns. Budget the corrective round against p95, not the average."
+    },
+    {
+      "id": "mem-chk-10",
+      "conceptId": "memory-safety",
+      "depth": 2,
+      "kind": "multi",
+      "stem": "Which measures protect long-term user memory? Select all that apply.",
+      "options": [
+        {
+          "id": "rls",
+          "text": "Row-level security in the store, keyed on the calling user's id.",
+          "feedback": "Correct. The store itself refuses to return another user's rows, whatever the prompt or model does."
+        },
+        {
+          "id": "write-policy",
+          "text": "A write policy accepting facts only from confirmed user statements or trusted systems.",
+          "feedback": "Correct. It blocks memory poisoning from emails, documents and tool output."
+        },
+        {
+          "id": "ttl",
+          "text": "A time-to-live on each fact.",
+          "feedback": "Correct. Expiry limits how long a stale or poisoned fact can keep influencing sessions."
+        },
+        {
+          "id": "deletion",
+          "text": "Deletion of every row under a user's id when they ask.",
+          "feedback": "Correct. Deletion on request is a core obligation for memory that holds personal data."
+        },
+        {
+          "id": "prompt-scope",
+          "text": "A system prompt line telling the model to read only the current user's memories.",
+          "feedback": "Incorrect. A prompt is not a control. One injection or bug can bypass it, so scope must live in the store."
+        },
+        {
+          "id": "save-instructions",
+          "text": "Saving instructions found in retrieved documents as user preferences so they persist.",
+          "feedback": "Incorrect. That is memory poisoning by design: untrusted text becomes a fact replayed in every later session."
+        }
+      ],
+      "answers": ["rls", "write-policy", "ttl", "deletion"],
+      "explanation": "Memory safety lives in the store and the write path. Scope reads by principal, guard writes by source, and let facts expire or be deleted on request."
+    }
+  ]
+}

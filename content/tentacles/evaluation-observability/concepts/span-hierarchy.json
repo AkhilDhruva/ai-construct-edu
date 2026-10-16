@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "span-hierarchy",
+  "tentacle": "evaluation-observability",
+  "title": "Span hierarchy",
+  "point": "A trace nests a run span over step spans over model, tool, retrieval and guard spans, with attributes that let anyone reconstruct the run and its cost.",
+  "definition": "A span hierarchy is the tree of timed spans recorded for one agent run. The run span holds step spans, and each step holds model call, tool call, retrieval and guard spans carrying tokens, cost, latency, model, rung and status.",
+  "level": 1,
+  "objective": {
+    "id": "span-hierarchy-obj",
+    "text": "Given an agent run, sketch its span tree and name the attributes each span must carry so the run can be reconstructed and costed."
+  },
+  "misconceptions": [
+    {
+      "claim": "Logging each model prompt and response is enough to debug an agent.",
+      "correction": "Flat logs lose the structure: which step a call belonged to, what ran in parallel and how long each part took. Spans keep parent and timing, so the run can be rebuilt."
+    },
+    {
+      "claim": "Observability means a dashboard of averages.",
+      "correction": "Averages hide the bad run. You need per-run traces with attributes, so any single complaint can be traced to the exact step and call that went wrong."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "The root is the run span. Under it sit step spans, one per turn of the loop, and under each step sit the model, tool, retrieval and guard spans it made.",
+      "Each span records a start time, a duration and a status. Attributes carry tokens, cost, latency, the model name, the degradation rung and any typed result.",
+      "OpenTelemetry GenAI semantic conventions keep attribute names standard, so traces move between tools and teams without custom parsers."
+    ],
+    "l2": [
+      "Take a three-step refund run lasting 6.4 seconds. Step 1 holds an llm.plan span, step 2 a tool.get_order span, and step 3 an llm.answer span and a guard.output span.",
+      "The llm.answer span records 2,100 input tokens and 420 output tokens. At $2 per million input and $10 per million output, its cost attribute is $0.0084.",
+      "Summing span costs gives the run cost, and the rung attribute on the run span shows whether it ran on the full rung or a degraded one."
+    ],
+    "l3": [
+      "Every span's start and end must fall inside its parent's. Broken nesting usually means context was not propagated across an asynchronous boundary, and the tree becomes a pile of orphans.",
+      "Record content, such as prompts and tool arguments, behind a redaction policy. Always keep token counts, cost and status, because every run needs them and they carry little risk.",
+      "Sample by value, not uniformly. Keep every trace with an error, a guard trip or a high cost, plus a small fraction of healthy traces as baselines."
+    ]
+  },
+  "prerequisites": ["six-components", "bounded-loop"],
+  "labs": ["trace-debugger"],
+  "drills": [],
+  "goals": ["interview", "capstone"],
+  "minutes": 10
+}

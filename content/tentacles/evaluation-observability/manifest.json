@@ -1,0 +1,24 @@
+{
+  "id": "evaluation-observability",
+  "version": "1.0.0",
+  "schemaVersion": 1,
+  "title": "Evaluation & Observability",
+  "summary": "How to test agents with an evaluation pyramid, golden sets and calibrated model judges, trace every run as a span tree, debug from symptom to cause, and gate releases on safety, significance and cost.",
+  "route": "/t/evaluation-observability",
+  "bookSource": "Part III, Ch 12 and 13",
+  "audience": ["engineer", "architect"],
+  "order": 5,
+  "concepts": "concepts/*.json",
+  "labs": [
+    { "id": "trace-debugger", "title": "Trace Debugger", "engine": "trace-debugger", "scenario": "labs/trace-debugger.json", "concepts": ["span-hierarchy", "trace-debugging"] },
+    { "id": "eval-pyramid-sorter", "title": "Evaluation Pyramid Sorter", "engine": "sorting-board", "scenario": "labs/eval-pyramid.json", "concepts": ["evaluation-pyramid", "golden-sets"] }
+  ],
+  "cards": "cards.json",
+  "checks": "checks.json",
+  "drills": "drills.json",
+  "prerequisites": ["foundations"],
+  "depthLevels": [1, 2, 3],
+  "capabilities": { "coach": false, "tutor": true },
+  "estimatedMinutes": 150,
+  "passMark": 0.8
+}

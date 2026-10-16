@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "human-gates",
+  "tentacle": "safety-governance",
+  "title": "Human gates",
+  "point": "Place human approval by cost of error and reversibility, so people review the few actions that matter instead of rubber-stamping everything.",
+  "definition": "A human gate is a control point where a person checks an agent action. Gates differ in timing: approve before the action, review a sample after it, or forbid the action for agents entirely.",
+  "level": 2,
+  "objective": {
+    "id": "human-gates-obj",
+    "text": "Sort agent actions into automatic, review-after, approve-before and never, justify each by reversibility, external effect and value, and estimate the reviewer load the placement creates."
+  },
+  "misconceptions": [
+    {
+      "claim": "Requiring approval for every action is the safest design.",
+      "correction": "Reviewers facing hundreds of low-risk approvals start clicking yes without reading. Approval fatigue turns every gate into a rubber stamp, including the gates that matter."
+    },
+    {
+      "claim": "A human gate stops prompt injection on its own.",
+      "correction": "It helps only if the reviewer sees the real effect, such as recipient, amount and content. A vague summary written by the same model can hide the attack."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Auto: reversible, low-value, internal actions run without a person, and every action is logged. Reading a public catalogue or labelling a ticket fits here.",
+      "Review-after: cheap actions that can be undone run immediately, and a person reviews a sample later. A $15 refund within policy is a typical case.",
+      "Approve-before: irreversible, external or high-value actions wait for a person. Never: actions no agent may take, such as changing payout bank details because an email asked."
+    ],
+    "l2": [
+      "Score each action with three questions. Can it be undone? Does its effect leave the organisation? What does one wrong action cost?",
+      "Deleting an account cannot be undone, so it waits for approval. Rescheduling a delivery is reversible and cheap, so it runs and is sampled.",
+      "Show the reviewer the exact effect: recipient, amount, data fields and the evidence the agent used. Approve the action itself, not the agent's description of it."
+    ],
+    "l3": [
+      "Budget reviewer time. If 2 per cent of 5,000 daily actions need approval at one minute each, that is 100 minutes of review a day.",
+      "Track approval rate and time to decide. Near 100 per cent approval with decisions under three seconds suggests rubber-stamping, so move low-risk actions down a tier.",
+      "Every gate needs a timeout rule. Decide what happens when nobody approves in time; usually the action is cancelled and the requester is told."
+    ]
+  },
+  "prerequisites": ["agency-spectrum", "prompt-injection"],
+  "labs": ["gate-placement"],
+  "drills": ["saf-drill-inbox-agent"],
+  "goals": ["interview", "capstone"],
+  "minutes": 12
+}

@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "drills": [
+    {
+      "id": "evl-drill-release-gates",
+      "title": "Design evaluation and release gates for a support agent",
+      "prompt": "Design the evaluation and release process for a customer-support agent. It handles 200,000 conversations a month and ships a prompt change every week. The golden set has 400 cases across four task types, and a model judge costs $0.01 per graded case. Human review costs $2 per conversation. Cost is currently $0.02 per conversation, and 12 per cent of conversations escalate to a human. Define the pyramid, the golden set, the judge, the trace data you need, and the gates from offline eval to full rollout.",
+      "minutes": 45,
+      "concepts": ["evaluation-pyramid", "golden-sets", "llm-as-judge", "trace-debugging", "release-gates"],
+      "rubric": [
+        {
+          "id": "requirements-as-numbers",
+          "criterion": "Requirements are stated as numbers before any architecture is chosen.",
+          "levels": [
+            "No numbers; requirements are adjectives such as accurate, safe or cheap.",
+            "Some numbers are given, but key ones are missing, such as daily volume or the judging cost per run.",
+            "Volume, cost and escalation numbers are stated, but derived figures such as canary sample size or review cost are missing or wrong.",
+            "Volume, cost and escalation numbers are stated, and daily volume, canary sample size, judging cost and review cost are derived correctly."
+          ]
+        },
+        {
+          "id": "architecture-with-decision-rule",
+          "criterion": "The architecture is chosen with an explicit decision rule tied to the numbers.",
+          "levels": [
+            "Evaluation is a single manual review before release, or no stages are named.",
+            "Pyramid layers or release stages are listed, but without cadences or gating rules.",
+            "Layers have cadences and stages are ordered, but the judge calibration, held-out split or significance rule is left unspecified.",
+            "Layers, golden set, judge and four gated stages are specified, each tied to a stated number such as agreement, sample size or a rollback threshold."
+          ]
+        },
+        {
+          "id": "trade-off-named",
+          "criterion": "A trade-off is named and accepted explicitly, with its cost quantified.",
+          "levels": [
+            "No trade-off is mentioned; the design is presented as having no downside.",
+            "A trade-off is mentioned in general terms, without saying what is given up.",
+            "A specific trade-off is named and accepted, but its cost is not quantified.",
+            "A specific trade-off is named, accepted and quantified, and the rejected alternative is stated."
+          ]
+        },
+        {
+          "id": "measurement-named",
+          "criterion": "A measurement is named that would show the choice was wrong.",
+          "levels": [
+            "No measurement or success signal is given.",
+            "A vague signal is given, such as watching quality, with no metric or threshold.",
+            "A specific metric is named, but without a threshold or the time window that would trigger a rethink.",
+            "A specific metric, threshold and window are named, together with the decision that would change."
+          ]
+        }
+      ],
+      "passMark": 9,
+      "outline": [
+        "Derive the load: 200,000 conversations a month is about 6,700 a day. A 5 per cent canary over three days sees about 1,000 conversations, enough to flag a 3-point rise in the 12 per cent escalation rate.",
+        "Derive the eval costs: judging all 400 cases costs $4 a run, so the judge can score every candidate. A human sample of 50 conversations costs $100 a release, or about $400 a month.",
+        "Pyramid: schema, tool-contract and loop-bound checks on every commit; about 120 replayed scenarios checking tool order and step counts on every merge; the judged golden set and human sample before each release.",
+        "Golden set: 100 cases per task type across three difficulty levels, 100 cases held out from tuning, every incident added as a regression case, and the set versioned with its rubric.",
+        "Judge: rubric-bound, evidence-citing and structured, with a separate prompt and model family from the agent, accepted only at 90 per cent within-one accuracy on 200 human-labelled cases.",
+        "Gates and traces: offline eval, a day of shadow, a three-day 5 per cent canary, then full rollout. Safety failures block outright, quality blocks only on a significant sign-test loss, and traces carry cost and rung per run.",
+        "Trade-off and measurement: accept about four days from merge to full rollout for safer weekly releases. Roll back automatically if escalation rises 3 points or cost exceeds $0.03 per conversation over a day."
+      ]
+    }
+  ]
+}

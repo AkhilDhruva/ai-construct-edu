@@ -1,0 +1,203 @@
+{
+  "schemaVersion": 1,
+  "cards": [
+    {
+      "id": "fin-001",
+      "conceptId": "cost-per-task",
+      "depth": 1,
+      "front": "What goes into cost per completed task?",
+      "back": "Every model call in the loop, in-loop retries, re-runs of failed tasks, and tool and retrieval fees. Divide that total spend by the number of tasks that succeed.",
+      "kind": "recall",
+      "tags": ["cost-per-task", "definition"]
+    },
+    {
+      "id": "fin-002",
+      "conceptId": "cost-per-task",
+      "depth": 1,
+      "front": "Cost per completed task divides total spend by the tasks that ____, not by the requests sent.",
+      "back": "Succeed. Failed attempts still cost money, so they raise the cost of each task that does complete.",
+      "kind": "cloze",
+      "tags": ["cost-per-task", "denominator"]
+    },
+    {
+      "id": "fin-003",
+      "conceptId": "cost-per-task",
+      "depth": 2,
+      "front": "An attempt makes 6 calls of 5,000 input and 500 output tokens at an illustrative $2 and $10 per million, plus $0.01 of tool fees. 1,000 attempts complete 800 tasks. Cost per completed task?",
+      "back": "Each call costs $0.015, so an attempt costs $0.09 plus $0.01, or $0.10. Spend is $100 across 800 completed tasks, which is $0.125 per completed task.",
+      "kind": "apply",
+      "tags": ["cost-per-task", "arithmetic"]
+    },
+    {
+      "id": "fin-004",
+      "conceptId": "cost-per-task",
+      "depth": 3,
+      "front": "Model A costs $0.08 per attempt and succeeds 0.9 of the time. Model B costs $0.05 per attempt and succeeds 0.5 of the time. Failures are re-run. Which is cheaper per completed task?",
+      "back": "A: $0.08 divided by 0.9 is about $0.089. B: $0.05 divided by 0.5 is $0.10. The cheaper attempt is the dearer task, and B's users also wait for more re-runs.",
+      "kind": "apply",
+      "tags": ["cost-per-task", "model-choice", "arithmetic"]
+    },
+    {
+      "id": "fin-005",
+      "conceptId": "prompt-caching",
+      "depth": 1,
+      "front": "Where should byte-stable content go in a prompt that uses caching, and why?",
+      "back": "First, before the cache breakpoint. The cache matches a prefix from the start, so the system prompt, tool definitions and rubric lead, and variable content follows.",
+      "kind": "recall",
+      "tags": ["caching", "prompt-order"]
+    },
+    {
+      "id": "fin-006",
+      "conceptId": "prompt-caching",
+      "depth": 1,
+      "front": "Cache reads cost about a ____ of normal input, while cache writes cost a little ____ than normal input.",
+      "back": "Tenth; more. A prefix that is written but never read again therefore costs extra, which is why stable content and steady traffic matter.",
+      "kind": "cloze",
+      "tags": ["caching", "pricing"]
+    },
+    {
+      "id": "fin-007",
+      "conceptId": "prompt-caching",
+      "depth": 2,
+      "front": "An 8,000-token prefix is resent on 5 calls per task at an illustrative $2 per million. Writes cost 1.25 times input and reads a tenth. What does the prefix cost with and without caching?",
+      "back": "Without: 40,000 tokens, or $0.08. With: one write of 10,000 token-equivalents plus four reads of 800, or 13,200 in all, about $0.026. Caching cuts prefix spend by about two thirds.",
+      "kind": "apply",
+      "tags": ["caching", "arithmetic"]
+    },
+    {
+      "id": "fin-008",
+      "conceptId": "prompt-caching",
+      "depth": 3,
+      "front": "After a deploy, prefix spend rises above its pre-caching level, yet nothing errors. What are the likely causes and how do you confirm?",
+      "back": "Something now varies in the prefix: a timestamp or request ID, JSON with unsorted keys, or tools listed in a new order. Every call writes. Confirm with cache-read token counts falling to near zero.",
+      "kind": "apply",
+      "tags": ["caching", "invalidation", "observability"]
+    },
+    {
+      "id": "fin-009",
+      "conceptId": "model-routing",
+      "depth": 1,
+      "front": "Which steps does model routing usually send to a cheaper model?",
+      "back": "Easy, well-defined steps such as classification, extraction and routing. Planning and judgement steps stay on the stronger model, and each route is checked on a golden set.",
+      "kind": "recall",
+      "tags": ["routing", "definition"]
+    },
+    {
+      "id": "fin-010",
+      "conceptId": "model-routing",
+      "depth": 1,
+      "front": "A ____ tries a cheap model first and escalates to a stronger model when confidence is low.",
+      "back": "Cascade. Its saving depends on how many calls escalate, because escalated calls pay for both models.",
+      "kind": "cloze",
+      "tags": ["routing", "cascade"]
+    },
+    {
+      "id": "fin-011",
+      "conceptId": "model-routing",
+      "depth": 2,
+      "front": "A task makes 12 calls: 8 extraction and 4 reasoning. The strong model costs $0.03 per call and a cheap one $0.006. What do all-strong and routed tasks cost?",
+      "back": "All strong: 12 times $0.03 is $0.36. Routed: 8 times $0.006 plus 4 times $0.03 is $0.168, a 53 per cent saving, provided extraction still passes the golden set.",
+      "kind": "apply",
+      "tags": ["routing", "arithmetic"]
+    },
+    {
+      "id": "fin-012",
+      "conceptId": "model-routing",
+      "depth": 3,
+      "front": "A cascade uses a $0.004 cheap call and a $0.02 strong call. What is the expected cost per call at 40 and 85 per cent escalation, and where is break-even?",
+      "back": "At 40 per cent: $0.004 plus 0.4 times $0.02 is $0.012. At 85 per cent: $0.021, dearer than strong-only. Break-even is 80 per cent escalation.",
+      "kind": "apply",
+      "tags": ["routing", "cascade", "arithmetic"]
+    },
+    {
+      "id": "fin-013",
+      "conceptId": "context-trimming",
+      "depth": 1,
+      "front": "Name four ways to trim an agent's context.",
+      "back": "Summarise long observations, cap retrieved tokens, drop stale history and cap output length. Each cuts cost, and fewer tokens also cut latency.",
+      "kind": "recall",
+      "tags": ["trimming", "techniques"]
+    },
+    {
+      "id": "fin-014",
+      "conceptId": "context-trimming",
+      "depth": 2,
+      "front": "Summarising cuts a call's history from 25,000 to 7,500 tokens at an illustrative $2 per million input. What is the saving per call, and over 10 such calls?",
+      "back": "The call falls from $0.05 to $0.015, saving $0.035. Over 10 calls that is $0.35 per task, as long as the golden set shows no drop in task success.",
+      "kind": "apply",
+      "tags": ["trimming", "arithmetic"]
+    },
+    {
+      "id": "fin-015",
+      "conceptId": "context-trimming",
+      "depth": 2,
+      "front": "An output cap of 300 tokens cut output spend, but total cost went up. What probably happened?",
+      "back": "The cap truncated structured verdicts mid-field. Each truncation caused a parse failure and a retry, which cost more than the saved tokens. Size caps from the real output distribution.",
+      "kind": "apply",
+      "tags": ["trimming", "output-caps", "retries"]
+    },
+    {
+      "id": "fin-016",
+      "conceptId": "batch-and-async",
+      "depth": 1,
+      "front": "Which agent workloads suit a batch API, and roughly what does it save?",
+      "back": "Work nobody is waiting for: overnight grading, evaluation runs, backfills and periodic re-checks. A batch API typically charges roughly half price for results within hours.",
+      "kind": "recall",
+      "tags": ["batch", "definition"]
+    },
+    {
+      "id": "fin-017",
+      "conceptId": "batch-and-async",
+      "depth": 2,
+      "front": "A weekly evaluation runs 20,000 cases at $0.03 each. What do four runs a month cost interactively and through a batch API at half price?",
+      "back": "Each run costs $600, so four runs cost $2,400 a month. Through a batch API they cost about $1,200, with no change to the results.",
+      "kind": "apply",
+      "tags": ["batch", "evals", "arithmetic"]
+    },
+    {
+      "id": "fin-018",
+      "conceptId": "batch-and-async",
+      "depth": 2,
+      "front": "Users wait for a contract assistant, but its full clause audit is expensive. How do you use async design without hurting them?",
+      "back": "Split the workflow. Return a quick risk summary now, queue the full audit as a batch job, and notify the user when it is ready, typically by the next morning.",
+      "kind": "apply",
+      "tags": ["batch", "async", "ux"]
+    },
+    {
+      "id": "fin-019",
+      "conceptId": "cost-guardrails",
+      "depth": 1,
+      "front": "Name four cost guardrails.",
+      "back": "Per-user or per-tenant budgets checked before each call, alerts on requests costing a multiple of their trailing median, degraded modes instead of failure, and cost attribution by route, model and customer.",
+      "kind": "recall",
+      "tags": ["guardrails", "definition"]
+    },
+    {
+      "id": "fin-020",
+      "conceptId": "cost-guardrails",
+      "depth": 1,
+      "front": "Alert when a request costs a multiple, such as ____, of its route's trailing median cost.",
+      "back": "Three times. A route with a $0.25 median alerts at $0.75, which catches runaway loops and prompt bugs within minutes.",
+      "kind": "cloze",
+      "tags": ["guardrails", "alerts"]
+    },
+    {
+      "id": "fin-021",
+      "conceptId": "cost-guardrails",
+      "depth": 2,
+      "front": "A call will send 30,000 input tokens with a 1,500-token output cap, at an illustrative $2 and $10 per million. The tenant has $0.05 left. What should the gateway do?",
+      "back": "The worst case is $0.06 plus $0.015, or $0.075, which exceeds $0.05. Degrade before the call, for example to a smaller model or shorter context, and tell the user.",
+      "kind": "apply",
+      "tags": ["guardrails", "budgets", "arithmetic"]
+    },
+    {
+      "id": "fin-022",
+      "conceptId": "cost-guardrails",
+      "depth": 3,
+      "front": "Total model spend jumps 40 per cent overnight. What lets you find the cause quickly, and what would have limited the damage?",
+      "back": "Spans tagged with route, model, tenant and feature, so spend can be grouped to one source. A per-task cost cap and a three-times-median alert would have stopped and flagged the runaway within minutes.",
+      "kind": "apply",
+      "tags": ["guardrails", "attribution", "anomaly"]
+    }
+  ]
+}

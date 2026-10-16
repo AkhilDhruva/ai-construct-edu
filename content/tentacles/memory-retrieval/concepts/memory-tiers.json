@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "memory-tiers",
+  "tentacle": "memory-retrieval",
+  "title": "The four memory tiers",
+  "point": "Split agent memory into four tiers, each with its own write policy, lifetime and read budget, and make every item carry its source.",
+  "definition": "Agent memory has four tiers: working context for the current step, session memory for this run or conversation, long-term memory for durable facts about one user, and shared knowledge retrieved from a document corpus.",
+  "level": 1,
+  "objective": {
+    "id": "memory-tiers-obj",
+    "text": "Given a list of items an agent holds, place each in the right tier and state its write policy, lifetime and read budget."
+  },
+  "misconceptions": [
+    {
+      "claim": "A large context window removes the need for memory tiers.",
+      "correction": "A bigger window only raises the ceiling on working context. Durable user facts and a document corpus still need their own stores, lifetimes and bounded reads."
+    },
+    {
+      "claim": "Anything the agent learns in a conversation should go into long-term memory.",
+      "correction": "Most of a session is noise once it ends. Write to long-term memory only through a policy, such as a fact the user confirmed, and record where it came from."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Working context is what sits in the prompt for this step. Session memory holds this run or conversation, such as earlier turns and tool results, and is dropped or archived when it ends.",
+      "Long-term user memory holds durable facts about one user, such as a preferred language. Each fact is scoped to that user and records where and when it was learned.",
+      "Shared knowledge is a retrieval corpus of documents, such as help articles or policies, that every user may read. Its owners curate it; the agent does not write to it.",
+      "Each tier has its own write policy, lifetime and read budget. Every read is bounded, and every item carries its source."
+    ],
+    "l2": [
+      "A user asks a support assistant where their refund is. Working context holds the system prompt, the question and the last tool result, which shows refund R-2291 issued two days ago.",
+      "Session memory supplies the two earlier turns, in which the user gave the order number. Long-term memory supplies one fact: the user prefers replies in Spanish, confirmed on 3 March.",
+      "Shared knowledge supplies the refunds policy article, which says card refunds take five to ten working days. The answer cites that article and the tool result."
+    ],
+    "l3": [
+      "Lifetimes differ by tier. Working context lives for one step, session memory might live 24 hours, and a long-term fact might live 12 months unless the user deletes it sooner.",
+      "Read budgets follow from cost. If long-term memory is capped at 20 facts of 25 tokens each, a read costs at most 500 tokens a step, however much the user has stored.",
+      "The riskiest write is promotion from session to long-term memory, because it outlives the conversation. It needs the strictest policy and a provenance record."
+    ]
+  },
+  "prerequisites": ["six-components"],
+  "labs": ["memory-sorter"],
+  "drills": ["mem-drill-assistant-memory"],
+  "goals": ["interview", "capstone"],
+  "minutes": 12
+}

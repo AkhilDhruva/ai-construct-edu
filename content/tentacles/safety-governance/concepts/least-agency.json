@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "least-agency",
+  "tentacle": "safety-governance",
+  "title": "Least agency",
+  "point": "Give an agent the lowest agency level and the fewest, narrowest tools that meet the requirement, because every extra capability is extra attack surface.",
+  "definition": "Least agency extends least privilege from credentials to autonomy. It limits how freely the agent chooses actions, which tools it holds, what those tools can touch and how long its credentials last.",
+  "level": 2,
+  "objective": {
+    "id": "least-agency-obj",
+    "text": "For a stated requirement, choose the lowest sufficient agency level, a minimal read-only-by-default tool set and credential scopes, and show which trifecta legs the choice removes."
+  },
+  "misconceptions": [
+    {
+      "claim": "Extra tools make an agent more useful and cost nothing if they are rarely called.",
+      "correction": "Unused tools still widen what an injection can reach, and they make tool selection harder. Each tool must be earned by a requirement."
+    },
+    {
+      "claim": "Least agency means always building a fixed pipeline.",
+      "correction": "It means the lowest level that meets the requirement. If tasks truly need open-ended steps, a bounded loop is right, with narrow tools and firm limits."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Lowest sufficient level: if a router meets the requirement, do not build a loop. Each step up the agency spectrum adds choices an attacker can steer.",
+      "Fewest, narrowest tools: grant get_order_status, not a general database query tool. Narrow tools have typed arguments that leave little room for abuse.",
+      "Read-only by default, with scoped short-lived credentials. Write and send tools are added only for a stated requirement, and usually behind a gate."
+    ],
+    "l2": [
+      "A meeting-notes agent was given read and write access to every calendar, plus email send. The requirement was only to summarise one team's meetings.",
+      "Least agency gives it a read-only tool for that team's calendar and a draft-only notes tool. It loses the external-communication leg and most of its private-data reach.",
+      "The summaries are unchanged, because no requirement used the removed tools. Review usage logs regularly: a tool with no calls in thirty days is a candidate for removal."
+    ],
+    "l3": [
+      "Narrower agents shift work to people. An agent that can no longer handle an edge case hands it to a human queue.",
+      "Quantify that cost. If removing send means reps send 300 replies a day at 20 seconds each, that is 100 minutes a day, to compare with the expected cost of a leak.",
+      "Credential lifetime matters as much as scope. A token that expires in five minutes limits how long a hijacked session can act."
+    ]
+  },
+  "prerequisites": ["lethal-trifecta", "agency-spectrum"],
+  "labs": ["trifecta-check"],
+  "drills": [],
+  "goals": ["interview", "capstone"],
+  "minutes": 10
+}

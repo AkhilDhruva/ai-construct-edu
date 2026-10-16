@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "context-trimming",
+  "tentacle": "cost-finops",
+  "title": "Context trimming",
+  "point": "Send the model only the tokens it needs: summarise long observations, cap retrieval, drop stale history and cap output, which cuts both cost and latency.",
+  "definition": "Context trimming reduces the tokens sent and generated on each call. It summarises long tool observations, caps retrieved passages, drops history that no longer matters and limits output length.",
+  "level": 2,
+  "objective": {
+    "id": "context-trimming-obj",
+    "text": "Given a growing agent context, choose what to summarise, cap or drop, compute the per-call saving, and name the golden-set check that shows nothing important was lost."
+  },
+  "misconceptions": [
+    {
+      "claim": "More context always gives better answers, so it is worth paying for.",
+      "correction": "Long raw tool output and stale turns often bury the facts that matter. Trimmed context is cheaper, faster and frequently at least as accurate, which the golden set should confirm."
+    },
+    {
+      "claim": "Trimming only matters for input tokens.",
+      "correction": "Output tokens usually cost several times more than input and are generated one at a time. Capping output length cuts both cost and latency."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Each loop step usually appends a full tool observation, so context grows with every step. Summarise long observations to the facts the next step needs.",
+      "Cap retrieved tokens, for example to the top few passages. Drop history that no longer affects the decision, and cap output length with a maximum and a terse format.",
+      "Fewer tokens also cut latency. The model processes fewer input tokens and generates fewer output tokens, so each step finishes sooner."
+    ],
+    "l2": [
+      "At step 8, an agent carries 30,000 tokens of history, mostly raw tool output. At an illustrative $2 per million input tokens, that call's input costs $0.06.",
+      "Summarise each observation to about 300 tokens and keep only the last three turns verbatim. The context falls to 9,000 tokens, and the input for that call costs $0.018.",
+      "Capping output from 2,000 to 800 tokens, at an illustrative $10 per million, cuts output cost from $0.02 to $0.008 per call."
+    ],
+    "l3": [
+      "The risk is dropping a fact that a later step needs. Keep an ID for each full observation, and give the agent a tool that fetches it back on demand.",
+      "Run the golden set with and without trimming, and compare task success as well as tokens. A trim that saves 60 per cent of input tokens is still a bad trade if it costs more task success than the business allows.",
+      "Output caps need care too. A cap that truncates a structured verdict mid-field causes a parse failure and a retry, which costs more than the tokens it saved."
+    ]
+  },
+  "prerequisites": ["cost-per-task"],
+  "labs": ["cost-waterfall"],
+  "drills": [],
+  "goals": ["interview", "capstone"],
+  "minutes": 10
+}

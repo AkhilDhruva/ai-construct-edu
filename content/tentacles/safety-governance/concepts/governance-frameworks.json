@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "governance-frameworks",
+  "tentacle": "safety-governance",
+  "title": "Governance frameworks",
+  "point": "NIST AI RMF, ISO/IEC 42001 and the EU AI Act all ask for evidence that good engineering already produces, so map each expectation to a concrete artefact.",
+  "definition": "Governance frameworks describe how organisations manage AI risk. NIST AI RMF 1.0 is voluntary guidance, ISO/IEC 42001 is a certifiable management-system standard, and the EU AI Act is a risk-based regulation.",
+  "level": 2,
+  "objective": {
+    "id": "governance-frameworks-obj",
+    "text": "Say what kind of instrument each framework is, name the four NIST AI RMF functions, and map framework expectations to artefacts such as a risk register, eval reports and trace logs."
+  },
+  "misconceptions": [
+    {
+      "claim": "NIST AI RMF is a law that every AI system must comply with.",
+      "correction": "It is voluntary guidance organised into four functions: Govern, Map, Measure and Manage. Organisations adopt it to structure their risk work, and customers or regulators may refer to it."
+    },
+    {
+      "claim": "Governance is paperwork written after the system ships.",
+      "correction": "The evidence comes from work done during the build: risk assessments, eval results, logs and oversight design. Reconstructing it afterwards is slower and usually incomplete."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "NIST AI RMF 1.0 is voluntary and has four functions. Govern sets policy and roles, Map frames context and risks, Measure assesses them, and Manage treats and monitors them.",
+      "ISO/IEC 42001 specifies requirements for an AI management system. An organisation can be audited and certified against it, much as with information-security management standards.",
+      "The EU AI Act is risk-based. It prohibits some practices, places obligations on high-risk systems, requires transparency from certain systems such as chatbots, and leaves minimal-risk systems largely alone."
+    ],
+    "l2": [
+      "High-risk obligations include risk management, data governance, logging, human oversight and accuracy. The Act also covers general-purpose AI models, and its obligations phase in over several years.",
+      "Map each expectation to an artefact you already build. A risk register covers risk management, eval reports cover accuracy, trace logs cover logging and gate design covers human oversight.",
+      "Incident records and post-incident reviews show that risks are monitored and managed over time. Link each one to the risk register entries it affects."
+    ],
+    "l3": [
+      "Build one evidence pipeline, not one per framework. A single control, such as approval before outbound email, can serve NIST Manage, an ISO/IEC 42001 control and an oversight duty.",
+      "Classification drives the work. Whether a system counts as high-risk under the EU AI Act depends on its use, so record your reasoning and have legal counsel confirm it.",
+      "Version artefacts with the system. An eval report is evidence only for the model, prompt and tool set it actually tested."
+    ]
+  },
+  "prerequisites": ["six-components"],
+  "labs": [],
+  "drills": [],
+  "goals": ["interview", "capstone"],
+  "minutes": 14
+}

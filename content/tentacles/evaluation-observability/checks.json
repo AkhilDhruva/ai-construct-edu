@@ -1,0 +1,294 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {
+      "id": "evl-chk-01",
+      "conceptId": "evaluation-pyramid",
+      "depth": 1,
+      "kind": "mcq",
+      "stem": "A support agent has 400 schema and contract checks, 120 replayed scenarios and a 300-item judged set. Which cadence fits the evaluation pyramid?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Run all three layers on every commit so nothing slips through.",
+          "feedback": "Too costly. The judged set needs hundreds of model calls and human time, which would make every commit slow and expensive."
+        },
+        {
+          "id": "b",
+          "text": "Run the base checks on every commit, the scenarios on every merge, and the judged set nightly and before release.",
+          "feedback": "Correct. Each layer runs as often as its cost allows, so cheap checks catch most breakages within minutes."
+        },
+        {
+          "id": "c",
+          "text": "Run only the judged set before release, because it measures what users see.",
+          "feedback": "Too late and too coarse. A broken schema or loop bound would surface days after the change, and only if a judged case happened to hit it."
+        },
+        {
+          "id": "d",
+          "text": "Run the scenarios on every commit and skip the base checks, since scenarios cover them.",
+          "feedback": "Wasteful. Scenarios are slower and less precise; a failed schema check names the exact field, while a failed scenario only says something went wrong."
+        }
+      ],
+      "answer": "b",
+      "explanation": "Cadence follows cost. Cheap deterministic checks run constantly, scenarios run on merges, and expensive judgements run on release candidates."
+    },
+    {
+      "id": "evl-chk-02",
+      "conceptId": "evaluation-pyramid",
+      "depth": 2,
+      "kind": "multi",
+      "stem": "Which checks belong in the base of the evaluation pyramid? Select all that apply.",
+      "options": [
+        {
+          "id": "schema",
+          "text": "Every tool call's arguments validate against the tool's JSON Schema.",
+          "feedback": "Correct. It is deterministic, cheap and exact, so it runs on every commit."
+        },
+        {
+          "id": "loop",
+          "text": "A scripted planner that never finishes makes the loop stop with a typed step-limit reason.",
+          "feedback": "Correct. A unit test of a loop bound needs no model and gives the same result every time."
+        },
+        {
+          "id": "trajectory",
+          "text": "On a replayed refund ticket, the agent calls get_order before issue_refund.",
+          "feedback": "Incorrect. That checks the path the agent took, which is a scenario or trajectory eval in the middle layer."
+        },
+        {
+          "id": "judge",
+          "text": "A model judge scores answer helpfulness against a 1 to 5 rubric.",
+          "feedback": "Incorrect. A judged score is an end-to-end judgement at the top, too costly and noisy to run on every commit."
+        },
+        {
+          "id": "parse",
+          "text": "The final answer parses against the response schema with every required field present.",
+          "feedback": "Correct. Parsing is a deterministic check with a single right result."
+        }
+      ],
+      "answers": ["schema", "loop", "parse"],
+      "explanation": "The base holds checks with an exact, repeatable answer that need no judgement. Anything about the path taken or the quality of the answer sits higher up."
+    },
+    {
+      "id": "evl-chk-03",
+      "conceptId": "golden-sets",
+      "depth": 2,
+      "kind": "mcq",
+      "stem": "A team writes 60 examples in a workshop, calls them the golden set, and tunes the prompt until all 60 pass. What is the biggest problem?",
+      "options": [
+        {
+          "id": "a",
+          "text": "60 is too few; writing 600 examples would fix it.",
+          "feedback": "Not enough. More invented cases still reflect what the team imagines, and tuning on all of them would still overfit."
+        },
+        {
+          "id": "b",
+          "text": "The cases do not come from real traffic, and with no held-out split the passing score shows only that the prompt fits these 60.",
+          "feedback": "Correct. Draw cases from real traffic and incidents, stratify them, and keep a held-out split that tuning never sees."
+        },
+        {
+          "id": "c",
+          "text": "The examples should be labelled by the agent under test to save time.",
+          "feedback": "Harmful. Labels come from a written rubric applied by people or a calibrated judge, never by the system being measured."
+        },
+        {
+          "id": "d",
+          "text": "Nothing is wrong, provided the set is versioned.",
+          "feedback": "Versioning is needed, but it does not make invented cases representative or prevent overfitting."
+        }
+      ],
+      "answer": "b",
+      "explanation": "A golden set is only as good as its sources and its separation from tuning. Real cases, stratification and a held-out split make its score mean something."
+    },
+    {
+      "id": "evl-chk-04",
+      "conceptId": "llm-as-judge",
+      "depth": 2,
+      "kind": "multi",
+      "stem": "Which practices make an LLM judge more trustworthy? Select all that apply.",
+      "options": [
+        {
+          "id": "rubric",
+          "text": "The judge scores each criterion of a written rubric and quotes the passage that supports each score.",
+          "feedback": "Correct. A rubric fixes the standard, and quoted evidence lets anyone audit the score."
+        },
+        {
+          "id": "calibrate",
+          "text": "The judge's scores are compared with human labels, and within-one accuracy is reported.",
+          "feedback": "Correct. Without measured agreement there is no basis for trusting the judge's scores."
+        },
+        {
+          "id": "same-prompt",
+          "text": "The judge reuses the agent's system prompt so it understands the task in the same way.",
+          "feedback": "Incorrect. A judge that shares the producer's prompt shares its blind spots and tends to approve its own reasoning."
+        },
+        {
+          "id": "swap",
+          "text": "Pairwise comparisons are run in both orders, and only consistent wins count.",
+          "feedback": "Correct. Swapping positions cancels the bias towards whichever answer is shown first."
+        },
+        {
+          "id": "free-text",
+          "text": "The judge returns a free-text paragraph that an engineer reads to decide the score.",
+          "feedback": "Incorrect. Free text is hard to aggregate and audit. Structured output with score and evidence fields is machine-readable."
+        }
+      ],
+      "answers": ["rubric", "calibrate", "swap"],
+      "explanation": "A trustworthy judge is rubric-bound, cites evidence, returns structured output, is independent of the producer and has measured agreement with humans."
+    },
+    {
+      "id": "evl-chk-05",
+      "conceptId": "llm-as-judge",
+      "depth": 3,
+      "kind": "mcq",
+      "stem": "A 1 to 5 judge is checked on 250 human-labelled answers. It matches exactly on 140 and is within one point on 225. What is its within-one accuracy?",
+      "options": [
+        {
+          "id": "a",
+          "text": "56 per cent.",
+          "feedback": "That is exact agreement, 140 of 250. Within-one also counts the answers scored one point away."
+        },
+        {
+          "id": "b",
+          "text": "90 per cent.",
+          "feedback": "Correct. 225 of 250 is 90 per cent. Report it beside the 56 per cent exact agreement."
+        },
+        {
+          "id": "c",
+          "text": "34 per cent.",
+          "feedback": "That is the 85 answers one point away but not exact. Within-one accuracy includes the exact matches too."
+        },
+        {
+          "id": "d",
+          "text": "It cannot be computed without a second judge.",
+          "feedback": "Not needed. Agreement is measured against the human labels, which serve as the reference."
+        }
+      ],
+      "answer": "b",
+      "explanation": "Within-one accuracy is the share of items where the judge is no more than one point from the human label. Report it with exact agreement, the rubric version and the judge model."
+    },
+    {
+      "id": "evl-chk-06",
+      "conceptId": "span-hierarchy",
+      "depth": 1,
+      "kind": "mcq",
+      "stem": "Which span tree correctly describes one agent run?",
+      "options": [
+        {
+          "id": "a",
+          "text": "One span per model call, all at the same level, ordered by time.",
+          "feedback": "Too flat. Without step spans you cannot see which calls belonged to which turn of the loop."
+        },
+        {
+          "id": "b",
+          "text": "A run span containing step spans, each containing its model call, tool call, retrieval and guard spans.",
+          "feedback": "Correct. This is the hierarchy that lets any run be reconstructed and costed."
+        },
+        {
+          "id": "c",
+          "text": "A tool span at the root, with model calls nested under the tool that triggered them.",
+          "feedback": "Inverted. The run is the root, and tools are called from within steps."
+        },
+        {
+          "id": "d",
+          "text": "One span for the whole run, with every prompt and response stored as attributes.",
+          "feedback": "Too coarse. A single span hides the timing, cost and status of each part, so a fault cannot be located."
+        }
+      ],
+      "answer": "b",
+      "explanation": "Run, then step, then model call, tool call, retrieval and guard spans. Each carries tokens, cost, latency, model, rung and status as attributes."
+    },
+    {
+      "id": "evl-chk-07",
+      "conceptId": "trace-debugging",
+      "depth": 2,
+      "kind": "mcq",
+      "stem": "An agent closed a customer's account when asked how to update a billing address. The trace shows retrieval.vector ok with 4 hits, guard.injection ok after scanning 2,000 of 6,400 characters, llm.plan choosing close_account, and tool.close_account ok. Which span is the root cause?",
+      "options": [
+        {
+          "id": "a",
+          "text": "retrieval.vector",
+          "feedback": "It did its job and returned relevant documents. One contained an injected instruction, which is the guard's job to catch."
+        },
+        {
+          "id": "b",
+          "text": "guard.injection",
+          "feedback": "Correct. It is the first anomalous span: it scanned under a third of the document, so the injected instruction passed unseen."
+        },
+        {
+          "id": "c",
+          "text": "llm.plan",
+          "feedback": "It acted on an instruction that should never have reached it, so it is a consequence of the missed injection."
+        },
+        {
+          "id": "d",
+          "text": "tool.close_account",
+          "feedback": "The most visible span, but the last link in the chain. Human confirmation would add a second line of defence, but the first anomaly comes earlier."
+        }
+      ],
+      "answer": "b",
+      "explanation": "Status ok reports only what a span noticed. Comparing attributes with a healthy run, where guards scan whole documents, exposes the guard as the first anomaly."
+    },
+    {
+      "id": "evl-chk-08",
+      "conceptId": "trace-debugging",
+      "depth": 2,
+      "kind": "order",
+      "stem": "Put the steps for debugging a bad agent run from its trace in order.",
+      "items": [
+        { "id": "walk", "text": "Walk backwards through earlier spans, checking status and attributes against a healthy run." },
+        { "id": "regress", "text": "Add the case to the golden set so the fix is checked on every release." },
+        { "id": "symptom", "text": "Write down the symptom, such as a wrong answer or a high bill." },
+        { "id": "first", "text": "Stop at the first anomalous span and name it as the root cause." },
+        { "id": "locate", "text": "Find the span that produced what the user saw." }
+      ],
+      "answer": ["symptom", "locate", "walk", "first", "regress"],
+      "explanation": "Debugging runs from the visible symptom back to the earliest anomaly. Capturing the case afterwards stops the same failure from shipping again."
+    },
+    {
+      "id": "evl-chk-09",
+      "conceptId": "release-gates",
+      "depth": 1,
+      "kind": "order",
+      "stem": "Put the rollout stages for a weekly prompt change in order.",
+      "items": [
+        { "id": "canary", "text": "Serve the change to 5 per cent of live users while guardrail metrics are watched." },
+        { "id": "full", "text": "Roll out to all traffic, with automatic rollback still armed." },
+        { "id": "offline", "text": "Score the change on the golden set, including the held-out split." },
+        { "id": "shadow", "text": "Run the change on live traffic without showing its answers to users." }
+      ],
+      "answer": ["offline", "shadow", "canary", "full"],
+      "explanation": "Each stage exposes the change to more reality at more risk. Offline eval risks nothing, shadow risks only compute, and the canary limits harm to a small share of users."
+    },
+    {
+      "id": "evl-chk-10",
+      "conceptId": "release-gates",
+      "depth": 3,
+      "kind": "mcq",
+      "stem": "A new prompt wins 41, loses 29 and ties 230 on a 300-item golden set. No safety assertion fails, and cost is unchanged. What should the release report say?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Ship it as an improvement, because it wins 12 more items than it loses.",
+          "feedback": "Not justified. A sign test on the 70 non-tied items puts 41 wins about 1.4 standard deviations above chance, which is within noise."
+        },
+        {
+          "id": "b",
+          "text": "Block it, because any result short of significance counts as a regression.",
+          "feedback": "Wrong direction. The change is not significantly worse either, so it does not trip the quality gate."
+        },
+        {
+          "id": "c",
+          "text": "No significant quality change; it may proceed to shadow as neutral, without claiming a gain.",
+          "feedback": "Correct. Wins would average 35 under no change, with a standard deviation near 4.2, so 41 is not significant."
+        },
+        {
+          "id": "d",
+          "text": "Rerun the eval until the result is significant, then ship.",
+          "feedback": "That is fishing for a result. Repeated runs on the same set inflate false positives, so fix the test before looking."
+        }
+      ],
+      "answer": "c",
+      "explanation": "Quality gates use a paired test on per-item scores. Safety failures would block outright, and cost is reported beside quality either way."
+    }
+  ]
+}

@@ -43,8 +43,8 @@ describe('adaptive engine rules-v1', () => {
     const p = plan(inputs(), g2, rules)
     expect(validatePlan(p, g2)).toEqual([])
     const idx = (id: string) => p.items.findIndex((i) => i.conceptId === id)
-    expect(idx('six-components')).toBeLessThan(idx('memory-tiers'))
-    expect(idx('memory-tiers')).toBeLessThan(idx('bitemporal'))
+    expect(idx('six-components')).toBeLessThan(idx('fx-tiers'))
+    expect(idx('fx-tiers')).toBeLessThan(idx('fx-history'))
   })
 
   it('drops mastered concepts and picks depth from mastery', () => {

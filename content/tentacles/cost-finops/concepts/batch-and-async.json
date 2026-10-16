@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "batch-and-async",
+  "tentacle": "cost-finops",
+  "title": "Batch and async",
+  "point": "Run work nobody is waiting for through a batch API at roughly half price, and queue expensive work instead of blocking the user.",
+  "definition": "Batch processing submits many requests together for results within hours, at a discount of roughly half. Asynchronous design queues work and notifies the user later instead of holding a request open.",
+  "level": 2,
+  "objective": {
+    "id": "batch-and-async-obj",
+    "text": "Given a mix of workloads, decide which can move to a batch API or a queue, compute the saving, and state what the user sees while the work waits."
+  },
+  "misconceptions": [
+    {
+      "claim": "Batching is only for offline data pipelines, not for agent systems.",
+      "correction": "Agent systems run plenty of work nobody waits for: nightly evaluations, grading, backfills and re-checks. Each can go through a batch API at roughly half price."
+    },
+    {
+      "claim": "Asynchronous means the user gets a worse experience.",
+      "correction": "A quick acknowledgement and a reliable notification often beat a spinner that times out. Queue the expensive part and show what is ready now."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Ask of each workload whether a person is waiting for it right now. If not, it is a candidate for a batch API, which typically returns results within hours at roughly half price.",
+      "Good candidates are overnight grading, evaluation runs, backfills over old documents and periodic re-checks. Interactive chat turns are not.",
+      "Async design applies even to user-facing work. Acknowledge the request, queue the expensive part, and notify the user when it completes."
+    ],
+    "l2": [
+      "A nightly evaluation runs 5,000 cases at $0.04 each, or $200 a night. Through a batch API at half price it costs $100, so a 30-night month falls from $6,000 to $3,000.",
+      "A one-off backfill tags 1 million old documents at $0.01 each. Interactively that is $10,000; through a batch API it is about $5,000, and nobody notices the extra hours.",
+      "Neither change affects answer quality. The only cost is waiting, which these workloads can afford."
+    ],
+    "l3": [
+      "Split mixed workflows. A contract assistant can return a quick risk summary now and run the full clause-by-clause audit as a batch job, delivered by morning.",
+      "Queues also smooth peaks. Work arriving at three times the average rate waits its turn instead of forcing capacity sized for the peak or hitting rate limits.",
+      "Discounts may not stack predictably. Cache hits inside a batch can be less reliable, so measure the combined saving rather than multiplying the two headline discounts."
+    ]
+  },
+  "prerequisites": ["cost-per-task"],
+  "labs": ["cost-waterfall"],
+  "drills": ["fin-drill-cut-spend"],
+  "goals": ["interview", "capstone"],
+  "minutes": 9
+}

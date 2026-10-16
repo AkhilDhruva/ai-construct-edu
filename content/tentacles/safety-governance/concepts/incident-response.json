@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "incident-response",
+  "tentacle": "safety-governance",
+  "title": "Incident response for agents",
+  "point": "Detect, contain, investigate, fix, then turn the incident into a regression case, so the same failure cannot ship twice.",
+  "definition": "Incident response for agents is the practised sequence for handling harmful or anomalous behaviour in production. It covers detection, containment, investigation with traces, a fix, a regression case and a blameless review.",
+  "level": 2,
+  "objective": {
+    "id": "incident-response-obj",
+    "text": "Order the incident-response stages, name a concrete control for each, such as a kill switch, credential revocation or a golden-set regression case, and run a blameless review."
+  },
+  "misconceptions": [
+    {
+      "claim": "The first job in an incident is to find the root cause.",
+      "correction": "Contain first. Stop the harm with a kill switch, a lower rung of the degradation ladder or revoked credentials, then investigate from traces while nothing else leaks."
+    },
+    {
+      "claim": "Once the prompt is patched, the incident is closed.",
+      "correction": "Without a regression case in the golden set, a later prompt or model change can bring the failure back unnoticed. Closing requires the test as well as the fix."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Detect: guardrail metrics and alerts, such as a spike in blocked tool calls, outbound messages to new domains or refund volume above baseline.",
+      "Contain: a kill switch for the agent or one tool, a step down the degradation ladder to human handling, and revocation of any credentials that may be exposed.",
+      "Investigate with traces, fix the cause, and add the triggering input to the golden set as a regression case. Then hold a blameless post-incident review."
+    ],
+    "l2": [
+      "An inbox agent's alert fires: replies to previously unseen domains jump from 3 to 40 in an hour. The on-call engineer disables the send tool, so the agent drops to drafts only.",
+      "Traces show one inbound email carrying hidden instructions to attach CRM exports. The engineer revokes the agent's CRM token and lists every affected message.",
+      "The fix quarantines inbound email and requires approval for attachments. The hostile email joins the golden set, and the review asks which control failed, not who failed."
+    ],
+    "l3": [
+      "Track time to detect and time to contain separately. A kill switch that needs a deploy turns minutes of exposure into hours.",
+      "Practise containment. Run a regular exercise in which someone flips the kill switch and confirms the agent stops within the target time.",
+      "Feed the review into governance: update the risk register, the eval set and the incident records that frameworks or customers expect you to keep."
+    ]
+  },
+  "prerequisites": ["governance-frameworks", "degradation-ladder"],
+  "labs": [],
+  "drills": ["saf-drill-inbox-agent"],
+  "goals": ["interview", "capstone"],
+  "minutes": 12
+}

@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "engine": "bitemporal-timeline",
+  "id": "bitemporal-lab",
+  "brief": [
+    "Every record below has two kinds of time. Valid time is when the address was true in the world. System time is when the store recorded it, and when a later record superseded it.",
+    "Nothing here is ever overwritten. A correction appends a new record, and a mistake is marked superseded rather than deleted. Where two records cover the same moment, the one recorded later wins.",
+    "Answer each question by fixing two dates: the moment in the world you are asking about, and the moment of knowledge you are asking from. Then read off what the store believed."
+  ],
+  "subject": "Customer 4812's shipping address",
+  "axis": { "start": "2026-01-01", "end": "2026-06-30" },
+  "facts": [
+    {
+      "id": "harbour-lane",
+      "value": "12 Harbour Lane, Leeds",
+      "validFrom": "2026-01-05",
+      "validTo": null,
+      "recordedAt": "2026-01-05",
+      "supersededAt": null,
+      "note": "The original address, captured when the customer opened the account on 5 January."
+    },
+    {
+      "id": "mill-street",
+      "value": "4 Mill Street, York",
+      "validFrom": "2026-02-14",
+      "validTo": null,
+      "recordedAt": "2026-02-14",
+      "supersededAt": null,
+      "note": "A real move, recorded promptly: the customer updated the address in the app on moving day."
+    },
+    {
+      "id": "mill-road-error",
+      "value": "4 Mill Road, York",
+      "validFrom": "2026-03-01",
+      "validTo": null,
+      "recordedAt": "2026-03-02",
+      "supersededAt": "2026-03-16",
+      "note": "An erroneous record: a support agent mistyped the street during a phone call. It was marked superseded on 16 March when a parcel came back."
+    },
+    {
+      "id": "mill-street-fix",
+      "value": "4 Mill Street, York",
+      "validFrom": "2026-03-01",
+      "validTo": null,
+      "recordedAt": "2026-03-16",
+      "supersededAt": null,
+      "note": "The correction appended on 16 March. It restates the right address from 1 March, and the mistyped record stays in the store."
+    },
+    {
+      "id": "quay-road",
+      "value": "9 Quay Road, Hull",
+      "validFrom": "2026-04-01",
+      "validTo": null,
+      "recordedAt": "2026-05-06",
+      "supersededAt": null,
+      "note": "A late retroactive correction: the customer moved on 1 April but only told the company on 6 May, five weeks later."
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-before-account",
+      "prompt": "As of 30 June, what did the store believe the address was on 2 January?",
+      "validAt": "2026-01-02",
+      "knownAt": "2026-06-30",
+      "answer": "none",
+      "explanation": "No record is valid before 5 January, when the account was opened. Even with everything known by 30 June, the store holds no address for that day."
+    },
+    {
+      "id": "q-error-visible",
+      "prompt": "As of 10 March, what did the store believe the address was on 5 March?",
+      "validAt": "2026-03-05",
+      "knownAt": "2026-03-10",
+      "answer": "mill-road-error",
+      "explanation": "On 10 March the mistyped record, made on 2 March, had not yet been superseded. It was the latest record covering 5 March, so the store believed the wrong street."
+    },
+    {
+      "id": "q-error-corrected",
+      "prompt": "As of 20 March, what did the store believe the address was on 5 March?",
+      "validAt": "2026-03-05",
+      "knownAt": "2026-03-20",
+      "answer": "mill-street-fix",
+      "explanation": "Same moment in the world, later knowledge. By 20 March the error was superseded and the correction appended on 16 March is the latest visible record."
+    },
+    {
+      "id": "q-before-late-news",
+      "prompt": "As of 20 April, what did the store believe the address was on 15 April?",
+      "validAt": "2026-04-15",
+      "knownAt": "2026-04-20",
+      "answer": "mill-street-fix",
+      "explanation": "The customer had already moved to Hull, but the store did not learn that until 6 May. On 20 April its best knowledge was still Mill Street, so a parcel sent then was not a mistake."
+    },
+    {
+      "id": "q-after-late-news",
+      "prompt": "As of 10 May, what did the store believe the address was on 15 April?",
+      "validAt": "2026-04-15",
+      "knownAt": "2026-05-10",
+      "answer": "quay-road",
+      "explanation": "The late correction recorded on 6 May is valid from 1 April. Asked from 10 May, the store now says the customer lived in Hull on 15 April, even though it said otherwise on 20 April."
+    }
+  ]
+}

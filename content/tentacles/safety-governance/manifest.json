@@ -1,0 +1,24 @@
+{
+  "id": "safety-governance",
+  "version": "1.0.0",
+  "schemaVersion": 1,
+  "title": "Safety, Security & Governance",
+  "summary": "How to break the lethal trifecta, defend against prompt injection with structure, place human gates by risk, grant least agency, map governance frameworks to engineering evidence and respond to agent incidents.",
+  "route": "/t/safety-governance",
+  "bookSource": "Part IV, Ch 16 to 18",
+  "audience": ["engineer", "architect"],
+  "order": 7,
+  "concepts": "concepts/*.json",
+  "labs": [
+    { "id": "trifecta-check", "title": "Lethal Trifecta Check", "engine": "trifecta", "scenario": "labs/trifecta.json", "concepts": ["lethal-trifecta", "least-agency"] },
+    { "id": "gate-placement", "title": "Gate Placement", "engine": "sorting-board", "scenario": "labs/gate-placement.json", "concepts": ["human-gates"] }
+  ],
+  "cards": "cards.json",
+  "checks": "checks.json",
+  "drills": "drills.json",
+  "prerequisites": ["foundations", "tools-gateway"],
+  "depthLevels": [1, 2, 3],
+  "capabilities": { "coach": false, "tutor": true },
+  "estimatedMinutes": 150,
+  "passMark": 0.8
+}

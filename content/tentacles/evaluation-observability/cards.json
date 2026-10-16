@@ -1,0 +1,203 @@
+{
+  "schemaVersion": 1,
+  "cards": [
+    {
+      "id": "evl-001",
+      "conceptId": "evaluation-pyramid",
+      "depth": 1,
+      "front": "Name the three layers of the evaluation pyramid, from base to top.",
+      "back": "Deterministic checks such as schema and tool-contract tests, then scenario and trajectory evals, then end-to-end judgements by humans or a model judge.",
+      "kind": "recall",
+      "tags": ["pyramid", "layers"]
+    },
+    {
+      "id": "evl-002",
+      "conceptId": "evaluation-pyramid",
+      "depth": 1,
+      "front": "The base of the evaluation pyramid runs on every ____, while the top runs on release candidates.",
+      "back": "Commit. Base checks are cheap and exact, so they run constantly, while expensive judgements run less often.",
+      "kind": "cloze",
+      "tags": ["pyramid", "cadence"]
+    },
+    {
+      "id": "evl-003",
+      "conceptId": "evaluation-pyramid",
+      "depth": 2,
+      "front": "A nightly judged eval keeps failing because the agent sends dates as 12/03 instead of ISO 8601. What should you change?",
+      "back": "Push the test down the pyramid. Add a base-layer schema check on the tool's date argument, so the failure is caught on every commit in seconds rather than overnight.",
+      "kind": "apply",
+      "tags": ["pyramid", "schema", "shift-left"]
+    },
+    {
+      "id": "evl-004",
+      "conceptId": "evaluation-pyramid",
+      "depth": 3,
+      "front": "A team spends 80 per cent of its eval effort on manual review of full conversations. What goes wrong, and what is the fix?",
+      "back": "Reviews are slow, so regressions slip in between them and releases wait. Shift effort to cheap base checks and replayed scenarios, keeping a small judged and human sample at the top.",
+      "kind": "apply",
+      "tags": ["pyramid", "trade-off"]
+    },
+    {
+      "id": "evl-005",
+      "conceptId": "golden-sets",
+      "depth": 1,
+      "front": "Where should golden-set cases come from?",
+      "back": "From real traffic and incidents. Every incident or wrong answer becomes a regression case, labelled against the written rubric.",
+      "kind": "recall",
+      "tags": ["golden-set", "sourcing"]
+    },
+    {
+      "id": "evl-006",
+      "conceptId": "golden-sets",
+      "depth": 1,
+      "front": "Keep a ____ split of the golden set that prompt tuning never touches.",
+      "back": "Held-out. Its score shows whether a change generalises or has only been tuned to the visible cases.",
+      "kind": "cloze",
+      "tags": ["golden-set", "overfitting"]
+    },
+    {
+      "id": "evl-007",
+      "conceptId": "golden-sets",
+      "depth": 2,
+      "front": "Refunds are 5 per cent of traffic. Why does a 400-case random sample give a poor refund score, and what is the fix?",
+      "back": "It holds only about 20 refund cases, so the per-type score is noisy. Stratify by task type and difficulty so each type, including refunds, has enough cases.",
+      "kind": "apply",
+      "tags": ["golden-set", "stratification"]
+    },
+    {
+      "id": "evl-008",
+      "conceptId": "golden-sets",
+      "depth": 3,
+      "front": "A refund score is 90 per cent on 100 cases. Roughly how precise is it, and how would 20 cases compare?",
+      "back": "The standard error is about 3 points at 100 cases. With 20 cases it rises to nearly 7 points, too wide to detect most regressions.",
+      "kind": "apply",
+      "tags": ["golden-set", "sample-size"]
+    },
+    {
+      "id": "evl-009",
+      "conceptId": "llm-as-judge",
+      "depth": 1,
+      "front": "Name four requirements for a trustworthy LLM judge.",
+      "back": "A written rubric, quoted evidence from the output for each score, structured output, and measured agreement with human labels.",
+      "kind": "recall",
+      "tags": ["judge", "requirements"]
+    },
+    {
+      "id": "evl-010",
+      "conceptId": "llm-as-judge",
+      "depth": 1,
+      "front": "Never grade an answer with the same ____ that produced it.",
+      "back": "Prompt. A judge that shares the producer's prompt shares its blind spots and tends to approve its own reasoning.",
+      "kind": "cloze",
+      "tags": ["judge", "independence"]
+    },
+    {
+      "id": "evl-011",
+      "conceptId": "llm-as-judge",
+      "depth": 2,
+      "front": "On 200 human-labelled answers, a 1 to 5 judge matches exactly on 124 and is within one point on 182. Report its agreement.",
+      "back": "Exact agreement is 62 per cent and within-one accuracy is 91 per cent. State both, with the rubric version and judge model they apply to.",
+      "kind": "apply",
+      "tags": ["judge", "calibration"]
+    },
+    {
+      "id": "evl-012",
+      "conceptId": "llm-as-judge",
+      "depth": 2,
+      "front": "Name three judge biases and one control for each.",
+      "back": "Position bias: run pairwise comparisons in both orders. Verbosity bias: make the rubric penalise unsupported length. Self-preference bias: use a judge from a different model family.",
+      "kind": "recall",
+      "tags": ["judge", "bias"]
+    },
+    {
+      "id": "evl-013",
+      "conceptId": "span-hierarchy",
+      "depth": 1,
+      "front": "Name the levels of an agent's span hierarchy.",
+      "back": "The run span, then one step span per loop turn, then the model call, tool call, retrieval and guard spans inside each step.",
+      "kind": "recall",
+      "tags": ["spans", "hierarchy"]
+    },
+    {
+      "id": "evl-014",
+      "conceptId": "span-hierarchy",
+      "depth": 1,
+      "front": "OpenTelemetry GenAI ____ conventions make agent traces portable between tools.",
+      "back": "Semantic. Standard attribute names for the model, tokens and operation mean any compatible backend can read the trace.",
+      "kind": "cloze",
+      "tags": ["spans", "opentelemetry"]
+    },
+    {
+      "id": "evl-015",
+      "conceptId": "span-hierarchy",
+      "depth": 2,
+      "front": "An llm.answer span records 2,100 input and 420 output tokens. At $2 and $10 per million respectively, what is its cost?",
+      "back": "$0.0042 for input plus $0.0042 for output, so $0.0084. Store it as the span's cost attribute, so run cost is a simple sum.",
+      "kind": "apply",
+      "tags": ["spans", "cost"]
+    },
+    {
+      "id": "evl-016",
+      "conceptId": "trace-debugging",
+      "depth": 1,
+      "front": "Where does trace debugging start, and where does it stop?",
+      "back": "It starts at the symptom and walks backwards through earlier spans. It stops at the first span whose status or attributes are anomalous.",
+      "kind": "recall",
+      "tags": ["debugging", "method"]
+    },
+    {
+      "id": "evl-017",
+      "conceptId": "trace-debugging",
+      "depth": 2,
+      "front": "A run's costliest span is a large-model fallback answer. Four slow tool.get_order spans come before it. Which span do you inspect first, and why?",
+      "back": "The first slow tool.get_order. The retries and the costly fallback both follow from that timeout, so fixing the answer call would treat a consequence.",
+      "kind": "apply",
+      "tags": ["debugging", "cost-heat"]
+    },
+    {
+      "id": "evl-018",
+      "conceptId": "trace-debugging",
+      "depth": 3,
+      "front": "A guard.injection span has status ok, but the agent then closed an account nobody asked to close. What do you check?",
+      "back": "Compare its attributes with a healthy run. If it scanned only 2,000 characters of a 6,400-character document, an instruction later in the text was never seen. Status ok reflects only what the guard saw.",
+      "kind": "apply",
+      "tags": ["debugging", "injection", "guard"]
+    },
+    {
+      "id": "evl-019",
+      "conceptId": "release-gates",
+      "depth": 1,
+      "front": "List the four release stages in order.",
+      "back": "Offline eval, shadow, canary, full rollout.",
+      "kind": "recall",
+      "tags": ["release", "stages"]
+    },
+    {
+      "id": "evl-020",
+      "conceptId": "release-gates",
+      "depth": 1,
+      "front": "Safety assertion failures block ____; quality regressions block only when statistically significant.",
+      "back": "Absolutely. One safety failure stops the release whatever the average quality score says.",
+      "kind": "cloze",
+      "tags": ["release", "safety"]
+    },
+    {
+      "id": "evl-021",
+      "conceptId": "release-gates",
+      "depth": 2,
+      "front": "On 300 items, a new prompt wins 41, loses 29 and ties 230. Is the gain significant by a sign test?",
+      "back": "No. Only the 70 non-ties count. Wins would average 35 with a standard deviation near 4.2, and 41 is about 1.4 deviations above, short of the usual 2.",
+      "kind": "apply",
+      "tags": ["release", "significance"]
+    },
+    {
+      "id": "evl-022",
+      "conceptId": "release-gates",
+      "depth": 3,
+      "front": "A prompt raises judged quality 2 points and cost per conversation from $0.02 to $0.06. At 200,000 conversations a month, how do you present it?",
+      "back": "Show both: the gain, and monthly spend rising from $4,000 to $12,000, or $8,000 more. Shipping it is then an explicit business trade, not a hidden side effect.",
+      "kind": "apply",
+      "tags": ["release", "cost", "trade-off"]
+    }
+  ]
+}

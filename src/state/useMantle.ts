@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { devAuth, supabaseAuth, type AuthProvider, type SupabaseAuth } from '../mantle/api/auth'
 import { ApiError, MantleApi, type Health, type Me } from '../mantle/api/client'
-import { getRegistry } from '../mantle/content/registry'
+import { emptyRegistry, loadRegistry } from '../mantle/content/registry'
 import type { ContentRegistry } from '../mantle/content/load'
 import type { CurriculumPlan } from '../mantle/engine/types'
 import { MantleRuntime } from '../mantle/runtime'
@@ -145,7 +145,7 @@ export const useMantle = create<MantleState>((set, get) => {
 
   return {
     status: 'booting',
-    content: getRegistry(),
+    content: emptyRegistry(),
     storage: 'dexie',
     rung: 4,
     mastery: {},
@@ -230,7 +230,8 @@ export const useMantle = create<MantleState>((set, get) => {
 
     async boot() {
       try {
-        const content = get().content
+        const content = await loadRegistry()
+        set({ content })
         let store
         try {
           store = await openDexieStore()

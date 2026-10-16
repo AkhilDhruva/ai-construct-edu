@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "drills": [
+    {
+      "id": "saf-drill-inbox-agent",
+      "title": "Design a safe inbox-triage agent",
+      "prompt": "Design an inbox-triage agent for a 300-person sales team. It reads external email, looks up senders in the CRM, and drafts or sends replies. Expect 12,000 inbound emails a day, mostly within a 10-hour working day, with a 3x peak. Triage must finish within 60 seconds at p95, and drafts within 2 minutes. Misrouting must stay below 2 per cent. At most 1 in 10,000 sent replies may reach the wrong recipient or contain another account's data. The cost ceiling is $0.02 per email at $1.50 per million tokens. Break the lethal trifecta, place human gates, and plan your incident response.",
+      "minutes": 45,
+      "concepts": ["lethal-trifecta", "prompt-injection", "human-gates", "incident-response"],
+      "rubric": [
+        {
+          "id": "requirements-as-numbers",
+          "criterion": "Requirements are stated as numbers before any architecture is chosen.",
+          "levels": [
+            "No numbers; requirements are adjectives such as safe, fast or accurate.",
+            "Some numbers are given, but key ones are missing, such as the acceptable error rate or the cost ceiling.",
+            "Volume, latency, error and cost numbers are stated, but derived figures such as peak rate or reviewer load are missing or wrong.",
+            "All numbers are stated, and peak rate, cost per email, reviewer load and the acceptable leak rate are derived correctly."
+          ]
+        },
+        {
+          "id": "architecture-with-decision-rule",
+          "criterion": "The architecture is chosen with an explicit decision rule tied to the numbers and the trifecta.",
+          "levels": [
+            "An architecture is named with no reason, or the agent keeps every tool with no leg analysis.",
+            "The trifecta is mentioned, but no leg is broken by structure, or the defence is a prompt instruction.",
+            "A leg is broken by structure, but gate placement, quarantine output types or gateway authorisation are left unspecified.",
+            "A leg is broken by a stated rule, with typed quarantine output, gateway authorisation and gates placed by reversibility, external effect and value."
+          ]
+        },
+        {
+          "id": "trade-off-named",
+          "criterion": "A trade-off is named and accepted explicitly, with its cost quantified.",
+          "levels": [
+            "No trade-off is mentioned; the design is presented as having no downside.",
+            "A trade-off is mentioned in general terms, without saying what is given up.",
+            "A specific trade-off is named and accepted, but its cost is not quantified.",
+            "A specific trade-off is named, accepted and quantified, and the rejected alternative is stated."
+          ]
+        },
+        {
+          "id": "measurement-named",
+          "criterion": "A measurement is named that would show the choice was wrong.",
+          "levels": [
+            "No measurement or success signal is given.",
+            "A vague signal is given, such as watching for attacks, with no metric or threshold.",
+            "A specific metric is named, but without a threshold or the time window that would trigger a rethink.",
+            "A specific metric, threshold and window are named, together with the incident or design decision that would follow."
+          ]
+        }
+      ],
+      "passMark": 9,
+      "outline": [
+        "State the envelope and derive: 12,000 emails over 10 hours is about 0.33 a second, or 1 a second at a 3x peak, which is about 40 emails per rep per day.",
+        "Mark the legs: reading inbound email is untrusted content and private data, and the CRM is private data. Both are required, so external communication is the leg to break.",
+        "Quarantine each email in a no-tools model that returns sender, intent enum and order number. The planner then drafts from the CRM, with every call authorised in the gateway under the rep's identity.",
+        "Place gates: labelling and routing run automatically, fixed acknowledgement templates run with sampled review, and every free-form reply waits for the account owner's approval. Bulk exports are never allowed.",
+        "Quantify the trade-off: about 4,800 drafts a day at 20 seconds each is roughly 5 minutes per rep per day. Accept it over auto-sending, which cannot meet a 1 in 10,000 leak target.",
+        "Check cost: 2,000 tokens for quarantine plus three planner steps of 3,000 tokens is 11,000 tokens, about $0.017 per email.",
+        "Plan response: alert on replies to unseen domains and approval rates above 98 per cent. Contain with a send kill switch and token revocation, and add every incident to the golden set."
+      ]
+    }
+  ]
+}

@@ -17,7 +17,7 @@ export function fakeClock(startIso = '2026-10-15T09:00:00.000Z') {
 }
 
 /** A minimal second tentacle, used to prove plug-in needs zero Mantle code changes. */
-export function fixtureTentacle(id = 'memory-retrieval', prereq = 'six-components'): ContentFiles {
+export function fixtureTentacle(id = 'fixture-memory', prereq = 'six-components'): ContentFiles {
   const root = `tentacles/${id}`
   const concept = (cid: string, prerequisites: string[]) => ({
     schemaVersion: 1,
@@ -69,18 +69,18 @@ export function fixtureTentacle(id = 'memory-retrieval', prereq = 'six-component
       capabilities: { coach: false, tutor: true },
       estimatedMinutes: 60,
     },
-    [`${root}/concepts/memory-tiers.json`]: concept('memory-tiers', [prereq]),
-    [`${root}/concepts/bitemporal.json`]: concept('bitemporal', ['memory-tiers']),
+    [`${root}/concepts/fx-tiers.json`]: concept('fx-tiers', [prereq]),
+    [`${root}/concepts/fx-history.json`]: concept('fx-history', ['fx-tiers']),
     [`${root}/cards.json`]: {
       schemaVersion: 1,
-      cards: [1, 2, 3].map((n) => card(n, 'memory-tiers')).concat([4, 5, 6].map((n) => card(n, 'bitemporal'))),
+      cards: [1, 2, 3].map((n) => card(n, 'fx-tiers')).concat([4, 5, 6].map((n) => card(n, 'fx-history'))),
     },
     [`${root}/checks.json`]: {
       schemaVersion: 1,
       items: [
         {
           id: `${id}-k1`,
-          conceptId: 'memory-tiers',
+          conceptId: 'fx-tiers',
           depth: 2,
           kind: 'mcq',
           stem: 'Pick one.',

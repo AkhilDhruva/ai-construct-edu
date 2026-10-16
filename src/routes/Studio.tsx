@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 import { loadContent, publicationIssues, type ContentIssue, type ContentRegistry } from '../mantle/content/load'
-import { getContentFiles } from '../mantle/content/registry'
+import { loadContentFiles } from '../mantle/content/registry'
 import type { Card, Concept, Depth } from '../mantle/content/schemas'
 import { activityByDay, bumpVersion, itemHealth } from '../mantle/studio/analytics'
 import type { TelemetryEvent } from '../mantle/store/types'
@@ -456,7 +456,10 @@ function ActivityTab() {
 }
 
 export function Studio() {
-  const files = useMemo(() => getContentFiles(), [])
+  const [files, setFiles] = useState<Record<string, unknown> | undefined>()
+  useEffect(() => {
+    void loadContentFiles().then(setFiles)
+  }, [])
   const registry = useMantle((s) => s.content)
   const [tab, setTab] = useState<Tab>('validate')
   const TABS: Array<[Tab, string]> = [
@@ -481,7 +484,7 @@ export function Studio() {
       </div>
       <div role="tabpanel" id="studio-panel" aria-labelledby={`studio-tab-${tab}`}>
         {tab === 'validate' && <ValidateTab registry={registry} />}
-        {tab === 'edit' && <EditTab files={files} />}
+        {tab === 'edit' && (files ? <EditTab files={files} /> : <p role="status">Loading content…</p>)}
         {tab === 'health' && <HealthTab />}
         {tab === 'activity' && <ActivityTab />}
       </div>

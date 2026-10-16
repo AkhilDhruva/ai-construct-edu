@@ -1,0 +1,23 @@
+{
+  "id": "cost-finops",
+  "version": "1.0.0",
+  "schemaVersion": 1,
+  "title": "Cost & FinOps",
+  "summary": "How to measure an agent's cost per completed task, cut it with caching, routing, trimming, batching and fewer wasted retries, and keep spend inside budgets that degrade instead of failing.",
+  "route": "/t/cost-finops",
+  "bookSource": "Part III, Ch 14",
+  "audience": ["engineer", "architect"],
+  "order": 6,
+  "concepts": "concepts/*.json",
+  "labs": [
+    { "id": "cost-waterfall", "title": "Cost Waterfall", "engine": "cost-waterfall", "scenario": "labs/cost-waterfall.json", "concepts": ["prompt-caching", "model-routing", "context-trimming", "batch-and-async"] }
+  ],
+  "cards": "cards.json",
+  "checks": "checks.json",
+  "drills": "drills.json",
+  "prerequisites": ["foundations"],
+  "depthLevels": [1, 2, 3],
+  "capabilities": { "coach": false, "tutor": true },
+  "estimatedMinutes": 120,
+  "passMark": 0.8
+}

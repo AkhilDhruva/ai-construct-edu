@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "prompt-caching",
+  "tentacle": "cost-finops",
+  "title": "Prompt caching",
+  "point": "Put byte-stable content first so repeated calls reuse a cached prefix at about a tenth of the input price, and check cache-read counts to prove it works.",
+  "definition": "Prompt caching lets a provider reuse the processed form of a prompt prefix that exactly matches an earlier one. Matching content is billed at a reduced cache-read rate, while the first write costs slightly more than normal input.",
+  "level": 1,
+  "objective": {
+    "id": "prompt-caching-obj",
+    "text": "Given a prompt layout, reorder it so stable content sits before the cache breakpoint, remove silent invalidators, and compute the prefix cost with and without caching."
+  },
+  "misconceptions": [
+    {
+      "claim": "Caching works on any repeated content, wherever it appears in the prompt.",
+      "correction": "The cache matches a prefix byte for byte from the start. One changed byte early in the prompt invalidates everything after it, so stable content must come first."
+    },
+    {
+      "claim": "Once caching is switched on, the saving is guaranteed.",
+      "correction": "A timestamp in the system prompt, unsorted JSON or a reordered tool list silently breaks the match. Every call then pays the higher write price, so verify with cache-read token counts."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "The cache matches a prefix, so order matters. Put byte-stable content first: the system prompt, tool definitions and rubric. Put variable content, such as retrieved documents and the user's message, after the cache breakpoint.",
+      "Cache reads cost about a tenth of normal input. Cache writes cost a little more than normal input, so a prefix that is written but never read again costs extra.",
+      "Caches expire after a few minutes of inactivity unless a call refreshes them. Low-traffic routes may rarely see a warm cache."
+    ],
+    "l2": [
+      "An agent resends a 10,000-token prefix of system prompt, tools and rubric on each of 6 calls. At an illustrative $2 per million input tokens, that is 60,000 tokens or $0.12 per task.",
+      "With caching, the first call writes the prefix at 1.25 times the input price, or 12,500 token-equivalents. The other 5 calls read it at a tenth, or 5,000 token-equivalents.",
+      "That is 17,500 token-equivalents, or $0.035 per task instead of $0.12. Caching removes about 71 per cent of the prefix spend with no change to the answers."
+    ],
+    "l3": [
+      "Now someone adds the current time to the system prompt. Every call has a new prefix, so every call misses and writes. Six writes cost 75,000 token-equivalents, or $0.15, more than no caching at all.",
+      "Other silent invalidators include request IDs in the prefix, JSON serialised with unsorted keys, and tool lists built in a different order on each call. None of them raises an error.",
+      "So verify rather than assume. Log cache-read and cache-write token counts on every call, and alert when the cache-read share of prefix tokens falls well below its usual level."
+    ]
+  },
+  "prerequisites": ["cost-per-task"],
+  "labs": ["cost-waterfall"],
+  "drills": ["fin-drill-cut-spend"],
+  "goals": ["interview", "capstone"],
+  "minutes": 12
+}
