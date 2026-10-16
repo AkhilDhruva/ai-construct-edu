@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "llm-as-judge",
+  "tentacle": "evaluation-observability",
+  "title": "LLM as judge",
+  "point": "A model judge is useful only when it is bound to a rubric, cites evidence, returns structured output and has measured agreement with human labels.",
+  "definition": "An LLM judge is a model that scores agent outputs against a written rubric. It must cite evidence from the output, return a structured verdict, and be calibrated against human labels before its scores are trusted.",
+  "level": 2,
+  "objective": {
+    "id": "llm-as-judge-obj",
+    "text": "Given a draft judge prompt, make it rubric-bound and evidence-citing, name the biases to control, and state how to measure its agreement with human labels."
+  },
+  "misconceptions": [
+    {
+      "claim": "A strong model can grade answers well without a rubric.",
+      "correction": "Without a rubric the judge invents its own standard, which drifts between runs and rewards fluent text. Bind it to written criteria and require quoted evidence for each score."
+    },
+    {
+      "claim": "Reusing the agent's own prompt to grade its answer keeps the setup simple.",
+      "correction": "A judge that shares the producer's prompt shares its blind spots and tends to approve its own reasoning. Use a separate grading prompt, and ideally a different model family."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "A judge prompt holds the rubric, the case and the answer. For each criterion it returns a score and a quoted passage from the answer as evidence.",
+      "Structured output, such as JSON with a score field and an evidence field, makes verdicts machine-readable and easy to audit.",
+      "Calibrate before trusting the judge. Score a sample that humans have already labelled, and report how often the judge agrees with them."
+    ],
+    "l2": [
+      "Take a 1 to 5 rubric for answer correctness and 200 human-labelled answers. The judge matches the human score exactly on 124 and is within one point on 182.",
+      "That is 62 per cent exact agreement and 91 per cent within-one accuracy. A team might accept the judge for release gating at 90 per cent within-one, and keep humans on a sample.",
+      "Then test for bias. Swap the order in pairwise comparisons, pad answers with filler, and compare scores for answers from the judge's own model family against others."
+    ],
+    "l3": [
+      "Position bias favours whichever answer is shown first. Run each pairwise comparison in both orders and count only consistent wins.",
+      "Verbosity bias rewards longer answers, and self-preference bias rewards text from the judge's own model family. Both inflate scores for a change that only lengthens answers or switches model.",
+      "Recalibrate whenever the rubric, the judge model or the task mix changes. An agreement figure belongs to that combination, not to the judge alone."
+    ]
+  },
+  "prerequisites": ["golden-sets"],
+  "labs": [],
+  "drills": ["evl-drill-release-gates"],
+  "goals": ["interview", "capstone"],
+  "minutes": 13
+}

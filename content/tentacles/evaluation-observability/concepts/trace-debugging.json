@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "trace-debugging",
+  "tentacle": "evaluation-observability",
+  "title": "Trace debugging",
+  "point": "Start from the symptom and walk back to the first span whose status or attributes are anomalous, because the loudest or costliest span is usually a consequence.",
+  "definition": "Trace debugging is the method of finding a failure's root cause in a span tree. You start at the symptom, walk backwards through earlier spans, and stop at the first one whose status or attributes are wrong.",
+  "level": 2,
+  "objective": {
+    "id": "trace-debugging-obj",
+    "text": "Given a trace and a symptom, find the first anomalous span, explain why the most expensive or visible span is not the cause, and propose a fix."
+  },
+  "misconceptions": [
+    {
+      "claim": "The most expensive span is where the bug is.",
+      "correction": "Cost often piles up downstream of the real fault, such as a fallback model call after a timeout. Cost heat shows where money went, not why it went there."
+    },
+    {
+      "claim": "A span with status ok cannot be the cause.",
+      "correction": "Status reports only what the span itself noticed. A guard that passes an injected instruction, or a retrieval that returns the wrong document, can be ok and still be the root cause."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Write down the symptom first: a wrong answer, a slow run or a high bill. Then find the span that produced it, usually the final answer or the action the user saw.",
+      "Walk backwards in time and up the tree. At each earlier span, check its status and attributes against what a healthy run would show.",
+      "Stop at the first span that is anomalous. Everything after it is likely a consequence, however loud or expensive it looks."
+    ],
+    "l2": [
+      "A customer is told refunds are allowed within 60 days, but the policy says 30. The llm.answer span is the largest in the trace and looks guilty.",
+      "Walking back, the retrieval.vector span one step earlier has status empty and zero hits. The answer model had no policy text and filled the gap from its own assumptions.",
+      "The fix is not a better answer prompt. It is routing an EMPTY retrieval to a clarifying question or a human, and fixing why retrieval found nothing."
+    ],
+    "l3": [
+      "Cost heat is each span's share of total cost. It ranks spans by spend, which is the right view for a cost incident and the wrong one for a correctness incident.",
+      "Compare against a healthy trace for the same task. A guard that scanned 2,000 characters of a 6,400-character document looks normal until you see healthy runs scan whole documents.",
+      "Turn every diagnosed trace into a golden-set case and, where possible, a base-layer check. The debugging effort then keeps paying off on every later release."
+    ]
+  },
+  "prerequisites": ["span-hierarchy"],
+  "labs": ["trace-debugger"],
+  "drills": ["evl-drill-release-gates"],
+  "goals": ["interview", "capstone"],
+  "minutes": 13
+}

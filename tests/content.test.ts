@@ -19,9 +19,9 @@ describe('content registry', () => {
   it('plugs in a second tentacle from files alone, with cross-tentacle prerequisites', () => {
     const reg = loadContent({ ...contentFiles(), ...fixtureTentacle() })
     expect(reg.errors).toEqual([])
-    expect(reg.packages.map((p) => p.manifest.id)).toContain('memory-retrieval')
+    expect(reg.packages.map((p) => p.manifest.id)).toContain('fixture-memory')
     expect(reg.packages.map((p) => p.manifest.id)).toContain('foundations')
-    expect(reg.concepts.get('memory-tiers')?.prerequisites).toEqual(['six-components'])
+    expect(reg.concepts.get('fx-tiers')?.prerequisites).toEqual(['six-components'])
   })
 
   it('skips a package that fails validation instead of crashing', () => {
@@ -34,9 +34,9 @@ describe('content registry', () => {
   })
 
   it('rejects unresolved prerequisites and unknown lab engines', () => {
-    const files = { ...contentFiles(), ...fixtureTentacle('memory-retrieval', 'no-such-concept') }
+    const files = { ...contentFiles(), ...fixtureTentacle('fixture-memory', 'no-such-concept') }
     const reg = loadContent(files)
-    expect(reg.packages.map((p) => p.manifest.id)).not.toContain('memory-retrieval')
+    expect(reg.packages.map((p) => p.manifest.id)).not.toContain('fixture-memory')
     expect(reg.packages.map((p) => p.manifest.id)).toContain('foundations')
     expect(reg.errors.some((e) => e.message.includes('no-such-concept'))).toBe(true)
 
@@ -54,7 +54,7 @@ describe('content registry', () => {
   it('detects a prerequisite cycle across tentacles', () => {
     const files = { ...contentFiles(), ...fixtureTentacle() }
     const c = files['tentacles/foundations/concepts/what-is-an-agent.json'] as { prerequisites: string[] }
-    c.prerequisites = ['bitemporal']
+    c.prerequisites = ['fx-history']
     const reg = loadContent(files)
     expect(reg.errors.some((e) => e.message.startsWith('prerequisite cycle'))).toBe(true)
   })

@@ -29,10 +29,10 @@ export default defineConfig({
     }),
   ],
   build: {
-    // React, Dexie, Zod, framer-motion and every tentacle's validated content ship in the
-    // entry chunk (~190 kB gzip with three tentacles); routes and labs are split and all of
-    // it is precached offline. Loading tentacle content on demand is a later optimisation.
-    chunkSizeWarningLimit: 700,
+    // The entry (React, Dexie, Zod, framer-motion) is ~120 kB gzip; validated tentacle
+    // content is its own chunk loaded at boot; routes and labs are split. Everything is
+    // precached by the service worker for offline use.
+    chunkSizeWarningLimit: 560,
   },
   test: {
     environment: 'node',

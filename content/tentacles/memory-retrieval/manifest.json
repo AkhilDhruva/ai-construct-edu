@@ -1,0 +1,24 @@
+{
+  "id": "memory-retrieval",
+  "version": "1.0.0",
+  "schemaVersion": 1,
+  "title": "Memory & Retrieval",
+  "summary": "How an agent remembers and looks things up: four memory tiers with their own budgets, grounded and self-correcting retrieval, bitemporal records that never overwrite, and memory scoped and guarded in the store.",
+  "route": "/t/memory-retrieval",
+  "bookSource": "Part II, Ch 7 and 22",
+  "audience": ["engineer", "architect"],
+  "order": 4,
+  "concepts": "concepts/*.json",
+  "labs": [
+    { "id": "memory-sorter", "title": "Memory Tier Sorter", "engine": "sorting-board", "scenario": "labs/memory-sorter.json", "concepts": ["memory-tiers", "context-budgets"] },
+    { "id": "bitemporal-lab", "title": "Bitemporal Timeline", "engine": "bitemporal-timeline", "scenario": "labs/bitemporal.json", "concepts": ["bitemporal-memory"] }
+  ],
+  "cards": "cards.json",
+  "checks": "checks.json",
+  "drills": "drills.json",
+  "prerequisites": ["foundations", "tools-gateway"],
+  "depthLevels": [1, 2, 3],
+  "capabilities": { "coach": false, "tutor": true },
+  "estimatedMinutes": 150,
+  "passMark": 0.8
+}

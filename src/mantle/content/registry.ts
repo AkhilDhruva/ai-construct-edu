@@ -1,28 +1,37 @@
+import rulesJson from '../../../content/engine/rules.json'
 import { loadContent, type ContentFiles, type ContentRegistry } from './load'
-
-// Discovery is by folder layout: dropping content/tentacles/<id>/manifest.json (plus
-// its files) into the repo is the whole act of installing a tentacle. Nothing here
-// names a tentacle.
-const raw = import.meta.glob('/content/**/*.json', { eager: true, import: 'default' })
-
-export function contentFilesFromGlob(modules: Record<string, unknown>): ContentFiles {
-  const files: ContentFiles = {}
-  for (const [path, value] of Object.entries(modules)) files[path.replace(/^\/content\//, '')] = value
-  return files
-}
+import { rulesSchema } from './schemas'
 
 /** The raw files as shipped, for the content studio to edit and re-validate. */
-export function getContentFiles(): ContentFiles {
-  return contentFilesFromGlob(raw)
+export async function loadContentFiles(): Promise<ContentFiles> {
+  return (await import('./files')).files
 }
 
-let cached: ContentRegistry | undefined
+let pending: Promise<ContentRegistry> | undefined
 
-export function getRegistry(): ContentRegistry {
-  if (!cached) {
-    cached = loadContent(contentFilesFromGlob(raw))
-    for (const e of cached.errors) console.error(`[mantle] content skipped — ${e.where}: ${e.message}`)
-    for (const w of cached.warnings) console.warn(`[mantle] ${w.where}: ${w.message}`)
+/** Load and validate every tentacle once. Invalid packages are reported and skipped. */
+export function loadRegistry(): Promise<ContentRegistry> {
+  pending ??= loadContentFiles().then((files) => {
+    const reg = loadContent(files)
+    for (const e of reg.errors) console.error(`[mantle] content skipped — ${e.where}: ${e.message}`)
+    for (const w of reg.warnings) console.warn(`[mantle] ${w.where}: ${w.message}`)
+    return reg
+  })
+  return pending
+}
+
+/** A typed, empty registry for the moment before content loads (the app shows "Loading" then). */
+export function emptyRegistry(): ContentRegistry {
+  return {
+    packages: [],
+    concepts: new Map(),
+    cards: new Map(),
+    checks: new Map(),
+    drills: new Map(),
+    labs: new Map(),
+    diagnostics: {},
+    rules: rulesSchema.parse(rulesJson),
+    errors: [],
+    warnings: [],
   }
-  return cached
 }

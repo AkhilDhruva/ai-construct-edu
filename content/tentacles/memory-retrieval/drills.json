@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "drills": [
+    {
+      "id": "mem-drill-assistant-memory",
+      "title": "Design memory and retrieval for a support assistant",
+      "prompt": "Design memory and retrieval for a customer-support assistant. It serves 50,000 users who start 20,000 conversations a day, averaging 4 turns each, with a 3x peak. The help centre holds 40,000 articles averaging 1,200 tokens. The model has a 128,000-token window and costs $2 per million input tokens. Each turn must answer within 6 seconds at p95 and cost at most $0.03. State your numbers, the memory tiers, the context budget, the retrieval and correction strategy, and how user memory is kept safe.",
+      "minutes": 45,
+      "concepts": ["memory-tiers", "context-budgets", "retrieval-grounding", "corrective-retrieval", "memory-safety"],
+      "rubric": [
+        {
+          "id": "requirements-as-numbers",
+          "criterion": "Requirements are stated as numbers before any architecture is chosen.",
+          "levels": [
+            "No numbers; requirements are adjectives such as fast, accurate or private.",
+            "Some numbers are given, but key ones are missing, such as turns per second at peak or the cost ceiling per turn.",
+            "Load, corpus size, latency and cost are stated, but derived figures such as chunk count or cost per turn are missing or wrong.",
+            "Load, corpus size, latency and cost are stated, and turns per second, chunk count, prompt size and cost per turn are derived correctly."
+          ]
+        },
+        {
+          "id": "architecture-with-decision-rule",
+          "criterion": "The architecture is chosen with an explicit decision rule tied to the numbers.",
+          "levels": [
+            "Memory is one undifferentiated store, or the whole context window is filled by default.",
+            "Memory tiers are named, but without write policies, lifetimes or read budgets.",
+            "Tiers and section budgets are set with reasons, but grounding, correction bounds or user scoping are left unspecified.",
+            "Tiers, section budgets, cited retrieval, a bounded correction loop and store-level scoping are each tied to a stated number."
+          ]
+        },
+        {
+          "id": "trade-off-named",
+          "criterion": "A trade-off is named and accepted explicitly, with its cost quantified.",
+          "levels": [
+            "No trade-off is mentioned; the design is presented as having no downside.",
+            "A trade-off is mentioned in general terms, without saying what is given up.",
+            "A specific trade-off is named and accepted, but its cost is not quantified.",
+            "A specific trade-off is named, accepted and quantified, and the rejected alternative is stated."
+          ]
+        },
+        {
+          "id": "measurement-named",
+          "criterion": "A measurement is named that would show the choice was wrong.",
+          "levels": [
+            "No measurement or success signal is given.",
+            "A vague signal is given, such as monitoring answer quality, with no metric or threshold.",
+            "A specific metric is named, but without a threshold or the time window that would trigger a rethink.",
+            "A specific metric, threshold and window are named, together with the decision that would change."
+          ]
+        }
+      ],
+      "passMark": 9,
+      "outline": [
+        "Derive the load: 20,000 conversations of 4 turns is 80,000 turns a day, about 0.93 a second, or 2.8 at a 3x peak. The corpus is 48 million tokens, or 120,000 chunks of 400 tokens.",
+        "Map the tiers: working context rebuilt each turn, session memory kept for 24 hours, long-term facts per user with source and a 12-month expiry, and the help centre as shared knowledge.",
+        "Budget 16,000 of the 128,000 tokens: 1,500 system, 2,500 tools, 1,000 memory, 4,000 retrieval, 5,000 history and 2,000 answer reserve. The 14,000-token prompt costs $0.028, under the $0.03 ceiling.",
+        "Put system and tools first so their 4,000 tokens are cached. At a tenth of the price, that saves $0.0072 a turn and widens the cost margin for corrective rounds.",
+        "Retrieve 10 chunks of 400 tokens, each with article id and update date, and cite them. Grade the chunks, allow one rewrite against a second source, then answer not found and offer a handover.",
+        "Enforce row-level security on user id for every memory read and write. Accept long-term writes only from confirmed user statements, and delete a user's rows within 30 days of a request.",
+        "Trade-off and measurement: raising retrieval to 6,000 tokens would cost $0.004 more per turn, or $320 a day, so it is rejected. Revisit if weekly recall at 10 on a 500-question eval falls below 90 per cent."
+      ]
+    }
+  ]
+}

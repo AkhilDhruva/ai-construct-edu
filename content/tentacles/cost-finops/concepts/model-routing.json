@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "model-routing",
+  "tentacle": "cost-finops",
+  "title": "Model routing",
+  "point": "Send easy steps to a cheaper model and hard steps to a stronger one, and prove each route on a golden set by cost per completed task.",
+  "definition": "Model routing assigns each step or request to a model by difficulty. A fixed router maps step types to models; a cascade tries a cheap model first and escalates to a stronger one when confidence is low.",
+  "level": 2,
+  "objective": {
+    "id": "model-routing-obj",
+    "text": "Given the step types in an agent loop and two model prices, design a fixed or cascading route, compute its expected cost, and name the golden-set measurement that approves it."
+  },
+  "misconceptions": [
+    {
+      "claim": "The cheapest model that gives a plausible answer is always the cheapest choice.",
+      "correction": "A cheaper call that fails more often triggers retries and re-runs. Judge a route by cost per completed task, which can rise even when the price per call falls."
+    },
+    {
+      "claim": "Routing is decided once, by intuition about which steps are easy.",
+      "correction": "Measure quality per route on a golden set before and after any change. A step that looks easy, such as extracting dates from contracts, may fail badly on a smaller model."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Most agent loops mix easy steps, such as classification, extraction and routing, with hard steps, such as planning and judgement. Easy steps rarely need the strongest model.",
+      "A fixed router sends each step type to a chosen model. A cascade tries a cheap model first and escalates to a stronger one when the cheap answer has low confidence.",
+      "Every route is proven on a golden set: a fixed list of real cases with known answers. Quality is measured per route, not only for the whole task."
+    ],
+    "l2": [
+      "A task makes 10 calls. Six are classification or extraction and four need reasoning. On the strong model each call costs $0.02, so the task costs $0.20.",
+      "A cheaper model costs a fifth as much, $0.004 per call. Routing the six easy calls to it gives 6 times $0.004 plus 4 times $0.02, or $0.104 per task.",
+      "That is a 48 per cent saving per attempt. It counts only if the golden set shows the easy routes still succeed, because every failed extraction can force a re-run of the whole task."
+    ],
+    "l3": [
+      "A cascade sends every call to the cheap model first. If 30 per cent are escalated to the strong model, the expected cost is $0.004 plus 0.3 times $0.02, or $0.010 per call.",
+      "That is half the strong-only price, but the confidence threshold sets the trade. Set it low and wrong answers slip through; set it high and most calls escalate, paying for both models.",
+      "Tune the threshold on the golden set and judge it by cost per completed task and task success together. Re-check after every model or prompt change, because confidence scores drift."
+    ]
+  },
+  "prerequisites": ["cost-per-task", "agency-spectrum"],
+  "labs": ["cost-waterfall"],
+  "drills": ["fin-drill-cut-spend"],
+  "goals": ["interview", "capstone"],
+  "minutes": 13
+}

@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "evaluation-pyramid",
+  "tentacle": "evaluation-observability",
+  "title": "The evaluation pyramid",
+  "point": "Many cheap deterministic checks at the base, fewer scenario and trajectory evals in the middle, and a few expensive end-to-end judgements at the top, each run at its own cadence.",
+  "definition": "The evaluation pyramid layers agent tests by cost and scope. A wide base of deterministic checks runs on every commit. A middle of scenario and trajectory evals checks the steps taken, and a narrow top of human or model-judged reviews runs less often.",
+  "level": 1,
+  "objective": {
+    "id": "evaluation-pyramid-obj",
+    "text": "Given a list of agent checks, place each in the right layer of the pyramid and state how often it should run."
+  },
+  "misconceptions": [
+    {
+      "claim": "End-to-end judgements are the only evals that matter, because users see only the final answer.",
+      "correction": "End-to-end judgements are slow and costly, so they run rarely and find failures late. Cheap base checks catch broken schemas and loop bounds on every commit, minutes after the change."
+    },
+    {
+      "claim": "If the final answer is right, the trajectory does not need testing.",
+      "correction": "A right answer can hide a wrong path, such as an unneeded refund call or ten wasted steps. Trajectory evals catch unsafe or costly behaviour that the answer alone conceals."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "The base holds deterministic checks: schema validity, tool-contract tests and unit tests of loop bounds. They are cheap, fast and exact, so they run on every commit.",
+      "The middle holds scenario and trajectory evals. A scripted task checks whether the agent took sensible steps and called the right tools in a sensible order.",
+      "The top holds end-to-end judgements by humans or a model judge. They are expensive and slow, so they run on release candidates rather than on every change."
+    ],
+    "l2": [
+      "Take a support agent with 400 base checks, 120 scenarios and a 300-item judged set. The base runs in about two minutes and costs nothing beyond compute.",
+      "The 120 scenarios replay recorded tool responses, so they need no live systems and finish in about ten minutes. They run on every merge to the main branch.",
+      "The judged set needs 300 model-judge calls plus a human sample of 50 conversations. It runs nightly and before each release, because a full pass costs real money and an afternoon of review."
+    ],
+    "l3": [
+      "The shape follows cost per finding. A schema check costs a fraction of a cent and fails loudly, while a human review costs minutes per item and finds subtle problems.",
+      "When a failure first shows up at the top, push a cheaper test down the pyramid. A judged failure caused by a malformed date becomes a base schema check that runs on every commit.",
+      "An inverted pyramid, with most effort in manual review, is slow and leaves regressions undetected between reviews. Teams then ship less often, or ship without evidence."
+    ]
+  },
+  "prerequisites": ["six-components"],
+  "labs": ["eval-pyramid-sorter"],
+  "drills": ["evl-drill-release-gates"],
+  "goals": ["interview", "capstone"],
+  "minutes": 12
+}

@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "prompt-injection",
+  "tentacle": "safety-governance",
+  "title": "Prompt injection",
+  "point": "Any text the model reads can try to act as an instruction, so defend with structure that treats untrusted text as data, not with more instructions.",
+  "definition": "Prompt injection is text that tries to change an agent's behaviour against its principal's intent. Direct injection comes from the person typing; indirect injection hides inside content the agent reads, such as pages, emails, files or tool results.",
+  "level": 1,
+  "objective": {
+    "id": "prompt-injection-obj",
+    "text": "Classify an attack as direct or indirect, explain why instruction-only defences are not enough, and choose structural defences such as quarantine, typed outputs, allowlists and gateway authorisation."
+  },
+  "misconceptions": [
+    {
+      "claim": "Adding a line telling the model to ignore instructions in documents prevents indirect injection.",
+      "correction": "It may lower the success rate of some attacks, but it guarantees nothing. The model reads one stream of tokens and cannot reliably tell your instructions from an attacker's."
+    },
+    {
+      "claim": "Only the user can inject prompts, so authenticating users makes the agent safe.",
+      "correction": "Indirect injection arrives through content, not the chat box. A trusted user who asks for a summary of a hostile web page delivers the attacker's text for them."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Direct injection: the person typing tries to override the agent, for example by asking it to reveal its system prompt or skip a policy check.",
+      "Indirect injection: instructions hidden in content the agent reads, such as hidden text on a web page, a line in an inbound email or a poisoned tool description.",
+      "The model cannot reliably separate instructions from data in its context. Defences must therefore limit what a successful injection can do, not only try to prevent it."
+    ],
+    "l2": [
+      "Treat untrusted text as data. Pass it to a quarantined model call with no tools that returns only schema-validated fields, such as an intent enum and an order number.",
+      "Use typed outputs and allowlists. If the next step accepts only an order ID that matches a pattern, an injected sentence has nowhere to go.",
+      "Authorise in the gateway and the database under the principal's identity. An injected refund request then fails at authorisation, whatever the model was persuaded to propose."
+    ],
+    "l3": [
+      "Measure rather than assume. Keep a test set of hostile emails and pages, and track the attack success rate for each release alongside task accuracy.",
+      "Expect a non-zero bypass rate from model-level defences such as classifiers and tuned refusals. Use structure to bound the remaining blast radius, so a 1 per cent bypass cannot leak data.",
+      "Watch the quarantine boundary. A free-text summary field lets injected text ride through to the planner, so prefer enums, numbers and IDs."
+    ]
+  },
+  "prerequisites": ["six-components"],
+  "labs": [],
+  "drills": ["saf-drill-inbox-agent"],
+  "goals": ["interview", "capstone"],
+  "minutes": 12
+}

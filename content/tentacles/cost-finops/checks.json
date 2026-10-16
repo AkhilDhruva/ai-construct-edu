@@ -1,0 +1,295 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {
+      "id": "fin-chk-01",
+      "conceptId": "cost-per-task",
+      "depth": 2,
+      "kind": "mcq",
+      "stem": "An agent spends $0.12 per attempt on model calls and $0.03 per attempt on tools. In a week, 10,000 attempts, including re-runs, complete 7,500 tasks. What is the cost per completed task?",
+      "options": [
+        {
+          "id": "a",
+          "text": "$0.12",
+          "feedback": "This is the model spend of one attempt. It leaves out tool fees and ignores the attempts that did not complete a task."
+        },
+        {
+          "id": "b",
+          "text": "$0.15",
+          "feedback": "This is the full cost of one attempt, but it divides by attempts. The 2,500 failed attempts still cost money and must be carried by the completed tasks."
+        },
+        {
+          "id": "c",
+          "text": "$0.20",
+          "feedback": "Correct. Spend is 10,000 times $0.15, or $1,500, and $1,500 divided by 7,500 completed tasks is $0.20."
+        },
+        {
+          "id": "d",
+          "text": "$0.16",
+          "feedback": "This divides model spend alone by completed tasks. Tool and retrieval fees are part of what a task costs, so they belong in the total."
+        }
+      ],
+      "answer": "c",
+      "explanation": "Add every model and tool cost across all attempts, including failures and re-runs, then divide by the tasks that succeed."
+    },
+    {
+      "id": "fin-chk-02",
+      "conceptId": "prompt-caching",
+      "depth": 1,
+      "kind": "order",
+      "stem": "Order these prompt sections for the best cache hit rate, from the start of the prompt to the end.",
+      "items": [
+        { "id": "history", "text": "The conversation so far, which grows every turn." },
+        { "id": "system-tools", "text": "System instructions and tool definitions, which change only on deploy." },
+        { "id": "latest", "text": "The user's latest message, which is new on every call." },
+        { "id": "rubric", "text": "The review rubric, which changes about once a month." },
+        { "id": "account", "text": "The customer's account profile, which is fixed for the whole session." }
+      ],
+      "answer": ["system-tools", "rubric", "account", "history", "latest"],
+      "explanation": "The cache matches a prefix from the start, so order sections from most stable to least stable. Anything that changes invalidates every section after it."
+    },
+    {
+      "id": "fin-chk-03",
+      "conceptId": "prompt-caching",
+      "depth": 2,
+      "kind": "mcq",
+      "stem": "Caching was enabled a month ago, but the cache-read token count is near zero on every call. Which change most likely explains it?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The system prompt now starts with the current date and time.",
+          "feedback": "Correct. The first bytes differ on every call, so no prefix ever matches and every call pays to write the cache."
+        },
+        {
+          "id": "b",
+          "text": "The user's messages have become longer.",
+          "feedback": "Not the cause. User messages sit after the cache breakpoint, so their length does not affect whether the prefix matches."
+        },
+        {
+          "id": "c",
+          "text": "Traffic doubled during business hours.",
+          "feedback": "More traffic keeps the cache warmer, not colder. Busy periods should raise cache reads."
+        },
+        {
+          "id": "d",
+          "text": "The output cap was lowered from 1,000 to 600 tokens.",
+          "feedback": "Output length has no effect on prefix matching. It changes output spend, not cache hits."
+        }
+      ],
+      "answer": "a",
+      "explanation": "Timestamps, request IDs, unsorted JSON and reordered tools silently break the prefix match. Cache-read token counts are how you catch it."
+    },
+    {
+      "id": "fin-chk-04",
+      "conceptId": "model-routing",
+      "depth": 2,
+      "kind": "mcq",
+      "stem": "Moving the planning step to a model at a fifth of the price cuts cost per attempt by 30 per cent, but task success falls from 0.95 to 0.70. Failures are re-run. What should you conclude?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Ship it, because the cost per attempt fell by 30 per cent.",
+          "feedback": "The attempt price is the wrong measure. Re-runs and lost tasks are part of the cost, and success fell by 25 points."
+        },
+        {
+          "id": "b",
+          "text": "Reject it for planning: cost per completed task barely falls, and success drops far below the floor.",
+          "feedback": "Correct. If an attempt cost $0.10, a completed task cost about $0.105 before and $0.07 divided by 0.70, or $0.10, after. That 5 per cent saving costs 25 points of success."
+        },
+        {
+          "id": "c",
+          "text": "Route every step to the cheaper model, so the saving is larger.",
+          "feedback": "That spreads the quality loss to every step. Planning is a hard step; cheaper models suit easy steps such as classification and extraction."
+        },
+        {
+          "id": "d",
+          "text": "Keep the change but raise the retry limit until success recovers.",
+          "feedback": "More retries spend the saving and add latency. Fix the route instead of paying to retry a model that is wrong for the step."
+        }
+      ],
+      "answer": "b",
+      "explanation": "Judge routes by cost per completed task and task success on a golden set. A cheaper call that fails more often is not cheaper."
+    },
+    {
+      "id": "fin-chk-05",
+      "conceptId": "context-trimming",
+      "depth": 2,
+      "kind": "multi",
+      "stem": "An agent's context reaches 40,000 tokens by step 10. Which changes trim it while protecting task success? Select all that apply.",
+      "options": [
+        {
+          "id": "summarise",
+          "text": "Summarise each long tool observation and keep an ID so the full text can be fetched again.",
+          "feedback": "Correct. The summary carries the facts forward, and the ID lets a later step recover detail if it needs it."
+        },
+        {
+          "id": "cap-retrieval",
+          "text": "Cap retrieval to the top few passages, chosen by relevance score.",
+          "feedback": "Correct. Low-ranked passages add tokens and noise, and the golden set shows whether the cap loses answers."
+        },
+        {
+          "id": "drop-all",
+          "text": "Drop the whole history after every step.",
+          "feedback": "Incorrect. The agent loses the facts and decisions it needs to finish, so success falls and re-runs rise."
+        },
+        {
+          "id": "stale",
+          "text": "Drop turns that no longer affect the current decision, keeping the last few verbatim.",
+          "feedback": "Correct. Stale history costs tokens on every call while adding nothing to the next step."
+        },
+        {
+          "id": "tiny-cap",
+          "text": "Cap output at 100 tokens for every step, including the structured verdict.",
+          "feedback": "Incorrect. A cap below the real output size truncates verdicts, causing parse failures and retries that cost more than they save."
+        }
+      ],
+      "answers": ["summarise", "cap-retrieval", "stale"],
+      "explanation": "Trim what the next step does not need, keep a way back to full detail, and size caps from the real output distribution. Confirm on the golden set."
+    },
+    {
+      "id": "fin-chk-06",
+      "conceptId": "batch-and-async",
+      "depth": 1,
+      "kind": "mcq",
+      "stem": "Which workload is the best candidate for a batch API at roughly half price?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Live chat replies to customers on the support site.",
+          "feedback": "A person is waiting for each reply, and batch results can take hours. Keep this interactive."
+        },
+        {
+          "id": "b",
+          "text": "Grading 50,000 agent transcripts from the previous day for a morning quality report.",
+          "feedback": "Correct. Nobody waits for any single result, and the report is needed by morning, so a batch window of hours fits."
+        },
+        {
+          "id": "c",
+          "text": "Tool calls that check stock levels during checkout.",
+          "feedback": "Checkout is blocked until the call returns, so a delay of hours would break the purchase."
+        },
+        {
+          "id": "d",
+          "text": "Routing an inbound email to a queue while the sender waits for an acknowledgement.",
+          "feedback": "The acknowledgement depends on the routing decision, so it cannot wait hours for a batch result."
+        }
+      ],
+      "answer": "b",
+      "explanation": "Batch suits work nobody is waiting for: evaluations, grading, backfills and periodic re-checks."
+    },
+    {
+      "id": "fin-chk-07",
+      "conceptId": "cost-guardrails",
+      "depth": 2,
+      "kind": "mcq",
+      "stem": "A route's trailing median cost is $0.20 per request, and alerts fire at three times the median. Which request should raise an alert?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A request costing $0.35.",
+          "feedback": "Below the threshold. At $0.35 it is 1.75 times the median, which is ordinary variation for a loop."
+        },
+        {
+          "id": "b",
+          "text": "A request costing $0.55.",
+          "feedback": "Close, but $0.55 is 2.75 times the median. The threshold is $0.60."
+        },
+        {
+          "id": "c",
+          "text": "A request costing $0.72.",
+          "feedback": "Correct. Three times $0.20 is $0.60, and $0.72 is 3.6 times the median, so it alerts with its trace, tenant and model."
+        },
+        {
+          "id": "d",
+          "text": "None, because alerts should be based on the monthly invoice.",
+          "feedback": "A runaway loop can spend a month's budget in hours. Per-request alerts catch it long before an invoice does."
+        }
+      ],
+      "answer": "c",
+      "explanation": "A multiple of the trailing median adapts to each route's normal cost, so one threshold rule works across cheap and expensive routes."
+    },
+    {
+      "id": "fin-chk-08",
+      "conceptId": "cost-guardrails",
+      "depth": 2,
+      "kind": "multi",
+      "stem": "A tenant has spent its whole monthly budget with a week to go. Which responses fit good cost guardrails? Select all that apply.",
+      "options": [
+        {
+          "id": "smaller-model",
+          "text": "Route the tenant's calls to a smaller model and tell users the service is in a reduced mode.",
+          "feedback": "Correct. This is a degradation rung: service continues at lower cost, and users know which mode they are in."
+        },
+        {
+          "id": "hard-error",
+          "text": "Return an error on every request until the next month.",
+          "feedback": "Incorrect. Failing outright is the worst rung. Degrade first, and stop only if no cheaper mode is acceptable."
+        },
+        {
+          "id": "exemplars",
+          "text": "Serve exemplar answers only for common questions and queue the rest.",
+          "feedback": "Correct. Exemplars and queued work keep useful service running with little or no model spend."
+        },
+        {
+          "id": "attribute",
+          "text": "Group the tenant's spend by route and model to find what drove it.",
+          "feedback": "Correct. Attribution shows whether one route, one model or a runaway loop caused the overspend, which guides the fix."
+        },
+        {
+          "id": "silent",
+          "text": "Quietly switch to a weaker model without telling anyone.",
+          "feedback": "Incorrect. Silent degradation erodes trust and hides the drop in quality from reports. Show and record the current rung."
+        }
+      ],
+      "answers": ["smaller-model", "exemplars", "attribute"],
+      "explanation": "Budgets should trigger a visible step down the degradation ladder, and attribution should explain where the money went."
+    },
+    {
+      "id": "fin-chk-09",
+      "conceptId": "model-routing",
+      "depth": 2,
+      "kind": "order",
+      "stem": "Put the steps for safely moving an extraction step to a cheaper model in order.",
+      "items": [
+        { "id": "compare", "text": "Compare quality on the route and cost per completed task against the baseline." },
+        { "id": "golden", "text": "Build a golden set of real extraction cases with known answers." },
+        { "id": "rollout", "text": "Roll out to a small share of traffic and watch task success." },
+        { "id": "baseline", "text": "Measure the current model's quality and cost on the golden set." },
+        { "id": "swap", "text": "Run the cheaper model on the same golden set." }
+      ],
+      "answer": ["golden", "baseline", "swap", "compare", "rollout"],
+      "explanation": "You need fixed cases before any measurement, a baseline before a comparison, and a passing comparison before any live traffic sees the new route."
+    },
+    {
+      "id": "fin-chk-10",
+      "conceptId": "cost-per-task",
+      "depth": 1,
+      "kind": "mcq",
+      "stem": "A team's dashboard shows cost per model request. Which problem would it most likely hide?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A loop that now takes 9 calls per task instead of 6.",
+          "feedback": "Correct. Each request costs the same, so the dashboard stays flat while the bill per task rises by half."
+        },
+        {
+          "id": "b",
+          "text": "A switch to a provider with higher token prices.",
+          "feedback": "A price rise shows up directly in cost per request, so this dashboard would catch it."
+        },
+        {
+          "id": "c",
+          "text": "A prompt change that doubles input tokens on every call.",
+          "feedback": "Each request carries the extra tokens, so cost per request rises visibly."
+        },
+        {
+          "id": "d",
+          "text": "Longer outputs on every call after a format change.",
+          "feedback": "Longer outputs raise the cost of each request, so this dashboard would show it."
+        }
+      ],
+      "answer": "a",
+      "explanation": "Cost per request misses changes in how many calls, retries and re-runs a task needs. Track cost per completed task as the headline number."
+    }
+  ]
+}

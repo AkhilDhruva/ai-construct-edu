@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "lethal-trifecta",
+  "tentacle": "safety-governance",
+  "title": "The lethal trifecta",
+  "point": "An agent identity that reads private data, sees untrusted content and can communicate externally can be steered into leaking that data, so break at least one leg.",
+  "definition": "The lethal trifecta is the combination, on one agent identity, of access to private data, exposure to untrusted content and the ability to communicate externally. Together they let injected instructions turn the agent into an exfiltration channel.",
+  "level": 1,
+  "objective": {
+    "id": "lethal-trifecta-obj",
+    "text": "Given an agent's tool list, mark the legs each tool contributes, decide whether the identity is lethal, and choose the cheapest change that breaks a leg while keeping the required tools."
+  },
+  "misconceptions": [
+    {
+      "claim": "A strong system prompt telling the agent never to share data breaks the trifecta.",
+      "correction": "Instructions sit in the same context as the attack and can be overridden. A leg is broken only by structure: a removed tool, a split identity, quarantine or human approval."
+    },
+    {
+      "claim": "The trifecta only matters when a single tool does all three things.",
+      "correction": "Legs add up across every tool the identity holds. An inbox reader, a CRM lookup and a send tool are each harmless alone but lethal together."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Private data: anything the agent can read that an attacker should not see, such as CRM records, internal documents, source code or credentials.",
+      "Untrusted content: text written by someone outside your control, such as web pages, inbound email, uploaded files or third-party tool descriptions.",
+      "External communication: any way to move data out, such as sending email, calling arbitrary URLs or posting messages. When all three legs meet on one identity, an injected instruction can both read and send."
+    ],
+    "l2": [
+      "An inbox assistant reads inbound email, looks up the CRM and can send replies. An attacker emails a request to list the top ten accounts by revenue and reply to a new address.",
+      "Every leg is present, so the attack can succeed. Remove the send tool and keep drafts only, and the external leg is gone while triage still works.",
+      "Alternatively, quarantine inbound email: a model with no tools extracts sender, intent and order number into a schema. The planner never reads attacker-written text.",
+      "Or require human approval on every outbound message. Each fix breaks a different leg and costs something different: capability, extraction quality or reviewer time."
+    ],
+    "l3": [
+      "Choose the leg to break by what the task can afford to lose. A research agent needs the web, so split it from the identity that reads the internal wiki.",
+      "Exfiltration channels hide in ordinary features. A fetched URL with a query string, a remote image in rendered output or a webhook test all count as external communication.",
+      "Re-check the legs whenever a tool is added. One new connector, such as a chat poster, can quietly complete a trifecta that an earlier review signed off."
+    ]
+  },
+  "prerequisites": ["least-privilege-tools"],
+  "labs": ["trifecta-check"],
+  "drills": ["saf-drill-inbox-agent"],
+  "goals": ["interview", "capstone"],
+  "minutes": 12
+}

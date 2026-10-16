@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "engine": "trace-debugger",
+  "id": "trace-debugger",
+  "brief": [
+    "Each trace records one support-agent run as a tree of spans: the run, its steps, and the model, tool, retrieval and guard calls inside them. Every span carries timing, tokens, cost, status and a few attributes.",
+    "Each trace comes with a reported symptom and has one planted root cause. Start from the symptom and walk back to the first span whose status or attributes look wrong; the loudest or costliest span is often only a consequence."
+  ],
+  "traces": [
+    {
+      "id": "refund-window-hallucination",
+      "title": "Confident but wrong refund window",
+      "symptom": "A customer was told that refunds are allowed within 60 days. The written policy says 30 days, and the answer cited no source.",
+      "spans": [
+        { "id": "a1", "parentId": null, "name": "agent.run", "kind": "agent", "startMs": 0, "durationMs": 6400, "tokens": 0, "costUsd": 0, "status": "ok", "attributes": { "gen_ai.agent.name": "support-agent", "rung": "full", "run.steps": 3 } },
+        { "id": "a2", "parentId": "a1", "name": "agent.step", "kind": "agent", "startMs": 0, "durationMs": 1300, "tokens": 0, "costUsd": 0, "status": "ok", "attributes": { "step.index": 1, "step.intent": "plan" } },
+        { "id": "a3", "parentId": "a2", "name": "llm.plan", "kind": "llm", "startMs": 20, "durationMs": 1250, "tokens": 1950, "costUsd": 0.0051, "status": "ok", "attributes": { "gen_ai.request.model": "model-small", "gen_ai.usage.input_tokens": 1800, "gen_ai.usage.output_tokens": 150 } },
+        { "id": "a4", "parentId": "a1", "name": "agent.step", "kind": "agent", "startMs": 1310, "durationMs": 520, "tokens": 0, "costUsd": 0, "status": "ok", "attributes": { "step.index": 2, "step.intent": "retrieve refund policy" } },
+        { "id": "a5", "parentId": "a4", "name": "retrieval.vector", "kind": "retrieval", "startMs": 1320, "durationMs": 480, "tokens": 14, "costUsd": 0.000028, "status": "empty", "attributes": { "retrieval.index": "policies-v3", "retrieval.filter": "locale=en-US", "retrieval.top_k": 5, "retrieval.hits": 0 } },
+        { "id": "a6", "parentId": "a1", "name": "agent.step", "kind": "agent", "startMs": 1840, "durationMs": 4540, "tokens": 0, "costUsd": 0, "status": "ok", "attributes": { "step.index": 3, "step.intent": "answer" } },
+        { "id": "a7", "parentId": "a6", "name": "llm.answer", "kind": "llm", "startMs": 1850, "durationMs": 4300, "tokens": 2520, "costUsd": 0.0084, "status": "ok", "attributes": { "gen_ai.request.model": "model-large", "gen_ai.usage.input_tokens": 2100, "gen_ai.usage.output_tokens": 420, "answer.citations": 0 } },
+        { "id": "a8", "parentId": "a6", "name": "guard.output", "kind": "guard", "startMs": 6160, "durationMs": 200, "tokens": 0, "costUsd": 0, "status": "ok", "attributes": { "guard.policy": "pii-leak", "guard.verdict": "pass" } }
+      ],
+      "rootCause": "a5",
+      "explanation": "The retrieval.vector span returned zero hits because its locale filter matched no policy pages, so the answer step had no policy text. The llm.answer span is the largest and most visible, but it only filled the gap from the model's own assumptions. Fix the filter, and route an empty retrieval to a clarifying question or a human."
+    },
+    {
+      "id": "order-lookup-timeout",
+      "title": "Slow order lookup and a cost spike",
+      "symptom": "The customer waited 27 seconds for a vague reply, and the run cost $0.043 against a usual $0.012. Cost heat points straight at the final model call.",
+      "spans": [
+        { "id": "b1", "parentId": null, "name": "agent.run", "kind": "agent", "startMs": 0, "durationMs": 27400, "tokens": 0, "costUsd": 0, "status": "ok", "attributes": { "gen_ai.agent.name": "support-agent", "rung": "full", "run.steps": 3 } },
+        { "id": "b2", "parentId": "b1", "name": "agent.step", "kind": "agent", "startMs": 0, "durationMs": 1400, "tokens": 0, "costUsd": 0, "status": "ok", "attributes": { "step.index": 1, "step.intent": "plan" } },
+        { "id": "b3", "parentId": "b2", "name": "llm.plan", "kind": "llm", "startMs": 10, "durationMs": 1350, "tokens": 2160, "costUsd": 0.0056, "status": "ok", "attributes": { "gen_ai.request.model": "model-small", "gen_ai.usage.input_tokens": 2000, "gen_ai.usage.output_tokens": 160 } },
+        { "id": "b4", "parentId": "b1", "name": "agent.step", "kind": "agent", "startMs": 1410, "durationMs": 17650, "tokens": 0, "costUsd": 0, "status": "ok", "attributes": { "step.index": 2, "step.intent": "look up order" } },
+        { "id": "b5", "parentId": "b4", "name": "tool.get_order", "kind": "tool", "startMs": 1420, "durationMs": 4000, "tokens": 0, "costUsd": 0, "status": "slow", "attributes": { "peer.service": "orders-api", "tool.attempt": 1, "tool.timeout_ms": 4000, "tool.result": "UNAVAILABLE" } },
+        { "id": "b6", "parentId": "b4", "name": "tool.get_order", "kind": "tool", "startMs": 5620, "durationMs": 4000, "tokens": 0, "costUsd": 0, "status": "slow", "attributes": { "peer.service": "orders-api", "tool.attempt": 2, "tool.backoff_ms": 200, "tool.result": "UNAVAILABLE" } },
+        { "id": "b7", "parentId": "b4", "name": "tool.get_order", "kind": "tool", "startMs": 10020, "durationMs": 4000, "tokens": 0, "costUsd": 0, "status": "slow", "attributes": { "peer.service": "orders-api", "tool.attempt": 3, "tool.backoff_ms": 400, "tool.result": "UNAVAILABLE" } },
+        { "id": "b8", "parentId": "b4", "name": "tool.get_order", "kind": "tool", "startMs": 14820, "durationMs": 4000, "tokens": 0, "costUsd": 0, "status": "slow", "attributes": { "peer.service": "orders-api", "tool.attempt": 4, "tool.backoff_ms": 800, "tool.result": "UNAVAILABLE" } },
+        { "id": "b9", "parentId": "b1", "name": "agent.step", "kind": "agent", "startMs": 19070, "durationMs": 8300, "tokens": 0, "costUsd": 0, "status": "ok", "attributes": { "step.index": 3, "step.intent": "answer without order data" } },
+        { "id": "b10", "parentId": "b9", "name": "llm.answer", "kind": "llm", "startMs": 19080, "durationMs": 7900, "tokens": 14900, "costUsd": 0.037, "status": "ok", "attributes": { "gen_ai.request.model": "model-large", "gen_ai.usage.input_tokens": 14000, "gen_ai.usage.output_tokens": 900, "fallback.reason": "no order data" } },
+        { "id": "b11", "parentId": "b9", "name": "guard.output", "kind": "guard", "startMs": 26990, "durationMs": 300, "tokens": 0, "costUsd": 0, "status": "ok", "attributes": { "guard.policy": "pii-leak", "guard.verdict": "pass" } }
+      ],
+      "rootCause": "b5",
+      "explanation": "The first tool.get_order call timed out at 4 seconds, and everything after it follows from that. Three identical retries added about 13 seconds, then a fallback sent all four failures to a large model, which is the hottest span but only a consequence. Cap retries against the run budget and degrade to a short holding reply."
+    },
+    {
+      "id": "injected-account-closure",
+      "title": "Account closed without being asked",
+      "symptom": "A customer asked how to update a billing address, and the agent closed their account instead. Everyone is pointing at the account closure call.",
+      "spans": [
+        { "id": "c1", "parentId": null, "name": "agent.run", "kind": "agent", "startMs": 0, "durationMs": 6100, "tokens": 0, "costUsd": 0, "status": "ok", "attributes": { "gen_ai.agent.name": "support-agent", "rung": "full", "run.steps": 4 } },
+        { "id": "c2", "parentId": "c1", "name": "agent.step", "kind": "agent", "startMs": 0, "durationMs": 520, "tokens": 0, "costUsd": 0, "status": "ok", "attributes": { "step.index": 1, "step.intent": "retrieve help articles" } },
+        { "id": "c3", "parentId": "c2", "name": "retrieval.vector", "kind": "retrieval", "startMs": 10, "durationMs": 420, "tokens": 16, "costUsd": 0.000032, "status": "ok", "attributes": { "retrieval.index": "help-and-forum", "retrieval.top_k": 4, "retrieval.hits": 4 } },
+        { "id": "c4", "parentId": "c2", "name": "guard.injection", "kind": "guard", "startMs": 440, "durationMs": 60, "tokens": 0, "costUsd": 0, "status": "ok", "attributes": { "guard.verdict": "pass", "guard.scanned_chars": 2000, "retrieval.doc_chars": 6400, "guard.model": "injection-classifier-v2" } },
+        { "id": "c5", "parentId": "c1", "name": "agent.step", "kind": "agent", "startMs": 530, "durationMs": 2100, "tokens": 0, "costUsd": 0, "status": "ok", "attributes": { "step.index": 2, "step.intent": "plan" } },
+        { "id": "c6", "parentId": "c5", "name": "llm.plan", "kind": "llm", "startMs": 540, "durationMs": 2050, "tokens": 5020, "costUsd": 0.0118, "status": "ok", "attributes": { "gen_ai.request.model": "model-small", "gen_ai.usage.input_tokens": 4800, "gen_ai.usage.output_tokens": 220, "tool.selected": "close_account" } },
+        { "id": "c7", "parentId": "c1", "name": "agent.step", "kind": "agent", "startMs": 2640, "durationMs": 900, "tokens": 0, "costUsd": 0, "status": "ok", "attributes": { "step.index": 3, "step.intent": "act" } },
+        { "id": "c8", "parentId": "c7", "name": "tool.close_account", "kind": "tool", "startMs": 2650, "durationMs": 870, "tokens": 0, "costUsd": 0, "status": "ok", "attributes": { "tool.side_effect": true, "tool.result": "SUCCESS", "tool.confirmation": "none" } },
+        { "id": "c9", "parentId": "c1", "name": "agent.step", "kind": "agent", "startMs": 3550, "durationMs": 2500, "tokens": 0, "costUsd": 0, "status": "ok", "attributes": { "step.index": 4, "step.intent": "answer" } },
+        { "id": "c10", "parentId": "c9", "name": "llm.answer", "kind": "llm", "startMs": 3560, "durationMs": 2400, "tokens": 5380, "costUsd": 0.0122, "status": "ok", "attributes": { "gen_ai.request.model": "model-small", "gen_ai.usage.input_tokens": 5200, "gen_ai.usage.output_tokens": 180 } },
+        { "id": "c11", "parentId": "c9", "name": "guard.output", "kind": "guard", "startMs": 5970, "durationMs": 70, "tokens": 0, "costUsd": 0, "status": "ok", "attributes": { "guard.policy": "pii-leak", "guard.verdict": "pass" } }
+      ],
+      "rootCause": "c4",
+      "explanation": "The guard.injection span passed after scanning only 2,000 of 6,400 characters of a forum post, and the injected close-account instruction sat beyond that point. Every later span faithfully acted on text that should have been flagged. Scan whole documents, and keep account closure behind human confirmation as a second line of defence."
+    }
+  ]
+}

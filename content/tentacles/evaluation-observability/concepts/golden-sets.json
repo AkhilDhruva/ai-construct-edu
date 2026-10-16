@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "golden-sets",
+  "tentacle": "evaluation-observability",
+  "title": "Golden sets",
+  "point": "A golden set is a versioned, stratified collection of real cases labelled against a written rubric, grown from every incident, with a held-out split that tuning never sees.",
+  "definition": "A golden set is the fixed collection of cases an agent is scored against. It is drawn from real traffic and incidents, stratified by task type and difficulty, labelled against a written rubric and versioned like code.",
+  "level": 1,
+  "objective": {
+    "id": "golden-sets-obj",
+    "text": "Given a sample of production traffic and an incident log, design a stratified, versioned golden set with a held-out split, and state how it grows."
+  },
+  "misconceptions": [
+    {
+      "claim": "A few dozen hand-written examples make a good golden set.",
+      "correction": "Invented examples reflect what the team imagines, not what users send. Draw cases from real traffic and incidents, and stratify them so rare but costly task types are represented."
+    },
+    {
+      "claim": "Tuning the prompt until the whole golden set passes proves the change is better.",
+      "correction": "Repeated tuning against the same cases overfits to them. Keep a held-out split that is never used while tuning, and report the score on it."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Cases come from real traffic and incidents. Every incident or wrong answer becomes a regression case, so the same failure cannot ship twice unnoticed.",
+      "The set is stratified across task types and difficulty. A random sample would be mostly easy password resets and almost no complex refunds.",
+      "Each case is labelled against a written rubric, and the set is versioned. A score is only comparable with another score on the same version."
+    ],
+    "l2": [
+      "Take a support agent whose traffic is 50 per cent account questions, 30 per cent billing, 15 per cent technical and 5 per cent refunds. A 400-case random sample holds only about 20 refunds.",
+      "Stratify instead: 100 cases per task type, each split into easy, medium and hard. Refunds now have enough cases for a per-type score to mean something.",
+      "Hold out 100 of the 400 cases. Prompt engineers tune on the other 300, and the release report shows the held-out score next to the tuning score.",
+      "Last month's incident, where the agent promised a refund outside policy, becomes case 401 in version 1.4, with its label and a link to the incident."
+    ],
+    "l3": [
+      "A per-type score needs enough cases to be stable. With 100 cases, a measured 90 per cent has a standard error of about 3 points; with 20 cases it is nearly 7 points.",
+      "Golden sets go stale as products and users change. Refresh a share of cases each quarter from recent traffic, but keep incident cases permanently as regression guards.",
+      "Version every change to cases, labels or the rubric. When the rubric changes, relabel the affected cases and rescore the baseline, or the comparison is meaningless."
+    ]
+  },
+  "prerequisites": ["evaluation-pyramid"],
+  "labs": ["eval-pyramid-sorter"],
+  "drills": ["evl-drill-release-gates"],
+  "goals": ["interview", "capstone"],
+  "minutes": 12
+}

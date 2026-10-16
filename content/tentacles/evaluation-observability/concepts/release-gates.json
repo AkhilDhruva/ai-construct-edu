@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "release-gates",
+  "tentacle": "evaluation-observability",
+  "title": "Release gates",
+  "point": "A change moves from offline eval to shadow to canary to full rollout. Safety failures block absolutely, quality blocks only on significant regressions, and cost is reported beside quality.",
+  "definition": "Release gates are the checks a prompt, model or tool change must pass at each rollout stage. Safety assertions block on any failure, quality regressions block when statistically significant, and guardrail metrics trigger automatic rollback.",
+  "level": 2,
+  "objective": {
+    "id": "release-gates-obj",
+    "text": "Given a proposed prompt change, define the gates for offline eval, shadow, canary and full rollout, including the significance test and rollback triggers."
+  },
+  "misconceptions": [
+    {
+      "claim": "Any drop in the average golden-set score should block the release.",
+      "correction": "Small drops are often noise. Block a quality regression only when a paired test on per-item scores, such as a sign test or bootstrap, shows it is significant."
+    },
+    {
+      "claim": "A quality gain is always worth shipping.",
+      "correction": "Report cost next to quality. A two-point gain that triples spend per conversation is a business trade, and it should be a visible decision, not a side effect."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Offline eval scores the change on the golden set before any user sees it. Shadow mode then runs it on live traffic without showing its answers.",
+      "A canary serves a small share of real users, such as 5 per cent, while guardrail metrics are watched. Full rollout follows only if the canary holds.",
+      "Safety assertions, such as never revealing another customer's data, block on any failure. Quality and cost are compared with the current version."
+    ],
+    "l2": [
+      "Take a 300-item golden set. The new prompt beats the old on 41 items, loses on 29 and ties on 230. Only the 70 items that differ count in a sign test.",
+      "With no real change, wins among 70 would average 35 with a standard deviation of about 4.2. A count of 41 is about 1.4 deviations above, so the gain is not significant.",
+      "The release can still ship as neutral, but the report must not claim an improvement. If a safety assertion had failed even once, the release would be blocked whatever the score."
+    ],
+    "l3": [
+      "Set canary rollback triggers in advance, such as escalation rate up 3 points or p95 latency above 12 seconds over an hour. Rollback is then automatic, not a meeting.",
+      "A canary must be large enough to see the effect. At 5 per cent of 200,000 conversations a month, about 330 canary conversations a day can resolve only fairly large changes.",
+      "Report cost per conversation beside quality for every candidate. A change that raises quality 2 points and cost from $0.02 to $0.06 then reaches the decision as an explicit trade."
+    ]
+  },
+  "prerequisites": ["golden-sets", "llm-as-judge"],
+  "labs": [],
+  "drills": ["evl-drill-release-gates"],
+  "goals": ["interview", "capstone"],
+  "minutes": 15
+}

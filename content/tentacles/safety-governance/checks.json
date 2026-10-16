@@ -1,0 +1,295 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {
+      "id": "saf-chk-01",
+      "conceptId": "lethal-trifecta",
+      "depth": 1,
+      "kind": "mcq",
+      "stem": "An agent reads the company wiki, summarises uploaded customer files and can post to any webhook URL. What is the main risk?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Slow responses, because three tools add latency.",
+          "feedback": "Latency is a real cost, but it is not the main risk here. The tool combination creates a security problem."
+        },
+        {
+          "id": "b",
+          "text": "An instruction hidden in an uploaded file can make it post wiki content to an attacker's URL.",
+          "feedback": "Correct. Private data, untrusted content and external communication meet on one identity, which is the lethal trifecta."
+        },
+        {
+          "id": "c",
+          "text": "The wiki tool alone is dangerous because it reads private data.",
+          "feedback": "Reading private data is one leg. On its own it cannot send anything out or be steered by outside text."
+        },
+        {
+          "id": "d",
+          "text": "No risk, as long as the system prompt forbids sharing wiki content.",
+          "feedback": "A prompt is not a control. Injected text in the upload competes with that instruction and can win."
+        }
+      ],
+      "answer": "b",
+      "explanation": "All three legs sit on one identity. Breaking any one, such as removing the webhook tool or quarantining uploads, removes the exfiltration path."
+    },
+    {
+      "id": "saf-chk-02",
+      "conceptId": "lethal-trifecta",
+      "depth": 2,
+      "kind": "multi",
+      "stem": "An inbox agent must read inbound email and the CRM. Which changes break the lethal trifecta while keeping those tools? Select all that apply.",
+      "options": [
+        {
+          "id": "drafts-only",
+          "text": "Remove the send tool so the agent saves drafts for the account owner.",
+          "feedback": "Correct. Without a way to send, the external-communication leg is gone."
+        },
+        {
+          "id": "quarantine",
+          "text": "Have a no-tools model extract sender, intent and order number from each email into a schema.",
+          "feedback": "Correct. The planner never reads attacker-written text, which neutralises the untrusted-content leg."
+        },
+        {
+          "id": "approval",
+          "text": "Require the account owner to approve the exact recipient and body of every outbound message.",
+          "feedback": "Correct. Nothing leaves without a person seeing the real effect, which breaks the external leg."
+        },
+        {
+          "id": "polite-prompt",
+          "text": "Tell the model in its system prompt never to email CRM data.",
+          "feedback": "Incorrect. This is an instruction, not a structural change, and injected text can override it."
+        },
+        {
+          "id": "bigger-model",
+          "text": "Switch to a larger model that follows instructions better.",
+          "feedback": "Incorrect. A stronger model may resist some attacks, but every leg is still present."
+        }
+      ],
+      "answers": ["drafts-only", "quarantine", "approval"],
+      "explanation": "Each correct option removes one leg by structure. Prompt wording and model choice leave all three legs in place."
+    },
+    {
+      "id": "saf-chk-03",
+      "conceptId": "prompt-injection",
+      "depth": 1,
+      "kind": "mcq",
+      "stem": "A user asks an agent to summarise a supplier's web page. The page contains hidden text telling the agent to email its contact list to an outside address. What is this?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Direct prompt injection.",
+          "feedback": "Not quite. Direct injection comes from the person typing, and this user made an ordinary request."
+        },
+        {
+          "id": "b",
+          "text": "Indirect prompt injection.",
+          "feedback": "Correct. The instruction arrived inside content the agent read, not from its user."
+        },
+        {
+          "id": "c",
+          "text": "A hallucination.",
+          "feedback": "Incorrect. The model did not invent anything; an attacker planted the instruction in the page."
+        },
+        {
+          "id": "d",
+          "text": "Not an attack, because the user is authenticated.",
+          "feedback": "Incorrect. Authentication says who asked, not who wrote the content the agent reads."
+        }
+      ],
+      "answer": "b",
+      "explanation": "Indirect injection rides in through pages, emails, files and tool descriptions. The trusted user unknowingly delivers it."
+    },
+    {
+      "id": "saf-chk-04",
+      "conceptId": "prompt-injection",
+      "depth": 2,
+      "kind": "multi",
+      "stem": "Which are structural defences against prompt injection? Select all that apply.",
+      "options": [
+        {
+          "id": "quarantine",
+          "text": "A quarantined model with no tools that returns only schema-validated fields.",
+          "feedback": "Correct. Attacker text cannot call tools, and only typed values leave the quarantine."
+        },
+        {
+          "id": "gateway-auth",
+          "text": "Authorising every tool call in the gateway and the database under the principal's identity.",
+          "feedback": "Correct. Even a persuaded model cannot perform an action the principal is not allowed."
+        },
+        {
+          "id": "allowlist",
+          "text": "Accepting only order IDs that match a known pattern and exist for this customer.",
+          "feedback": "Correct. Typed, allowlisted values give injected sentences nowhere to go."
+        },
+        {
+          "id": "warning-line",
+          "text": "A system prompt line saying to ignore instructions inside documents.",
+          "feedback": "Incorrect as a sufficient defence. It is still an instruction, and it offers no guarantee."
+        },
+        {
+          "id": "capitals",
+          "text": "Writing the system prompt in capital letters so it takes priority.",
+          "feedback": "Incorrect. Emphasis changes nothing structural, and attacker text can use the same trick."
+        }
+      ],
+      "answers": ["quarantine", "gateway-auth", "allowlist"],
+      "explanation": "Structural defences limit what a successful injection can do. Instruction-only defences try to persuade the model, which an attacker can also do."
+    },
+    {
+      "id": "saf-chk-05",
+      "conceptId": "human-gates",
+      "depth": 2,
+      "kind": "mcq",
+      "stem": "A team requires approval for all 6,000 daily agent actions. Approval rate is 99.8 per cent and median decision time is two seconds. What is the best next step?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Hire more reviewers so each one approves fewer actions.",
+          "feedback": "This spreads the load but keeps people reviewing actions that do not need them, so fatigue persists."
+        },
+        {
+          "id": "b",
+          "text": "Move reversible low-value actions to logged or sampled review, and keep approval for irreversible, external or high-value ones.",
+          "feedback": "Correct. Fewer, meaningful approvals give reviewers time to read the actions that matter."
+        },
+        {
+          "id": "c",
+          "text": "Remove all gates, since reviewers approve nearly everything anyway.",
+          "feedback": "Too far. The rare costly actions still need a person, even if most actions do not."
+        },
+        {
+          "id": "d",
+          "text": "Keep the design, because a high approval rate shows the agent is reliable.",
+          "feedback": "Two-second decisions suggest rubber-stamping, not careful review. The gates are no longer working."
+        }
+      ],
+      "answer": "b",
+      "explanation": "Approval fatigue makes every gate weaker. Placing gates by reversibility, external effect and value keeps them meaningful."
+    },
+    {
+      "id": "saf-chk-06",
+      "conceptId": "human-gates",
+      "depth": 2,
+      "kind": "order",
+      "stem": "Order these agent actions from the lightest gate to the strictest.",
+      "items": [
+        { "id": "delete-account", "text": "Delete a customer's account at their request." },
+        { "id": "read-catalogue", "text": "Read the public product catalogue." },
+        { "id": "change-bank", "text": "Change payout bank details because an email asked." },
+        { "id": "refund-15", "text": "Refund $15 on a delivered-damaged order within policy." }
+      ],
+      "answer": ["read-catalogue", "refund-15", "delete-account", "change-bank"],
+      "explanation": "Reading public data runs automatically. A small refund runs with sampled review. Deletion is irreversible, so it needs approval first. Bank detail changes from email are never left to an agent."
+    },
+    {
+      "id": "saf-chk-07",
+      "conceptId": "least-agency",
+      "depth": 2,
+      "kind": "mcq",
+      "stem": "An agent must answer customers' questions about their own order status. Which design follows least agency?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A planner agent with a general SQL tool on the orders database.",
+          "feedback": "Too much agency and too broad a tool. A general query tool can reach every customer's data."
+        },
+        {
+          "id": "b",
+          "text": "A single read-only get_order_status call scoped to the signed-in customer, with a short-lived token.",
+          "feedback": "Correct. It is the lowest sufficient level, with one narrow, read-only tool and a scoped credential."
+        },
+        {
+          "id": "c",
+          "text": "A bounded loop with order lookup, refund and email tools, in case customers ask for more.",
+          "feedback": "Tools added in case are not earned by the requirement. Refund and email widen what an injection could do."
+        },
+        {
+          "id": "d",
+          "text": "Any design, as long as the agent's service account has broad but audited access.",
+          "feedback": "Auditing records misuse after the fact. Broad access still lets one injection reach everything."
+        }
+      ],
+      "answer": "b",
+      "explanation": "Least agency picks the lowest level and the narrowest tools that meet the requirement, with read-only defaults and scoped, short-lived credentials."
+    },
+    {
+      "id": "saf-chk-08",
+      "conceptId": "governance-frameworks",
+      "depth": 1,
+      "kind": "mcq",
+      "stem": "Which statement about the NIST AI RMF 1.0 is accurate?",
+      "options": [
+        {
+          "id": "a",
+          "text": "It is voluntary guidance organised into four functions: Govern, Map, Measure and Manage.",
+          "feedback": "Correct. Organisations adopt it to structure how they identify, assess and treat AI risk."
+        },
+        {
+          "id": "b",
+          "text": "It is a certifiable management-system standard.",
+          "feedback": "That describes ISO/IEC 42001, which specifies requirements for an AI management system."
+        },
+        {
+          "id": "c",
+          "text": "It is a regulation that bans prohibited AI practices.",
+          "feedback": "That describes part of the EU AI Act, which is a risk-based regulation."
+        },
+        {
+          "id": "d",
+          "text": "It applies only to general-purpose AI models.",
+          "feedback": "Incorrect. It is a general framework for managing risk across AI systems."
+        }
+      ],
+      "answer": "a",
+      "explanation": "The three frameworks are different instruments: voluntary guidance, a certifiable standard and a regulation. Each asks for evidence engineering can supply."
+    },
+    {
+      "id": "saf-chk-09",
+      "conceptId": "governance-frameworks",
+      "depth": 2,
+      "kind": "mcq",
+      "stem": "An auditor asks how your agent provides human oversight. Which artefact is the strongest evidence?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A policy statement saying humans oversee the system.",
+          "feedback": "A statement of intent is weak evidence. It does not show how or where oversight happens."
+        },
+        {
+          "id": "b",
+          "text": "The gate design, listing which actions need approval, plus logs of approvals and rejections.",
+          "feedback": "Correct. It shows the designed control and records that it runs in production."
+        },
+        {
+          "id": "c",
+          "text": "The latest eval report on answer accuracy.",
+          "feedback": "Eval reports are good evidence for accuracy, but they say little about human oversight."
+        },
+        {
+          "id": "d",
+          "text": "The model provider's terms of service.",
+          "feedback": "These describe the provider's obligations, not how your system involves people in decisions."
+        }
+      ],
+      "answer": "b",
+      "explanation": "Map each expectation to an artefact: oversight to gate design and approval logs, accuracy to eval reports, logging to traces, risk to the register."
+    },
+    {
+      "id": "saf-chk-10",
+      "conceptId": "incident-response",
+      "depth": 2,
+      "kind": "order",
+      "stem": "An agent starts emailing CRM data to unknown domains. Put the response stages in order.",
+      "items": [
+        { "id": "investigate", "text": "Read the traces to find the input and tool calls that caused the leak." },
+        { "id": "regression", "text": "Add the hostile input to the golden set as a regression case." },
+        { "id": "detect", "text": "An alert fires on outbound mail to previously unseen domains." },
+        { "id": "contain", "text": "Disable the send tool and revoke the agent's CRM token." },
+        { "id": "fix", "text": "Quarantine inbound email and gate outbound attachments." },
+        { "id": "review", "text": "Hold a blameless post-incident review and update the risk register." }
+      ],
+      "answer": ["detect", "contain", "investigate", "fix", "regression", "review"],
+      "explanation": "Containment comes before investigation so nothing else leaks. The regression case stops the failure returning, and the blameless review feeds governance."
+    }
+  ]
+}

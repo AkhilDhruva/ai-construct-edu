@@ -1,0 +1,203 @@
+{
+  "schemaVersion": 1,
+  "cards": [
+    {
+      "id": "saf-001",
+      "conceptId": "lethal-trifecta",
+      "depth": 1,
+      "front": "Name the three legs of the lethal trifecta.",
+      "back": "Access to private data, exposure to untrusted content and the ability to communicate externally. All three on one agent identity let injected instructions exfiltrate data.",
+      "kind": "recall",
+      "tags": ["trifecta", "definition"]
+    },
+    {
+      "id": "saf-002",
+      "conceptId": "lethal-trifecta",
+      "depth": 1,
+      "front": "To make a lethal agent safe, break at least ____ leg of the trifecta.",
+      "back": "One. Remove a tool, split the work across identities, quarantine untrusted content or require human approval on outbound actions.",
+      "kind": "cloze",
+      "tags": ["trifecta", "mitigation"]
+    },
+    {
+      "id": "saf-003",
+      "conceptId": "lethal-trifecta",
+      "depth": 2,
+      "front": "An inbox assistant must read inbound email and the CRM. It can also send email. Which leg do you break, and how?",
+      "back": "External communication, because both required tools carry the other legs. Switch off sending so the agent only drafts, or gate every outbound message behind the account owner's approval.",
+      "kind": "apply",
+      "tags": ["trifecta", "inbox"]
+    },
+    {
+      "id": "saf-004",
+      "conceptId": "lethal-trifecta",
+      "depth": 3,
+      "front": "A research agent's required tools already cover all three legs. Why is splitting identities often better than an egress allowlist?",
+      "back": "Splitting removes private data from the browsing identity by design, so it needs no upkeep. An allowlist must track every new site and channel, and one overlooked endpoint reopens the leak.",
+      "kind": "apply",
+      "tags": ["trifecta", "split-identity", "egress"]
+    },
+    {
+      "id": "saf-005",
+      "conceptId": "prompt-injection",
+      "depth": 1,
+      "front": "What is the difference between direct and indirect prompt injection?",
+      "back": "Direct injection comes from the person typing to the agent. Indirect injection hides in content the agent reads, such as web pages, emails, files or tool descriptions.",
+      "kind": "recall",
+      "tags": ["injection", "definition"]
+    },
+    {
+      "id": "saf-006",
+      "conceptId": "prompt-injection",
+      "depth": 1,
+      "front": "Structural defences treat untrusted text as ____, never as instructions.",
+      "back": "Data. Pass it through quarantined calls with typed outputs, check values against allowlists, and authorise every action in the gateway and the database.",
+      "kind": "cloze",
+      "tags": ["injection", "structure"]
+    },
+    {
+      "id": "saf-007",
+      "conceptId": "prompt-injection",
+      "depth": 2,
+      "front": "Why is a system prompt line saying ignore instructions in documents not a sufficient defence?",
+      "back": "The model reads instructions and data as one stream and cannot reliably tell them apart. The line may reduce some attacks, but a determined injection can still succeed, so structure must limit the damage.",
+      "kind": "recall",
+      "tags": ["injection", "instruction-only"]
+    },
+    {
+      "id": "saf-008",
+      "conceptId": "prompt-injection",
+      "depth": 2,
+      "front": "A quarantined model summarises inbound email into a free-text field for the planner. What is the weakness, and the fix?",
+      "back": "Injected text can ride through the summary into the planner. Return only enums, numbers and IDs, such as intent and order number, validated against a schema.",
+      "kind": "apply",
+      "tags": ["injection", "quarantine", "typed-output"]
+    },
+    {
+      "id": "saf-009",
+      "conceptId": "human-gates",
+      "depth": 1,
+      "front": "List the four gate placements for agent actions.",
+      "back": "Run automatically with logging; run then sample for human review; require approval before the action; never allow the action for an agent.",
+      "kind": "recall",
+      "tags": ["gates", "placement"]
+    },
+    {
+      "id": "saf-010",
+      "conceptId": "human-gates",
+      "depth": 2,
+      "front": "Where do a $15 in-policy refund and an account deletion belong, and why?",
+      "back": "The refund runs with sampled review, because it is cheap and reversible. The deletion needs approval before, because it cannot be undone.",
+      "kind": "apply",
+      "tags": ["gates", "reversibility"]
+    },
+    {
+      "id": "saf-011",
+      "conceptId": "human-gates",
+      "depth": 2,
+      "front": "What is approval fatigue, and what signal reveals it?",
+      "back": "Reviewers flooded with low-risk approvals stop reading and approve everything. An approval rate near 100 per cent with decisions taking seconds is the usual signal.",
+      "kind": "recall",
+      "tags": ["gates", "fatigue"]
+    },
+    {
+      "id": "saf-012",
+      "conceptId": "human-gates",
+      "depth": 3,
+      "front": "An agent takes 8,000 actions a day and 5 per cent need approval at 90 seconds each. What is the review load, and how might you cut it?",
+      "back": "400 approvals, or 10 hours a day. Move reversible low-value actions to sampled review, and keep approval for irreversible, external or high-value ones.",
+      "kind": "apply",
+      "tags": ["gates", "load", "arithmetic"]
+    },
+    {
+      "id": "saf-013",
+      "conceptId": "least-agency",
+      "depth": 1,
+      "front": "State the least-agency principle in one sentence.",
+      "back": "Choose the lowest agency level and the fewest, narrowest tools that meet the requirement, with read-only defaults and scoped, short-lived credentials.",
+      "kind": "recall",
+      "tags": ["least-agency", "definition"]
+    },
+    {
+      "id": "saf-014",
+      "conceptId": "least-agency",
+      "depth": 1,
+      "front": "Tools should be ____ by default, with write and send tools added only for a stated requirement.",
+      "back": "Read-only. Write and send tools widen what an injection can do, so each must be earned and usually gated.",
+      "kind": "cloze",
+      "tags": ["least-agency", "read-only"]
+    },
+    {
+      "id": "saf-015",
+      "conceptId": "least-agency",
+      "depth": 2,
+      "front": "A notes agent holds read and write access to every calendar plus email send, but only summarises one team's meetings. What do you change?",
+      "back": "Grant read-only access to that team's calendar and a draft-only notes tool. Remove send and write access, which removes the external leg and most private-data reach.",
+      "kind": "apply",
+      "tags": ["least-agency", "tools"]
+    },
+    {
+      "id": "saf-016",
+      "conceptId": "governance-frameworks",
+      "depth": 1,
+      "front": "Name the four functions of the NIST AI RMF 1.0.",
+      "back": "Govern, Map, Measure and Manage. The framework is voluntary guidance for organising AI risk work.",
+      "kind": "recall",
+      "tags": ["governance", "nist"]
+    },
+    {
+      "id": "saf-017",
+      "conceptId": "governance-frameworks",
+      "depth": 1,
+      "front": "ISO/IEC 42001 specifies requirements for an AI ____ system that an organisation can be certified against.",
+      "back": "Management. It covers how an organisation governs AI across its life cycle, and auditors can certify conformance.",
+      "kind": "cloze",
+      "tags": ["governance", "iso"]
+    },
+    {
+      "id": "saf-018",
+      "conceptId": "governance-frameworks",
+      "depth": 2,
+      "front": "Outline the risk-based structure of the EU AI Act.",
+      "back": "Prohibited practices; high-risk systems with duties such as risk management, logging and human oversight; transparency duties for systems such as chatbots; minimal-risk systems. It also covers general-purpose models, with obligations phasing in.",
+      "kind": "recall",
+      "tags": ["governance", "eu-ai-act"]
+    },
+    {
+      "id": "saf-019",
+      "conceptId": "governance-frameworks",
+      "depth": 3,
+      "front": "Map four governance expectations to engineering artefacts.",
+      "back": "Risk management to a risk register; accuracy to versioned eval reports; logging to trace logs; human oversight to the gate design. Incident records show ongoing monitoring.",
+      "kind": "apply",
+      "tags": ["governance", "evidence"]
+    },
+    {
+      "id": "saf-020",
+      "conceptId": "incident-response",
+      "depth": 1,
+      "front": "List the incident-response stages for an agent in order.",
+      "back": "Detect, contain, investigate with traces, fix, add a regression case to the golden set, then hold a blameless post-incident review.",
+      "kind": "recall",
+      "tags": ["incident", "stages"]
+    },
+    {
+      "id": "saf-021",
+      "conceptId": "incident-response",
+      "depth": 2,
+      "front": "Replies to unseen domains jump from 3 to 40 in an hour. What do you do first?",
+      "back": "Contain: disable the send tool or drop down the degradation ladder to drafts only, and revoke exposed credentials. Investigate the traces once nothing else can leave.",
+      "kind": "apply",
+      "tags": ["incident", "containment"]
+    },
+    {
+      "id": "saf-022",
+      "conceptId": "incident-response",
+      "depth": 3,
+      "front": "Why is an incident not closed when the prompt fix ships?",
+      "back": "Without a regression case in the golden set, a later model or prompt change can reintroduce the failure unnoticed. The test, the risk register update and the blameless review close it.",
+      "kind": "recall",
+      "tags": ["incident", "regression", "golden-set"]
+    }
+  ]
+}

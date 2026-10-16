@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "engine": "cost-waterfall",
+  "id": "cost-waterfall",
+  "brief": [
+    "A contract-review agent checks supplier contracts against a policy rubric. It completes 2,000,000 reviews a month, and customers expect each review within 24 hours. Every cost below is per completed review, so failed runs and retries are already folded in.",
+    "The bill is $0.28 per review, or $560,000 a month. The stable prefix of system prompt, tool definitions and rubric is resent on every loop step. Retries and re-runs add $0.05, and tool and retrieval fees add $0.02.",
+    "Turn levers on and watch the waterfall. Each lever multiplies the components it touches, and some cost task success. Measured task success is 0.92 today, and the business will not accept less than 0.90."
+  ],
+  "tasksPerMonth": 2000000,
+  "components": [
+    { "id": "stable-prefix", "label": "Stable prefix input (system, tools, rubric)", "usdPerTask": 0.09 },
+    { "id": "dynamic-input", "label": "Dynamic input (contract text, history, retrieval)", "usdPerTask": 0.06 },
+    { "id": "output", "label": "Output tokens", "usdPerTask": 0.06 },
+    { "id": "retries", "label": "Retries and re-runs", "usdPerTask": 0.05 },
+    { "id": "tools", "label": "Tool and retrieval fees", "usdPerTask": 0.02 }
+  ],
+  "baselineQuality": 0.92,
+  "levers": [
+    {
+      "id": "prompt-caching",
+      "label": "Prompt caching",
+      "description": "Put the byte-stable prefix first and mark a cache breakpoint after it, so later steps read it at about a tenth of the input price. Cache writes and expiries keep the saving near 85 per cent, with no quality cost.",
+      "effects": [{ "component": "stable-prefix", "multiplier": 0.15 }],
+      "qualityDelta": 0,
+      "conflictsWith": []
+    },
+    {
+      "id": "model-routing",
+      "label": "Model routing",
+      "description": "Send classification and clause extraction steps to a cheaper model and keep the judgement steps on the strong one. Model spend falls by about 40 per cent, but the golden set shows two points of task success lost.",
+      "effects": [
+        { "component": "stable-prefix", "multiplier": 0.6 },
+        { "component": "dynamic-input", "multiplier": 0.6 },
+        { "component": "output", "multiplier": 0.6 }
+      ],
+      "qualityDelta": -0.02,
+      "conflictsWith": []
+    },
+    {
+      "id": "trim-context",
+      "label": "Trim context",
+      "description": "Summarise long observations, cap retrieved passages and drop stale history. Dynamic input falls by 40 per cent, but a clause buried in a dropped passage is sometimes missed.",
+      "effects": [{ "component": "dynamic-input", "multiplier": 0.6 }],
+      "qualityDelta": -0.01,
+      "conflictsWith": []
+    },
+    {
+      "id": "output-caps",
+      "label": "Output caps",
+      "description": "Set a maximum output length and ask for a terse structured verdict instead of prose. Output spend falls by 30 per cent, and a few long contracts lose a finding to truncation.",
+      "effects": [{ "component": "output", "multiplier": 0.7 }],
+      "qualityDelta": -0.01,
+      "conflictsWith": []
+    },
+    {
+      "id": "batch-api",
+      "label": "Batch API",
+      "description": "Submit reviews through the provider's batch API, which charges about half price for results within 24 hours. Tool and retrieval fees are not discounted, and nothing can be shown to a waiting user.",
+      "effects": [
+        { "component": "stable-prefix", "multiplier": 0.5 },
+        { "component": "dynamic-input", "multiplier": 0.5 },
+        { "component": "output", "multiplier": 0.5 },
+        { "component": "retries", "multiplier": 0.5 }
+      ],
+      "qualityDelta": 0,
+      "conflictsWith": []
+    },
+    {
+      "id": "fewer-steps",
+      "label": "Fewer loop steps",
+      "description": "Merge the plan and check steps and lower the step bound, so each review takes a quarter fewer steps. Everything shrinks by 25 per cent, but losing the self-check costs three points of task success.",
+      "effects": [
+        { "component": "stable-prefix", "multiplier": 0.75 },
+        { "component": "dynamic-input", "multiplier": 0.75 },
+        { "component": "output", "multiplier": 0.75 },
+        { "component": "retries", "multiplier": 0.75 },
+        { "component": "tools", "multiplier": 0.75 }
+      ],
+      "qualityDelta": -0.03,
+      "conflictsWith": []
+    },
+    {
+      "id": "fix-retries",
+      "label": "Fix retries",
+      "description": "Validate tool arguments before the call, type the failures and stop retrying errors that cannot succeed. Retry spend falls by 80 per cent, and fewer timed-out reviews lift task success by a point.",
+      "effects": [{ "component": "retries", "multiplier": 0.2 }],
+      "qualityDelta": 0.01,
+      "conflictsWith": []
+    }
+  ],
+  "challenge": {
+    "instruction": "Finance wants the bill under $180,000 a month, which is $0.09 per review. Use at most three levers and keep task success at 0.90 or above.",
+    "targetUsdPerTask": 0.09,
+    "minQuality": 0.9,
+    "maxLevers": 3
+  }
+}

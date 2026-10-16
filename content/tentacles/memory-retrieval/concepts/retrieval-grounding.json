@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "retrieval-grounding",
+  "tentacle": "memory-retrieval",
+  "title": "Retrieval grounding",
+  "point": "Retrieve a bounded set of sourced chunks and let the answer claim only what those chunks support: no source, no claim.",
+  "definition": "Retrieval grounding fetches the top-k chunks for a query, bounded by a token budget, each tagged with a source id and a timestamp. The answer cites the chunks it relies on and makes no claim that no chunk supports.",
+  "level": 2,
+  "objective": {
+    "id": "retrieval-grounding-obj",
+    "text": "Given a question and a set of retrieved chunks, decide which claims the answer may make, attach the right citations, and say what to do when no chunk supports an answer."
+  },
+  "misconceptions": [
+    {
+      "claim": "Retrieval stops hallucination by itself.",
+      "correction": "Retrieval only supplies evidence. The model can still ignore it or add claims, so require a citation for each claim and check that the cited chunk supports it."
+    },
+    {
+      "claim": "Retrieving more chunks always gives better answers.",
+      "correction": "Extra chunks cost tokens and add distracting near-misses. Bound k by the token budget and tune it against a measured eval set."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Split documents into chunks, index them, and at query time retrieve the top k most relevant. Bound k by tokens, such as 10 chunks of 400 tokens within a 4,000-token budget.",
+      "Each chunk carries a source id and a timestamp, such as the article id and its last update date. The answer cites the ids of the chunks it uses.",
+      "No source, no claim. If no retrieved chunk supports a statement, the answer leaves it out or says the information was not found."
+    ],
+    "l2": [
+      "A user asks whether they can return opened headphones. Retrieval returns three chunks: the returns policy updated in May, a shipping article and a returns policy from 2024.",
+      "The current policy says opened audio products can be returned within 14 days if unused. The answer states that and cites the May policy chunk by its id.",
+      "The 2024 chunk says 30 days. Its older timestamp lets the answer prefer the current version, and the conflict is logged so the content owners can retire the old page."
+    ],
+    "l3": [
+      "Measure retrieval and grounding separately. Recall at k asks whether the right chunk was retrieved; faithfulness asks whether each claim is supported by a cited chunk.",
+      "Suppose recall at 10 is 92 per cent on a 500-question eval set. Then 40 questions never see the right chunk, and no prompt change can fix those 40.",
+      "Raising k to 15 adds 2,000 tokens, or $0.004 per call at $2 per million. Make that change only if the eval shows recall rising enough to justify the cost."
+    ]
+  },
+  "prerequisites": ["memory-tiers"],
+  "labs": [],
+  "drills": ["mem-drill-assistant-memory"],
+  "goals": ["interview", "capstone"],
+  "minutes": 12
+}

@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "cost-guardrails",
+  "tentacle": "cost-finops",
+  "title": "Cost guardrails",
+  "point": "Check budgets before each call, alert on requests that cost a multiple of their usual price, degrade instead of failing, and attribute every dollar to a route, model and customer.",
+  "definition": "Cost guardrails are runtime controls on spend. They include per-user or per-tenant budgets checked before a call, anomaly alerts, degraded modes when a budget is spent, and cost attribution by route, model and customer.",
+  "level": 2,
+  "objective": {
+    "id": "cost-guardrails-obj",
+    "text": "Given a tenant budget and a trailing median cost, specify the pre-call check, the alert threshold, the degraded mode and the attribution tags that would catch a runaway loop."
+  },
+  "misconceptions": [
+    {
+      "claim": "A monthly invoice review is enough to control model spend.",
+      "correction": "A runaway loop can spend a month's budget in hours. Budgets must be checked before each call, and anomalies must alert within minutes."
+    },
+    {
+      "claim": "When a budget runs out, the safest response is to return an error.",
+      "correction": "Step down the degradation ladder instead: a smaller model, fewer steps or exemplar answers only. The user keeps a reduced service and is told which mode they are in."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Give each user or tenant a budget and check it before every model call. Estimate the call's worst-case cost from its input tokens plus its maximum output.",
+      "Alert when one request costs a multiple, such as three times, of its route's trailing median. That catches loops and prompt bugs long before the invoice does.",
+      "When a budget is spent, degrade rather than fail: a smaller model, exemplar answers only, or queued work. Tag every call with route, model and customer so spend can be attributed."
+    ],
+    "l2": [
+      "A call will send 20,000 input tokens with a 2,000-token output cap. At an illustrative $2 and $10 per million, the worst case is $0.04 plus $0.02, or $0.06.",
+      "If the tenant has less than $0.06 left, the gateway switches to the degraded mode before the call. A tenant with a $500 monthly budget gets an alert at $400.",
+      "A route's trailing median is $0.25 per request, so the alert threshold is $0.75. A $0.90 request fires an alert carrying its trace ID, tenant and model."
+    ],
+    "l3": [
+      "Attribution turns a spike into a diagnosis. With every span tagged by route, model, tenant and feature, a spend jump traces to one tenant's loop rather than a vague rise in total cost.",
+      "Pair budgets with loop bounds. A per-task cost cap, such as $1, stops a loop that the step bound missed, and it records a typed termination reason.",
+      "The degraded mode is a rung on the degradation ladder. Show the user which rung they are on, and record it on every span so quality reports can separate degraded answers."
+    ]
+  },
+  "prerequisites": ["cost-per-task", "degradation-ladder"],
+  "labs": [],
+  "drills": ["fin-drill-cut-spend"],
+  "goals": ["interview", "capstone"],
+  "minutes": 11
+}

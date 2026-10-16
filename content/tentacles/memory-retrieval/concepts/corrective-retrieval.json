@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "corrective-retrieval",
+  "tentacle": "memory-retrieval",
+  "title": "Corrective retrieval",
+  "point": "Grade what you retrieved before answering from it, and when it is weak, rewrite, switch source or say not found, within a fixed number of attempts.",
+  "definition": "Corrective retrieval grades each retrieved chunk for relevance to the question. If the evidence is weak, it rewrites the query, tries another source or answers not found, and it bounds the attempts like any loop.",
+  "level": 2,
+  "objective": {
+    "id": "corrective-retrieval-obj",
+    "text": "Given a retrieval result and a grading threshold, choose the next action and state the bound on attempts and the fallback when the bound is reached."
+  },
+  "misconceptions": [
+    {
+      "claim": "If retrieval returns chunks, the evidence is good enough to answer from.",
+      "correction": "Retrieval always returns the nearest chunks, even when none is relevant. Grade them first, or the model answers confidently from near-misses."
+    },
+    {
+      "claim": "Keep rewriting the query until something relevant comes back.",
+      "correction": "An unbounded retry loop burns tokens and latency on questions the corpus cannot answer. Cap the attempts, then answer not found or hand over to a person."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "After retrieval, grade each chunk as relevant or not, using a small model or a scoring rule. Answer only if enough chunks pass the grade.",
+      "If the evidence is weak, take one corrective action: rewrite the query, try another source such as a product catalogue, or answer that the information was not found.",
+      "Bound the attempts, for example two retrievals at most. When the bound is reached, the run ends with not found or a handover, never another try."
+    ],
+    "l2": [
+      "A user asks about the warranty on the K7 kettle. The first retrieval returns three chunks about the K5 model, and all three fail the relevance grade.",
+      "The agent rewrites the query with the exact product code and searches the product catalogue instead. Two chunks about the K7 pass, and the answer cites them.",
+      "Had the second attempt also failed, the agent would say it could not find K7 warranty details and offer a human handover. It would not try a third time."
+    ],
+    "l3": [
+      "Price the loop. If a corrective round of rewriting, retrieving and grading takes 1.1 seconds and 15 per cent of turns need one, mean latency rises by about 0.17 seconds.",
+      "The p95 is different. Once more than 5 per cent of turns take the corrective path, the p95 turn includes it, so the full 1.1 seconds must fit the latency target.",
+      "Track the not-found rate. A rising rate points to gaps in the corpus, so send the unanswered questions to content owners rather than loosening the grade."
+    ]
+  },
+  "prerequisites": ["retrieval-grounding"],
+  "labs": [],
+  "drills": ["mem-drill-assistant-memory"],
+  "goals": ["interview", "capstone"],
+  "minutes": 11
+}

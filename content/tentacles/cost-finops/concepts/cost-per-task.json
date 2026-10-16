@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "cost-per-task",
+  "tentacle": "cost-finops",
+  "title": "Cost per completed task",
+  "point": "Measure what one finished task costs, counting every call, retry, re-run and tool fee, because the price of a single request hides most of the bill.",
+  "definition": "Cost per completed task is total spend on a workload divided by the number of tasks that succeed. Spend includes every model call in the loop, in-loop retries, re-runs of failed tasks, and tool and retrieval fees.",
+  "level": 1,
+  "objective": {
+    "id": "cost-per-task-obj",
+    "text": "Given calls per task, tokens per call, illustrative prices, tool fees and a success rate, compute cost per completed task and name which of the seven levers would move it most."
+  },
+  "misconceptions": [
+    {
+      "claim": "The cost of an agent is the price of one model request.",
+      "correction": "An agent makes many calls per task, retries some of them and re-runs failed tasks. One request is a small fraction of what a finished task actually costs."
+    },
+    {
+      "claim": "A model with half the per-token price halves the bill.",
+      "correction": "Only if success holds. If the cheaper model fails more tasks, the re-runs and lost tasks eat the saving, so compare cost per completed task, not price per request."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Count every model call in the loop, every retry, every re-run of a failed task and every tool or retrieval fee. Then divide that spend by the tasks that actually succeed.",
+      "Per-request dashboards miss most of this. A loop that grows from 6 calls to 9 calls raises the bill by half while the price per request stays the same.",
+      "Seven levers move the number: prompt caching, model routing, context trimming, output caps, batching, fewer loop steps and fixing retries. Each one has a cost in quality, latency or effort."
+    ],
+    "l2": [
+      "Take an agent that makes 6 calls per attempt. Each call sends 5,000 input tokens and returns 500 output tokens, at an illustrative $2 per million input tokens and $10 per million output tokens.",
+      "Each call costs $0.010 for input plus $0.005 for output, so 6 calls cost $0.09. Add $0.01 of tool and retrieval fees and one attempt costs $0.10.",
+      "Over a day, 1,000 attempts, including re-runs of failures, produce 800 completed tasks. Spend is $100, so the cost per completed task is $0.125, not $0.10."
+    ],
+    "l3": [
+      "Now switch to a model at half the per-call price. Six calls cost $0.045, and with $0.01 of tool fees one attempt costs $0.055, which is 45 per cent cheaper.",
+      "But success per attempt falls to 0.5. The same 1,000 attempts now cost $55 and complete only 500 tasks, so cost per completed task is $0.11.",
+      "The request price fell by half, yet cost per completed task fell only 12 per cent, and 300 fewer tasks were completed. Judge every lever on cost per completed task and success together."
+    ]
+  },
+  "prerequisites": ["design-envelope"],
+  "labs": [],
+  "drills": ["fin-drill-cut-spend"],
+  "goals": ["interview", "capstone"],
+  "minutes": 10
+}

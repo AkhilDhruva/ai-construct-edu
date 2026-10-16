@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "context-budgets",
+  "tentacle": "memory-retrieval",
+  "title": "Context budgets",
+  "point": "Give each prompt section a fixed token budget and evict within that section, so growth in one part never squeezes another.",
+  "definition": "A context budget gives a fixed token allowance to each prompt section: system instructions, tool definitions, memory, retrieved documents, conversation history and an answer reserve. Each section evicts its own content when full, and stable sections come first for prompt caching.",
+  "level": 1,
+  "objective": {
+    "id": "context-budgets-obj",
+    "text": "Given a context window and a cost ceiling, allocate a token budget to each prompt section, choose an eviction rule per section, and order the sections for caching."
+  },
+  "misconceptions": [
+    {
+      "claim": "Fill the context window, because the model can use everything it is given.",
+      "correction": "Every token costs money and latency, and long prompts can bury the passage that matters. Budget well below the window and spend tokens where evals show they help."
+    },
+    {
+      "claim": "When history grows, trim whatever is easiest, such as the retrieved documents.",
+      "correction": "Squeezing another section degrades it silently. History summarises or drops its own oldest turns, and retrieval keeps its full allowance."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Split the prompt into sections: system instructions, tool definitions, long-term memory, retrieved documents, conversation history and a reserve for the answer. Each section gets a fixed number of tokens.",
+      "When a section is full, it evicts within itself. History summarises or drops its oldest turns, retrieval keeps its highest-ranked chunks, and memory keeps its most relevant facts.",
+      "Put the sections that rarely change first, such as system instructions and tool definitions. A stable prefix can be prompt-cached, which cuts the cost and latency of repeated calls."
+    ],
+    "l2": [
+      "Take a 16,000-token budget inside a 128,000-token window. Allocate 1,500 to system, 2,500 to tools, 1,000 to memory, 4,000 to retrieval, 5,000 to history and 2,000 to the answer reserve.",
+      "On turn 12 the history reaches 7,200 tokens. The history section summarises its oldest turns until it fits within 5,000, and the other five sections keep their budgets.",
+      "The first 4,000 tokens, system plus tools, are identical on every call. Placing them first lets the provider cache them, so only the later sections are processed afresh."
+    ],
+    "l3": [
+      "Price the choice. At $2 per million input tokens, the 14,000-token prompt costs $0.028 per call, while filling the 128,000-token window costs $0.256, over nine times as much.",
+      "If cached tokens are billed at a tenth of the normal price, caching the 4,000 stable tokens saves the cost of 3,600 tokens per call. That is $0.0072, about a quarter of the call.",
+      "The trade-off is rigidity. A fixed budget can starve a section on unusual inputs, so measure how often each section hits its limit and rebalance from that data."
+    ]
+  },
+  "prerequisites": ["memory-tiers", "design-envelope"],
+  "labs": ["memory-sorter"],
+  "drills": ["mem-drill-assistant-memory"],
+  "goals": ["interview", "capstone"],
+  "minutes": 12
+}

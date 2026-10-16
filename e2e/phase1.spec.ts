@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { readdirSync } from 'node:fs'
 import { axe, onboard, readContent } from './helpers'
 
 interface Coach {
@@ -68,8 +69,10 @@ test('gateway walkthrough: reorder the stages until every call is correct and sa
 test('concept map and content studio', async ({ page }) => {
   await onboard(page)
   await page.goto('/map')
-  await expect(page.getByTestId('concept-map').locator('.react-flow__node.cmap-node')).toHaveCount(20)
-  await expect(page.getByTestId('concept-map').locator('.react-flow__node.cmap-lane')).toHaveCount(3)
+  const tentacles = readdirSync(new URL('../content/tentacles/', import.meta.url))
+  const concepts = tentacles.reduce((n, t) => n + readdirSync(new URL(`../content/tentacles/${t}/concepts/`, import.meta.url)).length, 0)
+  await expect(page.getByTestId('concept-map').locator('.react-flow__node.cmap-node')).toHaveCount(concepts)
+  await expect(page.getByTestId('concept-map').locator('.react-flow__node.cmap-lane')).toHaveCount(tentacles.length)
   await axe(page)
 
   await page.goto('/settings')

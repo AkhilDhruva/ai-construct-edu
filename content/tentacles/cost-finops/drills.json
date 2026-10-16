@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "drills": [
+    {
+      "id": "fin-drill-cut-spend",
+      "title": "Cut an agent's cost per task by two thirds",
+      "prompt": "A billing-dispute agent completes 2 million tasks a month at $0.42 per completed task, or $840,000. Each attempt makes 8 model calls. Every call sends an 8,000-token stable prefix and 4,000 tokens of dynamic input, and returns 1,000 output tokens. Prices are an illustrative $2 per million input tokens and $10 per million output tokens. Tool fees are $0.028 per attempt, and retries and re-runs mean each completed task consumes 1.4 attempts. Five of the eight calls are classification or extraction, and about 30 per cent of tasks are overnight re-checks nobody waits for. Task success is 0.94. Cut cost to $0.15 per completed task while losing at most one point of task success. State your numbers, the levers in order, the trade-off and the measurement.",
+      "minutes": 45,
+      "concepts": ["cost-per-task", "prompt-caching", "model-routing", "batch-and-async", "cost-guardrails"],
+      "rubric": [
+        {
+          "id": "requirements-as-numbers",
+          "criterion": "Requirements are stated as numbers before any architecture is chosen.",
+          "levels": [
+            "No numbers; requirements are adjectives such as cheaper, leaner or efficient.",
+            "Some numbers are given, but key ones are missing, such as the monthly target or the task success floor.",
+            "The target and floor are stated, but the $0.42 is not broken down by component, or the breakdown contains arithmetic errors.",
+            "The target, floor and monthly saving are stated, and the $0.42 is correctly broken into prefix, dynamic input, output, tools and retries."
+          ]
+        },
+        {
+          "id": "architecture-with-decision-rule",
+          "criterion": "The architecture is chosen with an explicit decision rule tied to the numbers.",
+          "levels": [
+            "Levers are named with no costing, or a cheaper model is swapped in everywhere by default.",
+            "Levers are chosen, but their order or size is justified by preference rather than by the breakdown.",
+            "Levers are ordered by the largest slice and costed, but the running total, quality effect or retry multiplier is missing.",
+            "Levers are ordered by size and quality cost, each is costed, and the running total per completed task lands below $0.15 with margin."
+          ]
+        },
+        {
+          "id": "trade-off-named",
+          "criterion": "A trade-off is named and accepted explicitly, with its cost quantified.",
+          "levels": [
+            "No trade-off is mentioned; the cuts are presented as having no downside.",
+            "A trade-off is mentioned in general terms, without saying what is given up.",
+            "A specific trade-off is named and accepted, but its cost in task success, latency or effort is not quantified.",
+            "A specific trade-off is named, accepted and quantified, and a rejected lever is stated with the reason it failed."
+          ]
+        },
+        {
+          "id": "measurement-named",
+          "criterion": "A measurement is named that would show the choice was wrong.",
+          "levels": [
+            "No measurement or success signal is given.",
+            "A vague signal is given, such as watching the bill, with no metric or threshold.",
+            "A specific metric is named, but without a threshold or the time window that would trigger a rethink.",
+            "A specific metric, threshold and window are named, together with the decision that would change."
+          ]
+        }
+      ],
+      "passMark": 9,
+      "outline": [
+        "Restate the goal: $840,000 down to $300,000 a month, a 64 per cent cut, with task success at 0.93 or above.",
+        "Break down one attempt: prefix $0.128, dynamic input $0.064, output $0.08 and tools $0.028, or $0.30. At 1.4 attempts per completed task that is $0.42, and the prefix is the largest slice.",
+        "Fix retries first: validate arguments before calls and stop retrying errors that cannot succeed. Cutting 1.4 attempts to 1.1 brings the cost to $0.33 and should lift success.",
+        "Cache the prefix: one write at 1.25 times and seven reads at a tenth cost 15,600 token-equivalents, or $0.031 per attempt. An attempt now costs $0.203, or about $0.22 per completed task.",
+        "Route the five easy calls to a model at a fifth of the price, which halves model spend. An attempt costs about $0.116, or $0.127 per completed task, if the golden set holds.",
+        "Batch the 30 per cent of overnight re-checks at half price for about $0.113, or $225,000 a month. Keep trimming and output caps in reserve, and reject cutting loop steps because it removes the self-check.",
+        "Measure cost per completed task, success per route and cache-read share daily, with a three-times-median alert. If success stays below 0.93 for a week, roll back the cheapest route first."
+      ]
+    }
+  ]
+}

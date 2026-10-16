@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "engine": "sorting-board",
+  "id": "gate-placement",
+  "brief": [
+    "A customer-operations agent can take the twelve actions below. Place each one in the gate it needs, judging by whether it can be undone, whether its effect leaves the organisation and what a wrong one costs.",
+    "Too few gates let costly mistakes through. Too many create approval fatigue, and reviewers start approving without reading."
+  ],
+  "buckets": [
+    { "id": "auto", "label": "Run automatically", "description": "Reversible, low-value, internal actions that run without a person and are always logged." },
+    { "id": "review-after", "label": "Run, then sampled review", "description": "Cheap actions that can be undone run at once, and a person reviews a sample afterwards." },
+    { "id": "approve-before", "label": "Approve before", "description": "Irreversible, external or high-value actions wait until a person approves the exact effect." },
+    { "id": "never", "label": "Never for an agent", "description": "Actions no agent may take, whatever it is asked, because the risk cannot be bounded by review." }
+  ],
+  "items": [
+    { "id": "read-catalogue", "text": "Read the public product catalogue", "bucket": "auto", "explanation": "Reading public data changes nothing and exposes nothing, so a log entry is enough." },
+    { "id": "label-ticket", "text": "Add a priority label to an inbound ticket", "bucket": "auto", "explanation": "A label is internal and can be changed in a second. Misrouted tickets show up in normal queue metrics." },
+    { "id": "order-status", "text": "Look up delivery status for the signed-in customer's own order", "bucket": "auto", "explanation": "It is read-only and scoped to the requester's own data by the gateway, so no human check adds value." },
+    { "id": "refund-15", "text": "Refund $15 on a delivered-damaged order", "bucket": "review-after", "explanation": "The amount is small and within policy. Sampled review catches a pattern of bad refunds without slowing every customer." },
+    { "id": "reschedule-delivery", "text": "Reschedule a delivery slot at the customer's request", "bucket": "review-after", "explanation": "It can be moved back easily and costs little if wrong, so it runs at once with later sampling." },
+    { "id": "merge-tickets", "text": "Merge two duplicate tickets from the same customer", "bucket": "review-after", "explanation": "Merges are internal and can be split again. Sampling shows whether the duplicate detection is accurate." },
+    { "id": "delete-account", "text": "Delete a customer's account", "bucket": "approve-before", "explanation": "Deletion cannot be undone, so a person confirms the identity and the request before it runs." },
+    { "id": "refund-2400", "text": "Refund $2,400 on an enterprise invoice", "bucket": "approve-before", "explanation": "The value is high enough that one wrong refund costs more than the reviewer's time. Approval happens first." },
+    { "id": "quote-price", "text": "Email a customer a revised contract price", "bucket": "approve-before", "explanation": "It is external and may bind the company. A person checks the recipient, figures and wording before it is sent." },
+    { "id": "change-bank", "text": "Change a supplier's payout bank details because an email asked", "bucket": "never", "explanation": "This is a classic fraud pattern. It belongs in a verified human process with out-of-band checks, not an agent." },
+    { "id": "grant-permissions", "text": "Add a new tool to the agent's own allowlist", "bucket": "never", "explanation": "An agent that can widen its own permissions makes every other control meaningless. Only owners change allowlists." },
+    { "id": "export-customers", "text": "Export the full customer table to an external address", "bucket": "never", "explanation": "Bulk export of private data to an outside party is the exfiltration the controls exist to prevent." }
+  ],
+  "passScore": 0.75
+}

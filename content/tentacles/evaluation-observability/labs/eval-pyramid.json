@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "engine": "sorting-board",
+  "id": "eval-pyramid-sorter",
+  "brief": [
+    "Twelve checks for a customer-support agent need a home, either in a layer of the evaluation pyramid or in production monitoring once the agent is live.",
+    "Place each check where it belongs. Ask what it costs to run, what it observes and how often it can run."
+  ],
+  "buckets": [
+    { "id": "unit", "label": "Deterministic checks", "description": "The base of the pyramid: exact, cheap checks such as schemas, tool contracts and loop bounds, run on every commit." },
+    { "id": "scenario", "label": "Scenario and trajectory evals", "description": "The middle of the pyramid: scripted tasks that check the steps the agent took and the tools it called." },
+    { "id": "end-to-end", "label": "End-to-end judgements", "description": "The top of the pyramid: human or model-judged scores of whole answers, run before releases." },
+    { "id": "production", "label": "Production monitoring", "description": "Online signals from live traffic, watched continuously and wired to alerts or rollback." }
+  ],
+  "items": [
+    {
+      "id": "tool-args-schema",
+      "text": "Every tool call's arguments validate against the tool's JSON Schema.",
+      "bucket": "unit",
+      "explanation": "Schema validation is deterministic and costs almost nothing, so it belongs in the base and runs on every commit."
+    },
+    {
+      "id": "loop-step-limit",
+      "text": "A scripted planner that never finishes makes the loop stop with a typed step-limit reason.",
+      "bucket": "unit",
+      "explanation": "A unit test of a loop bound needs no real model and always gives the same result."
+    },
+    {
+      "id": "answer-parses",
+      "text": "The final answer parses against the response schema, with every required field present.",
+      "bucket": "unit",
+      "explanation": "Parsing has one right result, so it is a base check rather than a judgement of quality."
+    },
+    {
+      "id": "refund-tool-order",
+      "text": "On a replayed refund ticket, the agent calls get_order before issue_refund and never calls close_account.",
+      "bucket": "scenario",
+      "explanation": "This checks the path the agent took through a scripted task, which is a trajectory eval."
+    },
+    {
+      "id": "empty-search-escalates",
+      "text": "When a knowledge-base search returns EMPTY, the agent asks a clarifying question or escalates instead of answering.",
+      "bucket": "scenario",
+      "explanation": "A scripted scenario with a recorded EMPTY result checks the agent's behaviour on that branch without any live system."
+    },
+    {
+      "id": "replay-step-budget",
+      "text": "On a replayed multi-turn ticket, the agent finishes within six steps and 20,000 tokens.",
+      "bucket": "scenario",
+      "explanation": "Step and token counts over a scripted task describe the trajectory, so this sits in the middle layer."
+    },
+    {
+      "id": "judge-golden-set",
+      "text": "A rubric-bound model judge scores 300 golden-set answers for correctness and quotes evidence for each score.",
+      "bucket": "end-to-end",
+      "explanation": "Judging whole answers against a rubric is an end-to-end judgement, costly enough to run before releases rather than on every commit."
+    },
+    {
+      "id": "human-blind-review",
+      "text": "Two support leads blind-review 50 sampled conversations against the written rubric before each release.",
+      "bucket": "end-to-end",
+      "explanation": "Human review is the most expensive judgement, so it sits at the very top and runs on release candidates."
+    },
+    {
+      "id": "pairwise-swap",
+      "text": "A pairwise judge compares old and new prompt answers, running each comparison in both orders.",
+      "bucket": "end-to-end",
+      "explanation": "Pairwise judging of whole answers is an end-to-end comparison; swapping the order controls position bias."
+    },
+    {
+      "id": "escalation-rate-alert",
+      "text": "The hourly rate of conversations handed to a human, with an alert when it rises 3 points above the weekly baseline.",
+      "bucket": "production",
+      "explanation": "This is an online signal from live traffic, watched continuously rather than run against a fixed set."
+    },
+    {
+      "id": "reopen-rate-by-version",
+      "text": "Thumbs-down rate and reopened-ticket rate per prompt version, read from live conversations.",
+      "bucket": "production",
+      "explanation": "These come from real users after release, so they are production monitoring signals."
+    },
+    {
+      "id": "cost-latency-rollback",
+      "text": "Cost per conversation and p95 latency per release, with automatic rollback when a guardrail threshold is crossed.",
+      "bucket": "production",
+      "explanation": "Guardrail metrics on live traffic drive automatic rollback during canary and full rollout."
+    }
+  ],
+  "passScore": 0.75
+}
