@@ -1,0 +1,337 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {
+      "id": "fnd-chk-01",
+      "conceptId": "what-is-an-agent",
+      "depth": 2,
+      "kind": "mcq",
+      "stem": "Which of these systems is an agent?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A summariser that always calls a translation API once and returns the output.",
+          "feedback": "Not an agent. The tool call is fixed and its result never changes the next step, so this is a pipeline step."
+        },
+        {
+          "id": "b",
+          "text": "A classifier that labels each email as urgent or routine.",
+          "feedback": "Not an agent. One model decision with no tools, no loop and no stop condition is a classification step."
+        },
+        {
+          "id": "c",
+          "text": "A debugger that runs a test, reads the failure, edits code and reruns until the tests pass or ten attempts are used.",
+          "feedback": "Correct. The model chooses each next action from the observed result, inside a loop with a stop condition."
+        },
+        {
+          "id": "d",
+          "text": "A chatbot with a 50-page system prompt and access to twelve tools it never uses.",
+          "feedback": "Not an agent in practice. Available tools are not a loop; what matters is whether the model chooses actions from observed results."
+        }
+      ],
+      "answer": "c",
+      "explanation": "The defining feature is the loop: choose an action, observe the result, and choose again until a stop condition. Tool count and prompt size do not decide it."
+    },
+    {
+      "id": "fnd-chk-02",
+      "conceptId": "agency-spectrum",
+      "depth": 2,
+      "kind": "mcq",
+      "stem": "Bank customers ask free-text questions such as what they spent at the airport last Tuesday. Answering needs one transaction search with a merchant and date range taken from the question. What is the lowest sufficient agency level?",
+      "options": [
+        {
+          "id": "level-1",
+          "text": "Level 1, a router.",
+          "feedback": "Too low. A router picks a branch from a fixed set but cannot build the merchant and date arguments the search needs."
+        },
+        {
+          "id": "level-2",
+          "text": "Level 2, a tool caller.",
+          "feedback": "Correct. The model picks one tool, extracts its arguments from the text and calls it once, which is exactly the requirement."
+        },
+        {
+          "id": "level-3",
+          "text": "Level 3, a bounded loop.",
+          "feedback": "Too high. Nothing in the requirement needs a second step based on an observation, so a loop adds cost and failure modes for no gain."
+        },
+        {
+          "id": "level-4",
+          "text": "Level 4, a planner and executor.",
+          "feedback": "Far too high. Planning a one-call task spends tokens on a plan that can itself be wrong."
+        }
+      ],
+      "answer": "level-2",
+      "explanation": "The requirement needs arguments drawn from free text and a single call. That is level 2; anything higher adds cost, latency and failure modes without meeting a further need."
+    },
+    {
+      "id": "fnd-chk-03",
+      "conceptId": "agency-spectrum",
+      "depth": 2,
+      "kind": "order",
+      "stem": "Order these designs from least to most agency.",
+      "items": [
+        { "id": "planner", "text": "The model writes a multi-step plan that an executor runs and revises." },
+        { "id": "router", "text": "The model picks which of three queues a ticket goes to." },
+        { "id": "open-ended", "text": "The model sets its own sub-goals over several days under human supervision." },
+        { "id": "pipeline", "text": "A fixed script calls the model to summarise each document." },
+        { "id": "loop", "text": "The model acts, observes and repeats within step and token limits." },
+        { "id": "tool-caller", "text": "The model chooses one tool, fills in its arguments, then stops." }
+      ],
+      "answer": ["pipeline", "router", "tool-caller", "loop", "planner", "open-ended"],
+      "explanation": "Each level hands the model one more kind of decision: first the branch, then the arguments, then repetition, then the plan, then the goals themselves."
+    },
+    {
+      "id": "fnd-chk-04",
+      "conceptId": "six-components",
+      "depth": 2,
+      "kind": "multi",
+      "stem": "Which statements correctly pair a component with the invariant it keeps? Select all that apply.",
+      "options": [
+        {
+          "id": "orchestrator",
+          "text": "Orchestrator: every run terminates and emits a trace.",
+          "feedback": "Correct. Termination and a trace are the orchestrator's guarantee to every other component."
+        },
+        {
+          "id": "model",
+          "text": "Reasoning model: executes the tool calls it emits.",
+          "feedback": "Incorrect. The model only returns a proposal; the orchestrator decides and the gateway executes."
+        },
+        {
+          "id": "memory",
+          "text": "Memory: reads are bounded, items carry a source, and user scope is enforced in the store.",
+          "feedback": "Correct. Scoping in the store, not the prompt, is what stops cross-user leaks."
+        },
+        {
+          "id": "guardrails",
+          "text": "Guardrails: the budget is checked after each call returns.",
+          "feedback": "Incorrect. A post-call check cannot prevent the spend. Guardrails check before the call and downgrade or halt."
+        },
+        {
+          "id": "observability",
+          "text": "Observability: one span per step with tokens and cost, so any run can be reconstructed.",
+          "feedback": "Correct. Per-step spans make every run reconstructable and every cost attributable."
+        }
+      ],
+      "answers": ["orchestrator", "memory", "observability"],
+      "explanation": "Each component keeps one invariant. The model never executes anything itself, and a budget is only a guardrail if it is checked before the spend."
+    },
+    {
+      "id": "fnd-chk-05",
+      "conceptId": "typed-tool-results",
+      "depth": 2,
+      "kind": "order",
+      "stem": "Order the tool gateway's steps for a single call.",
+      "items": [
+        { "id": "execute", "text": "Execute the call with a timeout." },
+        { "id": "return-typed", "text": "Return a typed result." },
+        { "id": "authorise", "text": "Authorise the principal against the tool allowlist." },
+        { "id": "validate", "text": "Validate the arguments against the tool schema." }
+      ],
+      "answer": ["authorise", "validate", "execute", "return-typed"],
+      "explanation": "Authorisation runs first so a denied caller never learns the schema from validation errors. The timeout bounds execution, and the typed result tells the orchestrator who acts next."
+    },
+    {
+      "id": "fnd-chk-06",
+      "conceptId": "typed-tool-results",
+      "depth": 2,
+      "kind": "mcq",
+      "stem": "An order-lookup tool returns HTTP 200 with an empty JSON array for a well-formed order number. What should the gateway return?",
+      "options": [
+        {
+          "id": "success",
+          "text": "SUCCESS",
+          "feedback": "Incorrect. Nothing was found, and labelling it SUCCESS invites the model to invent order details."
+        },
+        {
+          "id": "empty",
+          "text": "EMPTY",
+          "feedback": "Correct. The call was valid and found nothing, so the model can reason about it, for example by asking the user to check the number."
+        },
+        {
+          "id": "unavailable",
+          "text": "UNAVAILABLE",
+          "feedback": "Incorrect. The dependency answered normally. UNAVAILABLE would trigger needless retries by the orchestrator."
+        },
+        {
+          "id": "invalid",
+          "text": "INVALID",
+          "feedback": "Incorrect. The arguments passed validation; INVALID is reserved for arguments that fail the schema."
+        }
+      ],
+      "answer": "empty",
+      "explanation": "EMPTY and UNAVAILABLE must stay distinct. The model can reason about an empty result, while the orchestrator handles a failed dependency with retries or degradation."
+    },
+    {
+      "id": "fnd-chk-07",
+      "conceptId": "bounded-loop",
+      "depth": 2,
+      "kind": "mcq",
+      "stem": "Bounds: 15 steps, 40,000 tokens, 60 seconds, and a stop after three consecutive identical calls. Each step reads a different 12,000-token page and takes 2 seconds. Which bound fires first?",
+      "options": [
+        {
+          "id": "steps",
+          "text": "The step ceiling.",
+          "feedback": "Incorrect. Only three steps run, far below the ceiling of 15."
+        },
+        {
+          "id": "tokens",
+          "text": "The token budget.",
+          "feedback": "Correct. After three steps 36,000 tokens are spent, and step 4 would project 48,000, over the 40,000 budget."
+        },
+        {
+          "id": "clock",
+          "text": "The wall-clock limit.",
+          "feedback": "Incorrect. Three steps take about 6 seconds, well inside 60."
+        },
+        {
+          "id": "no-progress",
+          "text": "The no-progress detector.",
+          "feedback": "Incorrect. Each call reads a different page, so there are no identical consecutive calls."
+        }
+      ],
+      "answer": "tokens",
+      "explanation": "Large observations are the token budget's pathology. Checking the projected total before each call stops the run cleanly with a typed token-budget reason."
+    },
+    {
+      "id": "fnd-chk-08",
+      "conceptId": "bounded-loop",
+      "depth": 3,
+      "kind": "multi",
+      "stem": "A team bounds its agent with a step ceiling of 20 and nothing else. Which failures could still run unchecked? Select all that apply.",
+      "options": [
+        {
+          "id": "slow-tool",
+          "text": "A tool that hangs for four minutes on a single call.",
+          "feedback": "Correct. One slow call counts as one step; only a wall-clock bound catches slow dependencies."
+        },
+        {
+          "id": "huge-reads",
+          "text": "Each of 20 steps re-reads a 50,000-token report, spending 1,000,000 tokens.",
+          "feedback": "Correct. Twenty steps stay within the ceiling while spend explodes; a token budget would catch it."
+        },
+        {
+          "id": "oscillation",
+          "text": "A planner oscillating between two tools for 500 steps.",
+          "feedback": "Incorrect. Oscillation is exactly what the step ceiling catches; the run stops at step 20."
+        },
+        {
+          "id": "repeats",
+          "text": "The same search with identical arguments repeated 15 times, adding no information.",
+          "feedback": "Correct. Fifteen steps fit under the ceiling. A no-progress detector would stop it after a few repeats and save most of that spend."
+        }
+      ],
+      "answers": ["slow-tool", "huge-reads", "repeats"],
+      "explanation": "The four bounds are independent because each catches a pathology the others miss. A step ceiling alone leaves time, tokens and progress unbounded."
+    },
+    {
+      "id": "fnd-chk-09",
+      "conceptId": "design-envelope",
+      "depth": 2,
+      "kind": "mcq",
+      "stem": "An agent handles 172,800 tasks a day with a 3x peak-to-average ratio and a mean task latency of 6 seconds. What peak concurrency should you size for?",
+      "options": [
+        {
+          "id": "six",
+          "text": "6",
+          "feedback": "Incorrect. That is peak arrivals per second, not tasks in flight. Little's law multiplies arrivals by mean latency."
+        },
+        {
+          "id": "twelve",
+          "text": "12",
+          "feedback": "Incorrect. That is average concurrency, 2 per second times 6 seconds. Size for peak, not average."
+        },
+        {
+          "id": "thirty-six",
+          "text": "36",
+          "feedback": "Correct. Peak arrivals are 6 per second, and 6 per second times 6 seconds gives 36 tasks in flight."
+        },
+        {
+          "id": "one-hundred-eight",
+          "text": "108",
+          "feedback": "Incorrect. That applies the 3x peak twice. The 6 per second figure already includes it."
+        }
+      ],
+      "answer": "thirty-six",
+      "explanation": "Little's law: concurrency equals arrival rate times mean time in the system. 172,800 divided by 86,400 is 2 per second, times 3 for peak gives 6, times 6 seconds gives 36."
+    },
+    {
+      "id": "fnd-chk-10",
+      "conceptId": "reliability-arithmetic",
+      "depth": 3,
+      "kind": "mcq",
+      "stem": "A research agent needs 0.90 end-to-end success. Its plan has 15 steps, each succeeding 0.98 of the time, which gives about 0.74. Which single change meets the target?",
+      "options": [
+        {
+          "id": "eight-steps",
+          "text": "Cut the plan to 8 steps.",
+          "feedback": "Incorrect. 0.98^8 is about 0.85, still short. At 0.98 per step the limit for 0.90 is floor(ln 0.90 / ln 0.98), which is 5 steps."
+        },
+        {
+          "id": "verify",
+          "text": "Keep 15 steps but add verification that lifts per-step success to 0.995.",
+          "feedback": "Correct. 0.995^15 is about 0.93, above target. Verification costs extra tokens per step, which the cost ceiling must absorb."
+        },
+        {
+          "id": "retry-last",
+          "text": "Add one retry to the final step only.",
+          "feedback": "Incorrect. Improving one step barely moves the product; the other 14 steps alone multiply to 0.98^14, about 0.75."
+        },
+        {
+          "id": "point-99",
+          "text": "Raise per-step success to 0.99.",
+          "feedback": "Incorrect. 0.99^15 is about 0.86, still below 0.90. At 0.99 per step the limit is 10 steps."
+        }
+      ],
+      "answer": "verify",
+      "explanation": "Success compounds, so 0.98^15 is about 0.74. Close the gap with fewer steps, higher per-step reliability or checkpoints, and check every option with the same arithmetic."
+    },
+    {
+      "id": "fnd-chk-11",
+      "conceptId": "degradation-ladder",
+      "depth": 2,
+      "kind": "order",
+      "stem": "A provider incident gets steadily worse. Order the rungs the system should walk down, from first to last.",
+      "items": [
+        { "id": "budget-spent", "text": "Budget spent: AI features off, static content stays." },
+        { "id": "healthy", "text": "Healthy: full features." },
+        { "id": "unreachable", "text": "Unreachable: fully offline, local content only." },
+        { "id": "slow", "text": "Slow: queue the expensive part and show a partial result now." },
+        { "id": "saturated", "text": "Saturated: route to a smaller standby model with shorter output." }
+      ],
+      "answer": ["healthy", "slow", "saturated", "budget-spent", "unreachable"],
+      "explanation": "Each rung gives up a little more capability to keep something useful running. The rung is recorded on every span and shown to the user."
+    },
+    {
+      "id": "fnd-chk-12",
+      "conceptId": "design-envelope",
+      "depth": 3,
+      "kind": "mcq",
+      "stem": "Envelope: 6 steps of 3,000 tokens at $2 per million tokens, cost ceiling $0.03 per task, 1.5 seconds per step, tail factor 2, p95 target 20 seconds. Which change fits both limits with margin?",
+      "options": [
+        {
+          "id": "cheaper-model",
+          "text": "Switch to a model priced at $1 per million tokens, keeping steps and step time.",
+          "feedback": "Correct. 18,000 tokens at $1 per million is $0.018, and p95 stays at 6 times 1.5 times 2, or 18 seconds. Watch per-step success, which a smaller model may lower."
+        },
+        {
+          "id": "five-steps",
+          "text": "Cut to 5 steps of 3,000 tokens each.",
+          "feedback": "Incorrect. Cost becomes exactly $0.030, on the ceiling, with no margin for retries or longer inputs."
+        },
+        {
+          "id": "add-verify",
+          "text": "Add a verification step, making 7 steps.",
+          "feedback": "Incorrect. 21,000 tokens cost $0.042, and p95 rises to 21 seconds, breaking both limits."
+        },
+        {
+          "id": "fewer-bigger",
+          "text": "Halve the steps to 3 but double tokens per step to 6,000.",
+          "feedback": "Incorrect. Tokens per task stay at 18,000, so cost is still $0.036; only latency improves."
+        }
+      ],
+      "answer": "cheaper-model",
+      "explanation": "Derive before deciding. Tokens per task are steps times tokens per step, cost is tokens divided by a million times price, and p95 is roughly steps times seconds per step times tail factor."
+    }
+  ]
+}

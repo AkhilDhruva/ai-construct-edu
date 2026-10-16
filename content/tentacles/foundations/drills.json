@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "drills": [
+    {
+      "id": "fnd-drill-support-agent",
+      "title": "Design a support triage agent",
+      "prompt": "Design a customer-support triage agent for a mid-size SaaS company. It receives 40,000 tickets a day with a 3x peak-to-average ratio. Each ticket must be classified, then answered from the help centre or routed to a human queue. Answers must arrive within 20 seconds at p95, and the cost ceiling is $0.02 per ticket. Assume a model price of $1.50 per million tokens and 2 seconds per step. State your envelope, choose an agency level, specify the components, and plan for a provider outage.",
+      "minutes": 45,
+      "concepts": ["agency-spectrum", "six-components", "typed-tool-results", "design-envelope", "degradation-ladder"],
+      "rubric": [
+        {
+          "id": "requirements-as-numbers",
+          "criterion": "Requirements are stated as numbers before any architecture is chosen.",
+          "levels": [
+            "No numbers; requirements are adjectives such as fast, cheap or reliable.",
+            "Some numbers are given, but key ones are missing, such as peak load or the cost ceiling.",
+            "All eight envelope numbers are stated, but derived figures are missing or contain arithmetic errors.",
+            "All eight numbers are stated, and concurrency, cost, latency and end-to-end success are derived correctly."
+          ]
+        },
+        {
+          "id": "architecture-with-decision-rule",
+          "criterion": "The architecture is chosen with an explicit decision rule tied to the numbers.",
+          "levels": [
+            "An architecture is named with no reason, or the highest agency level is assumed by default.",
+            "An agency level is chosen, but the justification is preference rather than a requirement.",
+            "The lowest sufficient level is chosen by a rule, but a component, bound or result type is left unspecified.",
+            "The lowest sufficient level is chosen by a stated rule, with components, bounds and typed results specified to fit the envelope."
+          ]
+        },
+        {
+          "id": "trade-off-named",
+          "criterion": "A trade-off is named and accepted explicitly, with its cost quantified.",
+          "levels": [
+            "No trade-off is mentioned; the design is presented as having no downside.",
+            "A trade-off is mentioned in general terms, without saying what is given up.",
+            "A specific trade-off is named and accepted, but its cost is not quantified.",
+            "A specific trade-off is named, accepted and quantified, and the rejected alternative is stated."
+          ]
+        },
+        {
+          "id": "measurement-named",
+          "criterion": "A measurement is named that would show the choice was wrong.",
+          "levels": [
+            "No measurement or success signal is given.",
+            "A vague signal is given, such as monitoring quality, with no metric or threshold.",
+            "A specific metric is named, but without a threshold or the time window that would trigger a rethink.",
+            "A specific metric, threshold and window are named, together with the decision that would change."
+          ]
+        }
+      ],
+      "passMark": 9,
+      "outline": [
+        "State all eight numbers, then derive: about 1.4 tickets per second at peak, peak concurrency by Little's law, tokens and cost per ticket, p95 latency and end-to-end success.",
+        "Choose the lowest sufficient level, such as a router for queue choice plus a single retrieval call for answers, and justify any loop with a measured gap.",
+        "Check the budget: for example, 4 steps of 3,000 tokens is 12,000 tokens, or $0.018 per ticket, and p95 is about 4 times 2 times 2, or 16 seconds.",
+        "Specify the gateway and loop: an allowlist per principal, typed results with EMPTY going to the model and UNAVAILABLE to the orchestrator, and bounds on steps, tokens and time.",
+        "Define the degradation ladder: a standby model at saturation, human queues for every ticket once the budget is spent, and the current rung shown to support staff.",
+        "Name the trade-off, such as a thin cost margin accepted for answer quality, and the measurement: a misrouted-ticket rate above a set threshold over a week triggers a redesign."
+      ]
+    },
+    {
+      "id": "fnd-drill-research-agent",
+      "title": "Design a cited research assistant",
+      "prompt": "Design an internal research assistant that reads company documents and writes cited briefs for analysts. Expect 600 briefs a day with a 2x peak. A typical brief takes 30 steps of about 6,000 tokens each, at 4 seconds per step, and each step succeeds 0.98 of the time. Analysts need 0.90 end-to-end success, p95 under 10 minutes, and a cost ceiling of $1.50 per brief at $3 per million tokens. Show where the reliability arithmetic forces a change to the design.",
+      "minutes": 45,
+      "concepts": ["six-components", "bounded-loop", "design-envelope", "reliability-arithmetic"],
+      "rubric": [
+        {
+          "id": "requirements-as-numbers",
+          "criterion": "Requirements are stated as numbers before any architecture is chosen.",
+          "levels": [
+            "No numbers; requirements are adjectives such as fast, cheap or reliable.",
+            "Some numbers are given, but key ones are missing, such as per-step success or the cost ceiling.",
+            "All eight envelope numbers are stated, but derived figures are missing or contain arithmetic errors.",
+            "All eight numbers are stated, and concurrency, cost, latency and end-to-end success are derived correctly."
+          ]
+        },
+        {
+          "id": "architecture-with-decision-rule",
+          "criterion": "The architecture is chosen with an explicit decision rule tied to the numbers.",
+          "levels": [
+            "An architecture is named with no reason, or the highest agency level is assumed by default.",
+            "An agency level is chosen, but the justification is preference rather than a requirement.",
+            "The lowest sufficient level is chosen by a rule, but bounds, checkpoints or memory sourcing are left unspecified.",
+            "The lowest sufficient level is chosen by a stated rule, with bounds, checkpoints and sourced memory specified to fit the envelope."
+          ]
+        },
+        {
+          "id": "trade-off-named",
+          "criterion": "A trade-off is named and accepted explicitly, with its cost quantified.",
+          "levels": [
+            "No trade-off is mentioned; the design is presented as having no downside.",
+            "A trade-off is mentioned in general terms, without saying what is given up.",
+            "A specific trade-off is named and accepted, but its cost is not quantified.",
+            "A specific trade-off is named, accepted and quantified, and the rejected alternative is stated."
+          ]
+        },
+        {
+          "id": "measurement-named",
+          "criterion": "A measurement is named that would show the choice was wrong.",
+          "levels": [
+            "No measurement or success signal is given.",
+            "A vague signal is given, such as checking brief quality, with no metric or threshold.",
+            "A specific metric is named, but without a threshold or the time window that would trigger a rethink.",
+            "A specific metric, threshold and window are named, together with the decision that would change."
+          ]
+        }
+      ],
+      "passMark": 9,
+      "outline": [
+        "State the envelope and derive: 180,000 tokens and $0.54 per brief, p95 near 180 seconds with a tail factor of 1.5, and about 2 briefs in flight at peak.",
+        "Show the reliability gap: 0.98^30 is about 0.55, far below 0.90, and at 0.98 per step the limit for 0.90 is only 5 steps.",
+        "Close the gap with stated levers: for example, six checkpointed stages of five steps, each rerun once on a detected failure, give about 0.99 per stage and 0.95 overall.",
+        "Specify the loop: a bounded loop or planner and executor with four independent bounds per stage, typed termination reasons, and memory reads that carry their source for citations.",
+        "Name the trade-off: reruns and citation checks add roughly 10 per cent more tokens and latency, accepted because cost stays well under $1.50 and p95 well under 10 minutes.",
+        "Name the measurement: citation-check failure rate per stage and end-to-end success over a rolling week, with a threshold that triggers fewer steps or a redesign."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,275 @@
+{
+  "schemaVersion": 1,
+  "cards": [
+    {
+      "id": "fnd-001",
+      "conceptId": "what-is-an-agent",
+      "depth": 1,
+      "front": "What makes a system an agent rather than a pipeline?",
+      "back": "A model chooses the next action inside a loop, observes the result and continues until a stop condition fires. Tools and state support the loop, but the loop is the defining feature.",
+      "kind": "recall",
+      "tags": ["agent", "definition"]
+    },
+    {
+      "id": "fnd-002",
+      "conceptId": "what-is-an-agent",
+      "depth": 2,
+      "front": "A model reads an email, calls a calendar API once to book a slot, and returns. Is this an agent?",
+      "back": "No. One fixed tool call is a pipeline step. It becomes an agent only if the model inspects the result and chooses further actions, such as proposing another slot when the first is taken.",
+      "kind": "apply",
+      "tags": ["agent", "pipeline"]
+    },
+    {
+      "id": "fnd-003",
+      "conceptId": "what-is-an-agent",
+      "depth": 3,
+      "front": "A fixed pipeline handles 90 per cent of tasks; the rest need judgement. How do you add agency without paying for it on every task?",
+      "back": "Route the 90 per cent through the pipeline and send only the ambiguous 10 per cent to a bounded agent. Loop cost then applies to one task in ten, not to every task.",
+      "kind": "apply",
+      "tags": ["agent", "cost", "routing"]
+    },
+    {
+      "id": "fnd-004",
+      "conceptId": "agency-spectrum",
+      "depth": 1,
+      "front": "List agency levels 0 to 5.",
+      "back": "0 fixed pipeline; 1 router; 2 tool caller; 3 bounded loop; 4 planner and executor; 5 open-ended, supervised.",
+      "kind": "recall",
+      "tags": ["agency", "levels"]
+    },
+    {
+      "id": "fnd-005",
+      "conceptId": "agency-spectrum",
+      "depth": 1,
+      "front": "Pick the ____ level of agency that meets the requirement.",
+      "back": "Lowest. Each level up adds cost, latency and failure modes, so extra agency must be earned by a requirement.",
+      "kind": "cloze",
+      "tags": ["agency", "principle"]
+    },
+    {
+      "id": "fnd-006",
+      "conceptId": "agency-spectrum",
+      "depth": 2,
+      "front": "Each ticket must go to the billing, technical or sales queue. Which agency level fits?",
+      "back": "Level 1, a router. The model picks one branch from a fixed set and builds no arguments, so a tool caller or a loop would add risk for no gain.",
+      "kind": "apply",
+      "tags": ["agency", "router"]
+    },
+    {
+      "id": "fnd-007",
+      "conceptId": "agency-spectrum",
+      "depth": 2,
+      "front": "What does level 2 add over level 1, and what new failure does it bring?",
+      "back": "The model picks a tool and constructs its arguments, once. The new failure is arguments that look valid but are wrong, which schema validation only partly catches.",
+      "kind": "recall",
+      "tags": ["agency", "tool-caller"]
+    },
+    {
+      "id": "fnd-008",
+      "conceptId": "six-components",
+      "depth": 1,
+      "front": "Name the six components of a production agent.",
+      "back": "Orchestrator, reasoning model, tool gateway, memory, guardrails and observability.",
+      "kind": "recall",
+      "tags": ["components"]
+    },
+    {
+      "id": "fnd-009",
+      "conceptId": "six-components",
+      "depth": 1,
+      "front": "The model ____, the orchestrator decides.",
+      "back": "Proposes. Nothing the model says executes by itself; the orchestrator decides and the tool gateway executes.",
+      "kind": "cloze",
+      "tags": ["components", "orchestrator"]
+    },
+    {
+      "id": "fnd-010",
+      "conceptId": "six-components",
+      "depth": 2,
+      "front": "Why does the tool gateway authorise a caller before validating arguments?",
+      "back": "So a denied caller never learns the tool's schema. Validating first would leak argument names and types through validation errors.",
+      "kind": "recall",
+      "tags": ["gateway", "security"]
+    },
+    {
+      "id": "fnd-011",
+      "conceptId": "six-components",
+      "depth": 2,
+      "front": "A run overspent its $0.50 cap by $3. The guardrail checked spend after each call. What is the fix?",
+      "back": "Check projected cost before each call. A post-call check can only report the overspend; a pre-call check prevents it and downgrades or halts the run.",
+      "kind": "apply",
+      "tags": ["guardrails", "budget"]
+    },
+    {
+      "id": "fnd-012",
+      "conceptId": "six-components",
+      "depth": 3,
+      "front": "A user saw another customer's order history. Memory was filtered by user only in the prompt template. Which invariant broke, and where should it live?",
+      "back": "Memory's scoping invariant. Scope must be enforced in the store, as a filter on every read, so no prompt or injection can widen it.",
+      "kind": "apply",
+      "tags": ["memory", "security"]
+    },
+    {
+      "id": "fnd-013",
+      "conceptId": "bounded-loop",
+      "depth": 1,
+      "front": "Name the four independent bounds on an agent loop.",
+      "back": "Step ceiling, token budget, wall-clock limit and no-progress detector.",
+      "kind": "recall",
+      "tags": ["loop", "bounds"]
+    },
+    {
+      "id": "fnd-014",
+      "conceptId": "bounded-loop",
+      "depth": 1,
+      "front": "A run that stops on a bound returns a typed ____ reason, not a crash.",
+      "back": "Termination. The caller can then degrade, retry or explain, because it knows exactly which bound fired.",
+      "kind": "cloze",
+      "tags": ["loop", "termination"]
+    },
+    {
+      "id": "fnd-015",
+      "conceptId": "bounded-loop",
+      "depth": 2,
+      "front": "A planner alternates between two tools every step and never finishes. Which bound catches it?",
+      "back": "The step ceiling. Each step is cheap and quick, and each call differs from the one before it, so the token, clock and no-progress bounds can all miss it.",
+      "kind": "apply",
+      "tags": ["loop", "oscillation"]
+    },
+    {
+      "id": "fnd-016",
+      "conceptId": "bounded-loop",
+      "depth": 2,
+      "front": "Each step re-reads a 20,000-token document and the token budget is 50,000. When does the loop stop?",
+      "back": "Before step 3. Two steps spend 40,000 tokens, and a third would project 60,000, over budget. The run returns a typed token-budget reason.",
+      "kind": "apply",
+      "tags": ["loop", "tokens"]
+    },
+    {
+      "id": "fnd-017",
+      "conceptId": "typed-tool-results",
+      "depth": 1,
+      "front": "List the five typed tool results.",
+      "back": "SUCCESS, EMPTY, DENIED, UNAVAILABLE and INVALID.",
+      "kind": "recall",
+      "tags": ["tools", "results"]
+    },
+    {
+      "id": "fnd-018",
+      "conceptId": "typed-tool-results",
+      "depth": 1,
+      "front": "Gateway order: authorise, ____, execute with a timeout, return a typed result.",
+      "back": "Validate arguments. Authorisation comes first so a denied caller never sees schema details in validation errors.",
+      "kind": "cloze",
+      "tags": ["gateway", "order"]
+    },
+    {
+      "id": "fnd-019",
+      "conceptId": "typed-tool-results",
+      "depth": 2,
+      "front": "A search API returns HTTP 200 with an empty list. Which type, and who acts?",
+      "back": "EMPTY. The call was valid and found nothing, so the model reasons about it, for example by broadening the query or asking the user.",
+      "kind": "apply",
+      "tags": ["tools", "empty"]
+    },
+    {
+      "id": "fnd-020",
+      "conceptId": "typed-tool-results",
+      "depth": 2,
+      "front": "The CRM times out after 5 seconds. Which type, and who acts?",
+      "back": "UNAVAILABLE. The orchestrator handles it with a bounded retry or a degradation rung. The model must not treat it as no record found.",
+      "kind": "apply",
+      "tags": ["tools", "unavailable"]
+    },
+    {
+      "id": "fnd-021",
+      "conceptId": "design-envelope",
+      "depth": 1,
+      "front": "What are the eight numbers of the design envelope?",
+      "back": "Tasks per day, peak-to-average ratio, steps per task, tokens per step, seconds per step, per-step success rate, p95 latency target and cost ceiling per task.",
+      "kind": "recall",
+      "tags": ["envelope", "requirements"]
+    },
+    {
+      "id": "fnd-022",
+      "conceptId": "design-envelope",
+      "depth": 2,
+      "front": "86,400 tasks a day, a 3x peak and an 8-second mean task latency. What peak concurrency do you size for?",
+      "back": "Average is 1 task per second, so peak is 3 per second. By Little's law, 3 times 8 gives 24 tasks in flight at peak.",
+      "kind": "apply",
+      "tags": ["envelope", "concurrency"]
+    },
+    {
+      "id": "fnd-023",
+      "conceptId": "design-envelope",
+      "depth": 2,
+      "front": "Five steps of 4,000 tokens each, at $2.50 per million tokens. What is the cost per task?",
+      "back": "20,000 tokens per task. 20,000 divided by 1,000,000, times $2.50, gives $0.05.",
+      "kind": "apply",
+      "tags": ["envelope", "cost"]
+    },
+    {
+      "id": "fnd-024",
+      "conceptId": "design-envelope",
+      "depth": 3,
+      "front": "8 steps, 2 seconds per step, tail factor 1.5, p95 target 20 seconds. Does it fit, and what is your first lever?",
+      "back": "p95 is about 8 times 2 times 1.5, or 24 seconds, so it misses. Cut steps first: 6 steps give 18 seconds. Faster steps or a lower tail are the alternatives.",
+      "kind": "apply",
+      "tags": ["envelope", "latency"]
+    },
+    {
+      "id": "fnd-025",
+      "conceptId": "reliability-arithmetic",
+      "depth": 1,
+      "front": "End-to-end success equals per-step success raised to the power of ____.",
+      "back": "The number of steps. For example, 0.98 per step over 10 steps gives about 0.82.",
+      "kind": "cloze",
+      "tags": ["reliability"]
+    },
+    {
+      "id": "fnd-026",
+      "conceptId": "reliability-arithmetic",
+      "depth": 2,
+      "front": "Per-step success is 0.95 and the run has 20 steps. What is end-to-end success?",
+      "back": "0.95^20 is about 0.36. The agent fails almost two runs in three, even though each step looks reliable.",
+      "kind": "apply",
+      "tags": ["reliability", "compounding"]
+    },
+    {
+      "id": "fnd-027",
+      "conceptId": "reliability-arithmetic",
+      "depth": 3,
+      "front": "You need 0.90 end to end at 0.99 per step. What is the maximum number of steps?",
+      "back": "floor(ln 0.90 / ln 0.99) = floor(10.48) = 10. Check: 0.99^10 is about 0.904, while 0.99^11 is about 0.895 and misses.",
+      "kind": "apply",
+      "tags": ["reliability", "step-limit"]
+    },
+    {
+      "id": "fnd-028",
+      "conceptId": "degradation-ladder",
+      "depth": 1,
+      "front": "Name the five rungs of the degradation ladder.",
+      "back": "0 healthy; 1 slow, queue the expensive part; 2 saturated, smaller standby model; 3 budget spent, AI off but static content stays; 4 unreachable, fully offline.",
+      "kind": "recall",
+      "tags": ["degradation", "rungs"]
+    },
+    {
+      "id": "fnd-029",
+      "conceptId": "degradation-ladder",
+      "depth": 2,
+      "front": "The provider starts returning rate-limit errors at peak. Which rung, and what changes?",
+      "back": "Rung 2, saturated. Route to a smaller or standby model with shorter output, record rung 2 on every span, and tell users answers are briefer for now.",
+      "kind": "apply",
+      "tags": ["degradation", "overload"]
+    },
+    {
+      "id": "fnd-030",
+      "conceptId": "degradation-ladder",
+      "depth": 2,
+      "front": "Why record the current rung on every span?",
+      "back": "So any run can be reconstructed with its service level, and you can measure time spent per rung, catching a system quietly stuck on a lower rung.",
+      "kind": "recall",
+      "tags": ["degradation", "observability"]
+    }
+  ]
+}

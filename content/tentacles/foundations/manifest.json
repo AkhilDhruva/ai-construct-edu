@@ -1,0 +1,24 @@
+{
+  "id": "foundations",
+  "version": "1.0.0",
+  "schemaVersion": 1,
+  "title": "Foundations",
+  "summary": "What an agent is, where a system sits on the agency spectrum, the six components every agent needs, and how to state a design as numbers before you draw a box.",
+  "route": "/t/foundations",
+  "bookSource": "Part I, Ch 1-2",
+  "audience": ["engineer", "architect"],
+  "order": 1,
+  "concepts": "concepts/*.json",
+  "labs": [
+    { "id": "bounded-loop-sim", "title": "Bounded Loop Simulator", "engine": "sequence-stepper", "scenario": "labs/bounded-loop.json", "concepts": ["bounded-loop"] },
+    { "id": "design-console", "title": "Design Console", "engine": "eight-numbers", "scenario": "labs/design-console.json", "concepts": ["design-envelope", "reliability-arithmetic"] }
+  ],
+  "cards": "cards.json",
+  "checks": "checks.json",
+  "drills": "drills.json",
+  "prerequisites": [],
+  "depthLevels": [1, 2, 3],
+  "capabilities": { "coach": false, "tutor": true },
+  "estimatedMinutes": 180,
+  "passMark": 0.8
+}

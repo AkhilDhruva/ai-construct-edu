@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "typed-tool-results",
+  "tentacle": "foundations",
+  "title": "Typed tool results",
+  "point": "Every tool call returns one of five typed results, and EMPTY is not UNAVAILABLE: the model reasons about the first, the orchestrator handles the second.",
+  "definition": "A typed tool result is a tagged outcome, one of SUCCESS, EMPTY, DENIED, UNAVAILABLE or INVALID, returned by the tool gateway instead of a bare string. The tag tells the orchestrator who should act next.",
+  "level": 1,
+  "objective": {
+    "id": "typed-tool-results-obj",
+    "text": "Classify eight raw tool outcomes into the five result types, route each to the model or the orchestrator, and order the gateway's four steps correctly."
+  },
+  "misconceptions": [
+    {
+      "claim": "An HTTP 200 response means the call succeeded.",
+      "correction": "A 200 with an empty body is EMPTY: the call was valid and found nothing. Treating it as SUCCESS invites the model to invent content to fill the gap."
+    },
+    {
+      "claim": "Returning error text as a plain string is fine because the model can read it.",
+      "correction": "Bare strings blur nothing found with service down. The model may then retry a dead dependency, or give up on a search that only needed different terms."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "SUCCESS means a valid call returned data. EMPTY means a valid call found nothing. DENIED means the principal is not allowed to use the tool. UNAVAILABLE means the dependency failed or timed out. INVALID means the arguments failed schema validation.",
+      "The gateway runs four steps in order: authorise, validate arguments, execute with a timeout, return a typed result. Authorisation comes first so a denied caller never learns the tool's schema.",
+      "The point to remember: the model can reason about EMPTY, while the orchestrator handles UNAVAILABLE with a retry or a degradation step."
+    ],
+    "l2": [
+      "An order lookup returns HTTP 200 with an empty list. That is EMPTY, so the model can ask the user to confirm the order number.",
+      "The same lookup times out after 5 seconds. That is UNAVAILABLE, so the orchestrator retries once with backoff and then degrades, without asking the model to guess.",
+      "A request carries the date 31-02-2026. That is INVALID, and the model can repair the argument. A user without refund rights calls the refund tool: DENIED, and the caller learns nothing about its schema."
+    ],
+    "l3": [
+      "Separating EMPTY from UNAVAILABLE means every tool adapter must map its own failure modes. That is real engineering work for each tool you add.",
+      "The payoff is measurable. If 3 per cent of calls time out and are misread as EMPTY, the model tells 3 users in 100 that their order does not exist.",
+      "That is a correctness bug, not a latency blip. Accept the adapter cost, and track the share of each result type per tool to catch mislabelling."
+    ]
+  },
+  "prerequisites": ["six-components"],
+  "labs": [],
+  "drills": ["fnd-drill-support-agent"],
+  "goals": ["interview", "capstone"],
+  "minutes": 10
+}

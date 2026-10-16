@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "agency-spectrum",
+  "tentacle": "foundations",
+  "title": "The agency spectrum",
+  "point": "Pick the lowest level of agency that meets the requirement, because each level up adds cost, latency and failure modes.",
+  "definition": "The agency spectrum ranks systems from level 0, a fixed pipeline, to level 5, an open-ended supervised agent. Each level hands the model one more kind of decision.",
+  "level": 0,
+  "objective": {
+    "id": "agency-spectrum-obj",
+    "text": "Given six product requirements, choose the lowest sufficient agency level for each and justify the choice by naming the decision the next level up would add."
+  },
+  "misconceptions": [
+    {
+      "claim": "Higher levels are more advanced, so they make the better default.",
+      "correction": "Higher levels cost more and are harder to test. The right default is the lowest level that meets the requirement, raised only when a measured gap demands it."
+    },
+    {
+      "claim": "A router and a tool caller are the same thing.",
+      "correction": "A router picks among fixed branches and passes no arguments. A tool caller also constructs arguments, which opens a new failure mode: inputs that look valid but are wrong."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Level 0 is a fixed pipeline where code decides every step. Level 1 is a router: the model picks one branch from a fixed set. Level 2 is a tool caller: the model picks a tool and its arguments, once.",
+      "Level 3 is a bounded loop of choose, act and observe. Level 4 is a planner and executor that writes and revises a multi-step plan. Level 5 is open-ended work under human supervision.",
+      "The point to remember: pick the lowest level that meets the requirement, because every level up adds cost, latency and failure modes."
+    ],
+    "l2": [
+      "A travel company wants to answer the question of where a booking is. The answer needs one lookup by booking reference, so a level 2 tool caller is enough. The model extracts the reference and calls the lookup once.",
+      "The same company also wants to rebook missed connections across airlines. The next search depends on the seat availability seen in the previous one, so that task needs at least a level 3 bounded loop.",
+      "Same company, two requirements, two levels. The level follows the requirement, not the team's ambition."
+    ],
+    "l3": [
+      "Suppose a level 2 design resolves 88 per cent of requests and a level 3 loop resolves 94 per cent at three times the cost per request.",
+      "Running level 3 on everything pays triple cost on all hundred requests to rescue six. A cheaper hybrid runs level 2 first and invokes level 3 only on the 12 per cent it cannot resolve.",
+      "That hybrid adds roughly 12 per cent times three, about 36 per cent, to average cost instead of 200 per cent. State that number when you defend the design."
+    ]
+  },
+  "prerequisites": ["what-is-an-agent"],
+  "labs": [],
+  "drills": ["fnd-drill-support-agent"],
+  "goals": ["interview", "capstone", "enablement"],
+  "minutes": 10
+}

@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "engine": "sequence-stepper",
+  "id": "bounded-loop-sim",
+  "brief": [
+    "An agent loop needs four independent ways to stop, because each one catches a failure the others miss.",
+    "Pick a recorded trace, set the four bounds, and step through it. The gauges drain as the run spends steps, tokens and time. When a bound fires, the loop stops with a typed reason instead of running away.",
+    "Then take the challenge: with the default bounds locked, predict which bound stops each of three traces before you run them."
+  ],
+  "defaults": { "maxSteps": 12, "tokenBudget": 20000, "wallClockSec": 60, "noProgressWindow": 3 },
+  "ranges": {
+    "maxSteps": { "min": 3, "max": 30, "step": 1 },
+    "tokenBudget": { "min": 2000, "max": 60000, "step": 1000 },
+    "wallClockSec": { "min": 10, "max": 180, "step": 5 },
+    "noProgressWindow": { "min": 1, "max": 8, "step": 1 }
+  },
+  "traces": [
+    {
+      "id": "refund-lookup",
+      "title": "Healthy refund lookup",
+      "description": "A short, well-behaved run: plan, two tool calls, answer.",
+      "steps": [
+        { "kind": "think", "label": "Plan: fetch the order, then the refund policy", "tokens": 400, "ms": 900, "progress": true },
+        { "kind": "tool", "label": "get_order(id=4812)", "tokens": 600, "ms": 700, "progress": true, "result": "SUCCESS" },
+        { "kind": "think", "label": "Order is 9 days old; check the refund window", "tokens": 500, "ms": 900, "progress": true },
+        { "kind": "tool", "label": "search_policy(q='refund window')", "tokens": 1200, "ms": 800, "progress": true, "result": "SUCCESS" },
+        { "kind": "answer", "label": "Eligible: 14-day window, refund issued to card", "tokens": 700, "ms": 1200, "progress": true }
+      ]
+    },
+    {
+      "id": "flip-flop-planner",
+      "title": "Flip-flopping planner",
+      "description": "Every step looks like progress, but the planner keeps switching between two strategies and never commits.",
+      "steps": [
+        { "kind": "think", "label": "Plan A: find the customer by name", "tokens": 350, "ms": 800, "progress": true },
+        { "kind": "tool", "label": "search_customers(name='J. Ortiz')", "tokens": 350, "ms": 800, "progress": true, "result": "SUCCESS" },
+        { "kind": "think", "label": "Three matches. Plan B: search by order id instead", "tokens": 350, "ms": 800, "progress": true },
+        { "kind": "tool", "label": "search_orders(prefix='48')", "tokens": 350, "ms": 800, "progress": true, "result": "SUCCESS" },
+        { "kind": "think", "label": "Too many orders. Back to plan A with an email filter", "tokens": 350, "ms": 800, "progress": true },
+        { "kind": "tool", "label": "search_customers(name='Ortiz', has_email=true)", "tokens": 350, "ms": 800, "progress": true, "result": "SUCCESS" },
+        { "kind": "think", "label": "Still ambiguous. Plan B with a date range", "tokens": 350, "ms": 800, "progress": true },
+        { "kind": "tool", "label": "search_orders(prefix='48', since='2026-09-01')", "tokens": 350, "ms": 800, "progress": true, "result": "SUCCESS" },
+        { "kind": "think", "label": "Plan A again: name plus city", "tokens": 350, "ms": 800, "progress": true },
+        { "kind": "tool", "label": "search_customers(name='Ortiz', city='Austin')", "tokens": 350, "ms": 800, "progress": true, "result": "SUCCESS" },
+        { "kind": "think", "label": "Plan B again: order prefix plus amount", "tokens": 350, "ms": 800, "progress": true },
+        { "kind": "tool", "label": "search_orders(prefix='48', min_total=100)", "tokens": 350, "ms": 800, "progress": true, "result": "SUCCESS" },
+        { "kind": "think", "label": "Plan A again: name plus phone", "tokens": 350, "ms": 800, "progress": true },
+        { "kind": "tool", "label": "search_customers(name='Ortiz', phone='512')", "tokens": 350, "ms": 800, "progress": true, "result": "SUCCESS" },
+        { "kind": "think", "label": "Plan B again: order prefix plus status", "tokens": 350, "ms": 800, "progress": true },
+        { "kind": "answer", "label": "Found the order (finally)", "tokens": 400, "ms": 900, "progress": true }
+      ]
+    },
+    {
+      "id": "giant-document",
+      "title": "Re-reading a giant document",
+      "description": "One tool returns a 180-page contract, and the agent re-reads all of it for every question.",
+      "steps": [
+        { "kind": "think", "label": "Plan: pull the contract, answer three questions", "tokens": 400, "ms": 800, "progress": true },
+        { "kind": "tool", "label": "fetch_contract(id='MSA-2291')", "tokens": 2500, "ms": 1200, "progress": true, "result": "SUCCESS" },
+        { "kind": "think", "label": "Read the whole contract for the termination clause", "tokens": 6500, "ms": 2500, "progress": true },
+        { "kind": "think", "label": "Read the whole contract for the liability cap", "tokens": 6500, "ms": 2500, "progress": true },
+        { "kind": "think", "label": "Read the whole contract for renewal terms", "tokens": 6500, "ms": 2500, "progress": true },
+        { "kind": "answer", "label": "Summary of three clauses", "tokens": 800, "ms": 1000, "progress": true }
+      ]
+    },
+    {
+      "id": "slow-erp",
+      "title": "Slow dependency",
+      "description": "Each call to the finance system takes about 25 seconds, and the run needs three of them.",
+      "steps": [
+        { "kind": "think", "label": "Plan: invoice, then payments, then credit notes", "tokens": 400, "ms": 900, "progress": true },
+        { "kind": "tool", "label": "erp.get_invoice(id='INV-7731')", "tokens": 600, "ms": 24000, "progress": true, "result": "SUCCESS" },
+        { "kind": "think", "label": "Invoice found; now payments", "tokens": 300, "ms": 900, "progress": true },
+        { "kind": "tool", "label": "erp.get_payments(invoice='INV-7731')", "tokens": 600, "ms": 26000, "progress": true, "result": "SUCCESS" },
+        { "kind": "think", "label": "Part-paid; check credit notes", "tokens": 300, "ms": 900, "progress": true },
+        { "kind": "tool", "label": "erp.get_credit_notes(invoice='INV-7731')", "tokens": 600, "ms": 25000, "progress": true, "result": "SUCCESS" },
+        { "kind": "answer", "label": "Outstanding balance: 1,240.00", "tokens": 500, "ms": 1000, "progress": true }
+      ]
+    },
+    {
+      "id": "same-search",
+      "title": "Identical repeated call",
+      "description": "The search comes back EMPTY and the agent issues exactly the same call again, hoping for a different result.",
+      "steps": [
+        { "kind": "think", "label": "Plan: search the knowledge base for the error code", "tokens": 400, "ms": 900, "progress": true },
+        { "kind": "tool", "label": "search_kb(q='SSO error 4012')", "tokens": 500, "ms": 700, "progress": false, "result": "EMPTY" },
+        { "kind": "tool", "label": "search_kb(q='SSO error 4012')", "tokens": 500, "ms": 700, "progress": false, "result": "EMPTY" },
+        { "kind": "tool", "label": "search_kb(q='SSO error 4012')", "tokens": 500, "ms": 700, "progress": false, "result": "EMPTY" },
+        { "kind": "tool", "label": "search_kb(q='SSO error 4012')", "tokens": 500, "ms": 700, "progress": false, "result": "EMPTY" },
+        { "kind": "tool", "label": "search_kb(q='SSO error 4012')", "tokens": 500, "ms": 700, "progress": false, "result": "EMPTY" },
+        { "kind": "answer", "label": "No article found", "tokens": 300, "ms": 600, "progress": true }
+      ]
+    }
+  ],
+  "challenge": {
+    "instruction": "The bounds are locked at their defaults (12 steps, 20,000 tokens, 60 seconds, no-progress window 3). For each trace, predict which bound stops the run first. Then run it and see.",
+    "traceIds": ["flip-flop-planner", "giant-document", "slow-erp"]
+  }
+}
