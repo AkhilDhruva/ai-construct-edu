@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "engine": "eight-numbers",
+  "id": "design-console",
+  "brief": [
+    "State the design as numbers before you draw a single box. Eight numbers are enough to tell you whether an agent design can work at all.",
+    "Change any number and the operating envelope recomputes: peak concurrency by Little's law, cost per task, p95 latency, and end-to-end success compounded across every step.",
+    "Challenge: the research-assistant preset breaks two checks. Requirement numbers are locked. Change only the design numbers until all four checks pass."
+  ],
+  "constants": { "pricePerMTok": 3, "tailFactor": 1.6, "concurrencyLimit": 150 },
+  "fields": [
+    { "key": "tasksPerDay", "label": "Tasks per day", "unit": "tasks", "role": "requirement", "min": 100, "max": 500000, "step": 100, "help": "Daily volume the system must absorb." },
+    { "key": "peakToAverage", "label": "Peak-to-average ratio", "unit": "x", "role": "requirement", "min": 1, "max": 10, "step": 0.5, "help": "How much busier the busiest minute is than the daily average." },
+    { "key": "latencyTargetSec", "label": "p95 latency target", "unit": "s", "role": "requirement", "min": 2, "max": 600, "step": 1, "help": "95 per cent of tasks must finish within this time." },
+    { "key": "costCeiling", "label": "Cost ceiling per task", "unit": "$", "role": "requirement", "min": 0.001, "max": 5, "step": 0.001, "help": "The most one task may spend on model tokens." },
+    { "key": "stepsPerTask", "label": "Steps per task", "unit": "steps", "role": "design", "min": 1, "max": 60, "step": 1, "help": "Average model calls in the loop for one task." },
+    { "key": "tokensPerStep", "label": "Tokens per step", "unit": "tokens", "role": "design", "min": 200, "max": 50000, "step": 100, "help": "Input plus output tokens per model call." },
+    { "key": "secondsPerStep", "label": "Seconds per step", "unit": "s", "role": "design", "min": 0.2, "max": 30, "step": 0.1, "help": "Average wall time of one step, model plus tools." },
+    { "key": "stepSuccess", "label": "Per-step success rate", "unit": "", "role": "design", "min": 0.8, "max": 0.995, "step": 0.005, "help": "Probability one step is correct. Raising it means adding verification or retries." }
+  ],
+  "presets": [
+    {
+      "id": "support-triage",
+      "title": "Support triage agent",
+      "story": "Classify and route 40,000 support tickets a day, answering simple ones directly.",
+      "successTarget": 0.9,
+      "values": { "tasksPerDay": 40000, "peakToAverage": 3, "stepsPerTask": 4, "tokensPerStep": 3000, "secondsPerStep": 1.2, "stepSuccess": 0.98, "latencyTargetSec": 20, "costCeiling": 0.02 }
+    },
+    {
+      "id": "research-assistant",
+      "title": "Research assistant",
+      "story": "Read internal documents and write a cited two-page brief. Long horizon, many steps.",
+      "successTarget": 0.8,
+      "values": { "tasksPerDay": 2000, "peakToAverage": 2, "stepsPerTask": 25, "tokensPerStep": 6000, "secondsPerStep": 4, "stepSuccess": 0.97, "latencyTargetSec": 120, "costCeiling": 0.5 }
+    },
+    {
+      "id": "invoice-matcher",
+      "title": "Invoice matcher",
+      "story": "Match supplier invoices to purchase orders overnight in a batch.",
+      "successTarget": 0.95,
+      "values": { "tasksPerDay": 150000, "peakToAverage": 1.5, "stepsPerTask": 3, "tokensPerStep": 1500, "secondsPerStep": 0.8, "stepSuccess": 0.99, "latencyTargetSec": 30, "costCeiling": 0.01 }
+    }
+  ],
+  "challenge": {
+    "presetId": "research-assistant",
+    "instruction": "Make all four checks pass without touching the requirement numbers. Hint: success compounds per step, so the step count is the strongest lever."
+  }
+}

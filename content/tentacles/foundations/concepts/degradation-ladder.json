@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "degradation-ladder",
+  "tentacle": "foundations",
+  "title": "The degradation ladder",
+  "point": "Under outage or overload, step down visible rungs instead of failing, record the rung on every span, and tell the user which rung they are on.",
+  "definition": "The degradation ladder is an ordered set of reduced-service modes: healthy, slow, saturated, budget spent and unreachable. The system moves down one rung as conditions worsen and back up as they recover.",
+  "level": 2,
+  "objective": {
+    "id": "degradation-ladder-obj",
+    "text": "Given four failure signals, order the rungs of the degradation ladder, choose the rung each signal triggers, and specify what the user sees on each."
+  },
+  "misconceptions": [
+    {
+      "claim": "Graceful degradation means hiding failures from the user.",
+      "correction": "The user is told which rung they are on. A visible notice that summaries are delayed preserves trust, while silently worse answers erode it."
+    },
+    {
+      "claim": "When the primary model is down, the only option is an error page.",
+      "correction": "Rungs exist between full service and failure: queue the expensive part, route to a standby model, keep static content, or run fully offline."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Rung 0 is healthy, with full features. Rung 1 is slow: queue the expensive part and show a partial result now. Rung 2 is saturated: route to a smaller or standby model with shorter output.",
+      "Rung 3 is budget spent: turn AI features off and keep static content. Rung 4 is unreachable: run fully offline or locally.",
+      "The rung is recorded on every span, and the user is always told which rung they are on."
+    ],
+    "l2": [
+      "A support portal's primary model jumps from 4 seconds to 25 seconds at p95. That is rung 1: show the retrieved help articles at once and queue the drafted reply.",
+      "Later the provider starts returning rate-limit errors. That is rung 2: route to the standby model and tell users that answers are briefer for now.",
+      "At 18:00 the daily budget runs out, which is rung 3: AI features switch off, while search and the static FAQ stay up. If the network drops, rung 4 serves cached content offline."
+    ],
+    "l3": [
+      "Each rung is a feature you must build and test, so the ladder carries real engineering cost.",
+      "Justify it with a number. A provider with 99.5 per cent monthly availability is down for about 3.6 hours in a 30-day month. With a working rung 2, those hours become degraded rather than dark.",
+      "Recording the rung on every span lets you measure time spent per rung. That is how you spot a system that has quietly sat on rung 2 for days."
+    ]
+  },
+  "prerequisites": ["six-components", "design-envelope"],
+  "labs": [],
+  "drills": ["fnd-drill-support-agent"],
+  "goals": ["interview", "capstone"],
+  "minutes": 10
+}

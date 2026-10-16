@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "what-is-an-agent",
+  "tentacle": "foundations",
+  "title": "What is an agent",
+  "point": "An agent is a loop in which the model chooses the next action, observes the result and continues until a stop condition fires.",
+  "definition": "An agent is a system where a model selects actions inside a loop, using tools and state, and observes each result before deciding again. The loop ends only when a stop condition is met.",
+  "level": 0,
+  "objective": {
+    "id": "what-is-an-agent-obj",
+    "text": "Given five system descriptions, classify each as a fixed pipeline, a single tool call or an agent, and name the loop element that decides the classification."
+  },
+  "misconceptions": [
+    {
+      "claim": "Any LLM that calls a tool is an agent.",
+      "correction": "A single, fixed tool call is a pipeline step. It becomes an agent only when the model chooses the next action from observed results, repeatedly, until a stop condition fires."
+    },
+    {
+      "claim": "More autonomy always makes a system more capable.",
+      "correction": "Autonomy adds cost, latency and new failure modes. Many tasks are served better by a fixed pipeline whose behaviour you can test exhaustively."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "An agent has four ingredients: a model that chooses actions, tools it can call, state that persists across steps, and a loop with a stop condition.",
+      "The point to remember: the model chooses the next action, observes the result, and keeps going until something tells it to stop.",
+      "Remove the loop and you have a pipeline step, however capable the model inside it is."
+    ],
+    "l2": [
+      "Consider an invoice summariser. It sends every invoice to a model, which calls a currency converter once and returns a summary. The sequence never changes, so this is a pipeline.",
+      "Now let the model inspect the converter's result and decide whether to fetch the supplier record, retry with a different date, or finish. The next step depends on what it observed, so this is an agent.",
+      "The test is simple: who decides the next action, and does that decision use what was just observed?"
+    ],
+    "l3": [
+      "Turning a pipeline into an agent is a cost decision. If a fixed path handles 95 per cent of invoices, the loop only earns its keep on the remaining 5 per cent.",
+      "A sound design routes the easy 95 per cent through the pipeline and sends only the ambiguous cases to the agent. You pay loop cost on one task in twenty, not on every task.",
+      "Defend the choice with a number: the agent's added cost per task, multiplied by the share of tasks that need it, must stay below the value of the cases it rescues."
+    ]
+  },
+  "prerequisites": [],
+  "labs": [],
+  "drills": [],
+  "goals": ["interview", "capstone", "enablement"],
+  "minutes": 8
+}

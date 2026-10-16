@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "design-envelope",
+  "tentacle": "foundations",
+  "title": "The design envelope",
+  "point": "State eight numbers before choosing an architecture; the figures derived from them rule options in or out.",
+  "definition": "The design envelope is eight requirement numbers: tasks per day, peak-to-average ratio, steps per task, tokens per step, seconds per step, per-step success rate, p95 latency target and cost ceiling per task. Concurrency, cost, latency and success are derived from them.",
+  "level": 1,
+  "objective": {
+    "id": "design-envelope-obj",
+    "text": "Given eight envelope numbers, compute peak concurrency, tokens and cost per task, p95 latency and end-to-end success, then choose an architecture that fits all four."
+  },
+  "misconceptions": [
+    {
+      "claim": "Requirements such as fast and cheap are enough to start designing.",
+      "correction": "Adjectives cannot rule an option out. A target of 20 seconds at p95 and $0.02 per task can, because you can compute whether a design fits before building it."
+    },
+    {
+      "claim": "You size the system for average load.",
+      "correction": "You size for peak. Little's law multiplies peak arrivals per second by mean task latency, so a 4x peak needs four times the concurrency of the average."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "The eight numbers are tasks per day, peak-to-average ratio, steps per task, tokens per step, seconds per step, per-step success rate, p95 latency target in seconds and cost ceiling per task in dollars.",
+      "Peak concurrency is peak arrivals per second times mean task latency, which is Little's law. Tokens per task is steps times tokens per step. Cost per task is tokens divided by a million, times the price per million tokens.",
+      "p95 latency is roughly steps times seconds per step times a tail factor. End-to-end success is per-step success raised to the number of steps."
+    ],
+    "l2": [
+      "Take 86,400 tasks a day, which is 1 per second on average. A 4x peak gives 4 per second. Six steps at 1.5 seconds each give a mean task latency of 9 seconds, so peak concurrency is 36.",
+      "Six steps of 3,000 tokens make 18,000 tokens per task. At $2 per million tokens that is $0.036 per task.",
+      "With a tail factor of 2, p95 is about 6 times 1.5 times 2, or 18 seconds. At 0.98 per step, end-to-end success is 0.98^6, about 0.89."
+    ],
+    "l3": [
+      "Now set the cost ceiling at $0.03. The design above fails at $0.036, so something must change.",
+      "Cutting to five steps, or trimming each step to 2,500 tokens, both give 15,000 tokens and exactly $0.030. Each lands on the ceiling with no margin for retries.",
+      "The stronger choice is a model priced at $1 per million tokens: 18,000 tokens then cost $0.018. Name the trade-off openly: a smaller model may lower per-step success, and the success arithmetic must absorb that."
+    ]
+  },
+  "prerequisites": ["agency-spectrum"],
+  "labs": ["design-console"],
+  "drills": ["fnd-drill-support-agent", "fnd-drill-research-agent"],
+  "goals": ["interview", "capstone"],
+  "minutes": 14
+}

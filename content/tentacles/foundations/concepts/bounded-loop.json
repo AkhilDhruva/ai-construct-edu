@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "bounded-loop",
+  "tentacle": "foundations",
+  "title": "The bounded loop",
+  "point": "Four independent bounds, on steps, tokens, wall clock and progress, each catch a pathology the others miss, and a bounded stop returns a typed reason.",
+  "definition": "A bounded loop runs choose, act and observe under four independent limits: a step ceiling, a token budget, a wall-clock limit and a no-progress detector. Hitting any bound ends the run with a typed termination reason, not a crash.",
+  "level": 1,
+  "objective": {
+    "id": "bounded-loop-obj",
+    "text": "Given a run budget, configure four independent termination bounds and predict which fires first for three given traces."
+  },
+  "misconceptions": [
+    {
+      "claim": "A step ceiling alone is enough to bound a loop.",
+      "correction": "Ten steps can still read a 200,000-token document ten times or wait minutes on a slow API. Token and wall-clock bounds catch failures that a step count never sees."
+    },
+    {
+      "claim": "Hitting a bound is an error, so it should raise an exception.",
+      "correction": "A bounded stop is expected behaviour. The run returns a typed termination reason, such as a step-limit reason, so the caller can degrade, retry or explain."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "The step ceiling catches oscillation, where a planner flip-flops between two actions. The token budget catches a loop that keeps re-reading a huge observation.",
+      "The wall-clock limit catches slow dependencies. The no-progress detector catches identical repeated calls and steps that add no new information.",
+      "The bounds are independent because each catches a failure the others miss. When one fires, the run ends with a typed termination reason rather than a crash."
+    ],
+    "l2": [
+      "Take a budget of 12 steps, 60,000 tokens, 90 seconds, and a stop after three consecutive identical calls.",
+      "Trace A alternates between two tools, each step costing 1,000 tokens and 2 seconds. No two consecutive calls match, so the step ceiling fires at step 12, after only 12,000 tokens and 24 seconds.",
+      "Trace B re-reads a 15,000-token document every step. After four steps it has spent 60,000 tokens, and a fifth would project 75,000, so the token budget stops it before step 5.",
+      "Trace C calls a search API that takes 40 seconds per call. After two calls 80 seconds have passed, so the wall-clock limit fires during step 3 at the 90-second mark."
+    ],
+    "l3": [
+      "Setting the step ceiling trades false stops against wasted spend. If 99 per cent of successful runs finish within 9 steps, a ceiling of 12 leaves sensible headroom.",
+      "Compare a ceiling of 30. An oscillating run at 1,000 tokens and 2 seconds per step would then burn 18 extra steps: 18,000 tokens and 36 seconds for nothing.",
+      "Defend the number from the distribution of successful runs, and review it when that distribution shifts."
+    ]
+  },
+  "prerequisites": ["six-components"],
+  "labs": ["bounded-loop-sim"],
+  "drills": ["fnd-drill-research-agent"],
+  "goals": ["interview", "capstone"],
+  "minutes": 12
+}

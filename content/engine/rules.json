@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "strategy": "rules-v1",
+  "masteryThreshold": 0.7,
+  "weights": { "goal": 0.35, "leverage": 0.25, "gap": 0.25, "recency": 0.15 },
+  "depth": { "l1Below": 0.4, "l3AtOrAbove": 0.7, "interviewFastTrackWeeks": 4 },
+  "cards": { "dailyMax": 20, "minutesPerCard": 0.25 },
+  "remediation": { "missesToTrigger": 2 },
+  "recency": { "fullDecayDays": 14 },
+  "bkt": {
+    "learn": 0.15,
+    "slip": 0.1,
+    "guessMcq": 0.2,
+    "guessDesign": 0.05,
+    "guessRecall": 0.25,
+    "depthFactor": [0.6, 1.0, 1.4],
+    "lapseStep": 0.05,
+    "diagnosticCorrect": 0.45,
+    "diagnosticWrong": 0.1,
+    "prior": 0.1
+  },
+  "roles": {
+    "nonTechnicalMaxDepth": 2,
+    "nonTechnicalStartTentacle": "enablement-basics",
+    "architectBoostTentacles": ["multi-agent", "patterns-scale", "safety-governance"],
+    "architectBoost": 0.1
+  }
+}

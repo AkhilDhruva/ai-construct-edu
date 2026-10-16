@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "reliability-arithmetic",
+  "tentacle": "foundations",
+  "title": "Reliability arithmetic",
+  "point": "End-to-end success is per-step success raised to the number of steps, so long chains fail far more often than any single step suggests.",
+  "definition": "If each step succeeds independently with probability p, a run of n steps succeeds with probability p to the power n. The maximum number of steps for a target T is floor(ln T / ln p).",
+  "level": 2,
+  "objective": {
+    "id": "reliability-arithmetic-obj",
+    "text": "Compute end-to-end success for a given chain and the maximum step count for a target, then choose between fewer steps, verification and checkpoints to close the gap."
+  },
+  "misconceptions": [
+    {
+      "claim": "A 95 per cent reliable step makes a 95 per cent reliable agent.",
+      "correction": "Success compounds. Twenty steps at 0.95 give about 0.36 end to end, so the agent fails nearly two runs in three."
+    },
+    {
+      "claim": "Retries make every step effectively perfect.",
+      "correction": "Retries only help with faults that a check can detect. A confidently wrong step passes straight through unless something verifies its output."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Success compounds multiplicatively. 0.98^10 is about 0.82, 0.95^20 is about 0.36, and 0.99^50 is about 0.61.",
+      "To find the most steps you can afford for a target T at per-step success p, compute floor(ln T / ln p).",
+      "There are three levers: use fewer steps, raise per-step reliability through verification or retries, or add checkpoints so a failed step can be recovered instead of restarting the run."
+    ],
+    "l2": [
+      "A team needs 0.90 end to end, and each step succeeds 0.98 of the time. ln 0.90 divided by ln 0.98 is about 5.2, so the limit is 5 steps.",
+      "Their plan has 12 steps, which gives 0.98^12, about 0.78. That misses the target by a wide margin.",
+      "Adding verification that lifts each step to 0.995 gives 0.995^12, about 0.94. The plan keeps its 12 steps and clears the target."
+    ],
+    "l3": [
+      "Checkpoints are the third lever. Split the 12 steps into three stages of four; each stage succeeds with 0.98^4, about 0.92, and a failed stage reruns from its checkpoint.",
+      "Allowing one rerun per stage lifts each stage to about 0.994, and the three-stage run to about 0.98. This assumes failures are detected at the stage boundary and are independent.",
+      "The price is up to about 8 per cent more steps on average, plus checkpoint storage. State that cost next to the gain when you defend the design."
+    ]
+  },
+  "prerequisites": ["design-envelope", "bounded-loop"],
+  "labs": ["design-console"],
+  "drills": ["fnd-drill-research-agent"],
+  "goals": ["interview", "capstone"],
+  "minutes": 14
+}

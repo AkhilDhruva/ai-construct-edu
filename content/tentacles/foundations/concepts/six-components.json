@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "six-components",
+  "tentacle": "foundations",
+  "title": "The six components",
+  "point": "The model proposes and the orchestrator decides; each of the six components keeps one invariant that the others rely on.",
+  "definition": "A production agent splits into six components: orchestrator, reasoning model, tool gateway, memory, guardrails and observability. Each owns one invariant, so any failure can be traced to the component whose invariant broke.",
+  "level": 1,
+  "objective": {
+    "id": "six-components-obj",
+    "text": "Given an incident description, identify which of the six components owned the broken invariant and state the check that would have caught it."
+  },
+  "misconceptions": [
+    {
+      "claim": "The model executes a tool when it emits a tool call.",
+      "correction": "The model only returns a proposal. The orchestrator decides whether to act, and the tool gateway authorises, validates and executes the call."
+    },
+    {
+      "claim": "Guardrails can check the budget after the model call returns.",
+      "correction": "A check after the call cannot prevent the spend it is meant to cap. Guardrails check the projected cost before each call and downgrade or halt on a violation."
+    }
+  ],
+  "layers": {
+    "l1": [
+      "Orchestrator: every run terminates and emits a trace. Reasoning model: returns a proposal, and nothing it says executes by itself. The model proposes, the orchestrator decides.",
+      "Tool gateway: an allowlist per principal, schema validation, a timeout and a typed result. Authorisation runs before validation, so a denied caller never learns the tool's schema.",
+      "Memory: reads are bounded, every item carries its source, and scope to the user is enforced in the store. Guardrails: a violation downgrades or halts the run, and the budget is checked before each call.",
+      "Observability: one span per step, carrying tokens and cost, so any run can be reconstructed after the fact."
+    ],
+    "l2": [
+      "A user reports that the assistant quoted another customer's order. The trace shows memory returned an item with no user scope. The broken invariant belongs to memory: scope must be enforced in the store, not in the prompt.",
+      "A second incident: a run spent $4 on a task capped at $0.50. The guardrail checked spend after each call, so the expensive call had already happened. The fix is to check projected cost before the call.",
+      "In both cases the trace from observability is what made the diagnosis possible. Without one span per step, you would be guessing."
+    ],
+    "l3": [
+      "Enforcing user scope in the store costs an index and a filter on every read. Enforcing it in the prompt costs nothing, but it fails on the first successful prompt injection.",
+      "Put numbers on it: a scoped read might add 2 ms to a 1,500 ms step, about 0.13 per cent. That is a cheap price for an invariant that no prompt can talk its way around.",
+      "The general rule: place each invariant in the component that can enforce it mechanically, and never rely on the model to keep it."
+    ]
+  },
+  "prerequisites": ["what-is-an-agent"],
+  "labs": [],
+  "drills": ["fnd-drill-support-agent", "fnd-drill-research-agent"],
+  "goals": ["interview", "capstone"],
+  "minutes": 12
+}
