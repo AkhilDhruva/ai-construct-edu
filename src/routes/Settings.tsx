@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router'
 import { RUNG_INFO } from '../mantle/session/rung'
 import type { MergeReport } from '../mantle/store/sync'
 import { useMantle } from '../state/useMantle'
+import { ApiSettings } from '../ui/ApiSettings'
 import { RungBadge } from '../ui/primitives'
 
 export function Settings() {
@@ -115,13 +116,15 @@ export function Settings() {
           Capabilities: {Object.entries(flags ?? {})
             .map(([k, v]) => `${k} ${v ? 'on' : 'off'}`)
             .join(' · ')}
-          . Flags turn on only when the API health probe passes.
+          . Flags turn on only when the API health probe passes and a signed-in account is bound.
         </p>
         <p className="small muted">
           Storage: {storage === 'dexie' ? 'IndexedDB in this browser' : 'memory only (IndexedDB is blocked here, so progress is lost on reload)'} · content:{' '}
           {content.packages.map((p) => `${p.manifest.id}@${p.manifest.version}`).join(', ')} · engine: {content.rules.strategy}
         </p>
       </section>
+
+      <ApiSettings />
 
       <section className="card stack" aria-labelledby="author-h">
         <h2 id="author-h">Author tools</h2>
@@ -130,8 +133,8 @@ export function Settings() {
           Show the content studio in navigation
         </label>
         <p className="small muted">
-          The studio validates and previews content drafts and shows item health. In API mode it is limited to the admin role; offline it is a local view of the
-          content that ships with the app.
+          The studio validates and previews content drafts and shows item health. It works on the content that ships with the app; publishing a change is a
+          pull request, so CI re-runs every gate.
         </p>
       </section>
 

@@ -6,7 +6,7 @@ import { bktUpdate, diagnosticPrior, lapse } from './engine/bkt'
 import { buildGraph, type ConceptGraph } from './engine/graph'
 import { explainChanges, plan as planRulesV1 } from './engine/plan'
 import type { CurriculumPlan, MasterySignal, PlanInputs } from './engine/types'
-import { createBundle, openBundle, type Bundle } from './identity/bundle'
+import { createBundle, openBundle, type Bundle, type LearnerSnapshot } from './identity/bundle'
 import { ALL_OFF, type CapabilityFlags, type Rung } from './session/rung'
 import {
   checkSession,
@@ -65,8 +65,9 @@ const ACTIVE_SESSION = 'activeSession'
  */
 export class MantleRuntime {
   readonly graph: ConceptGraph
-  readonly rung: Rung
-  readonly flags: CapabilityFlags
+  /** The current degradation rung; API mode updates it as health signals change. */
+  rung: Rung
+  flags: CapabilityFlags
   readonly bounds: SessionBounds
   learner!: Learner
   session!: SessionState
@@ -125,6 +126,12 @@ export class MantleRuntime {
 
   id(): string {
     return this.ulid(this.now().getTime())
+  }
+
+  /** Called by the API client whenever the server (or its absence) changes the rung. */
+  setLadder(rung: Rung, flags: CapabilityFlags) {
+    this.rung = rung
+    this.flags = flags
   }
 
   get mode(): 'offline' | 'api' {
@@ -498,6 +505,27 @@ export class MantleRuntime {
     this.learner = (await this.store.learners.get(snap.learner.id))!
     await this.beginSession()
     await this.span('identity.import', { attempts: report.attempts, mastery: report.mastery }, { progress: true })
+    return report
+  }
+
+  /** The current learner's full local state, for sync. */
+  async snapshot(): Promise<LearnerSnapshot> {
+    return snapshotLearner(this.store, this.learner.id)
+  }
+
+  /**
+   * Merge a snapshot from the server (union, never overwrite). When the account is
+   * bound to a different learner ID (a second device), adopt that learner.
+   */
+  async applySnapshot(snap: LearnerSnapshot): Promise<MergeReport> {
+    const report = await mergeSnapshot(this.store, snap)
+    if (snap.learner.id !== this.learner.id) {
+      await this.store.meta.upsert({ key: CURRENT_LEARNER, value: snap.learner.id })
+      this.learner = (await this.store.learners.get(snap.learner.id))!
+      await this.beginSession()
+    } else {
+      this.learner = (await this.store.learners.get(this.learner.id))!
+    }
     return report
   }
 

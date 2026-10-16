@@ -11,3 +11,13 @@ test-results
 .DS_Store
 *.tsbuildinfo
 .claude/
+
+# API local data
+api/*.db
+api/*.db-*
+api/.venv
+api/.env
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+api/dev.db*

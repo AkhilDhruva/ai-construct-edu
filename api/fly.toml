@@ -1,0 +1,27 @@
+# Fly.io template. Not deployed by this repository: fill in the app name and set secrets
+# (fly secrets set ANTHROPIC_API_KEY=... MANTLE_DATABASE_URL=... MANTLE_JWKS_URL=...).
+# Build from the repo root: fly deploy --config api/fly.toml --dockerfile api/Dockerfile .
+app = "veraclause-mantle-api"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  MANTLE_ENV = "prod"
+  MANTLE_MODEL_MODE = "live"
+  MANTLE_AUTH_MODE = "jwks"
+  MANTLE_JWT_AUDIENCE = "authenticated"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [[http_service.checks]]
+    method = "GET"
+    path = "/health"
+    interval = "30s"
+    timeout = "5s"

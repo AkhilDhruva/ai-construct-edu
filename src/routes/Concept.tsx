@@ -4,6 +4,7 @@ import type { Depth } from '../mantle/content/schemas'
 import { useMantle } from '../state/useMantle'
 import { CheckRunner } from '../ui/CheckRunner'
 import { DepthBadge, MasteryBar } from '../ui/primitives'
+import { TutorPanel } from '../ui/TutorPanel'
 import { usePackage } from './usePackage'
 
 const LAYER_NAME: Record<Depth, string> = { 1: 'L1 · Recall', 2: 'L2 · Apply', 3: 'L3 · Design' }
@@ -125,6 +126,8 @@ export function Concept() {
         <h2 id="qc-h">Quick check</h2>
         <CheckRunner key={concept.id} items={checks} />
       </section>
+
+      <TutorPanel conceptId={concept.id} />
     </div>
   )
 }

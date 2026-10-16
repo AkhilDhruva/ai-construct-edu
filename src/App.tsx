@@ -35,7 +35,7 @@ function SessionBanner() {
 }
 
 function Shell({ children }: { children: React.ReactNode }) {
-  const { rung, due, learner, authorMode } = useMantle()
+  const { rung, due, learner, authorMode, health, reachable } = useMantle()
   const { pathname } = useLocation()
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -68,7 +68,7 @@ function Shell({ children }: { children: React.ReactNode }) {
               <NavLink to="/settings">Settings</NavLink>
             </nav>
           )}
-          <RungBadge rung={rung} />
+          <RungBadge rung={rung} mock={reachable && health?.models.mode === 'mock'} />
         </div>
       </header>
       <main id="main" tabIndex={-1}>

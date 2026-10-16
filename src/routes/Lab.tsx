@@ -1,8 +1,9 @@
-import { Suspense, useCallback } from 'react'
+import { Suspense, useCallback, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { LAB_COMPONENTS } from '../labs'
 import type { LabEvidence } from '../labs/types'
 import { useMantle } from '../state/useMantle'
+import { TutorPanel } from '../ui/TutorPanel'
 import { usePackage } from './usePackage'
 
 export function Lab() {
@@ -11,10 +12,12 @@ export function Lab() {
   const run = useMantle((s) => s.run)
   const lab = pkg?.labs.find((l) => l.ref.id === labId)
   const concepts = lab?.ref.concepts
+  const [lastEvidence, setLastEvidence] = useState<LabEvidence | undefined>()
 
   const onEvidence = useCallback(
     async (e: LabEvidence) => {
       if (!concepts) return
+      setLastEvidence(e)
       await run((rt) =>
         rt.recordAttempt({ kind: 'lab', itemId: e.itemId, conceptIds: concepts, tier: 'apply', depth: e.depth, correct: e.correct, answer: e.answer, latencyMs: e.latencyMs }),
       )
@@ -38,6 +41,7 @@ export function Lab() {
           <Engine labRef={lab.ref} scenario={lab.scenario} onEvidence={onEvidence} />
         </Suspense>
       </div>
+      <TutorPanel conceptId={lab.ref.concepts[0]} labId={lab.ref.id} labState={lastEvidence && { item: lastEvidence.itemId, correct: lastEvidence.correct, answer: lastEvidence.answer }} />
       <p className="small">
         Then:{' '}
         {lab.ref.concepts.map((c, i) => (

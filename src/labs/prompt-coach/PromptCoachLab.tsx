@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
+import type { CoachRewrite } from '../../mantle/api/client'
 import { useMantle } from '../../state/useMantle'
 import type { LabProps } from '../types'
 import { analyzePrompt, diffWords } from './analyze'
@@ -22,7 +23,10 @@ function Diff({ before, after }: { before: string; after: string }) {
 }
 
 export default function PromptCoachLab({ scenario, onEvidence }: LabProps<PromptCoachScenario>) {
-  const flags = useMantle((s) => s.flags)
+  const { api, can } = useMantle()
+  const live = can('coach')
+  const [rewrite, setRewrite] = useState<CoachRewrite | undefined>()
+  const [rewriting, setRewriting] = useState(false)
   const [scenarioId, setScenarioId] = useState(scenario.scenarios[0].id)
   const current = scenario.scenarios.find((s) => s.id === scenarioId)!
   const [drafts, setDrafts] = useState<Record<string, string>>({})
@@ -128,12 +132,60 @@ export default function PromptCoachLab({ scenario, onEvidence }: LabProps<Prompt
             </div>
           ))}
           <p className="small muted">
-            {flags?.coach
-              ? 'Live coach available: ask for a rewrite with an explanation.'
+            {live
+              ? 'Live coach available: ask for a rewrite with an explanation. Prompts with sensitive data are blocked by the API before they reach the model.'
               : 'Offline coach: pattern checks only. Live rewrites arrive with API mode; this checklist stays as the floor.'}
           </p>
         </div>
       </div>
+
+      {live && (
+        <section className="card stack" aria-labelledby="pc-live" data-testid="coach-live">
+          <h3 id="pc-live">Live rewrite</h3>
+          <div>
+            <button
+              type="button"
+              className="btn"
+              disabled={rewriting || analysis.words < 3}
+              onClick={async () => {
+                setRewriting(true)
+                try {
+                  setRewrite(await api!.coachRewrite(scenarioId, text))
+                } catch (e) {
+                  setRewrite({ status: 'UNAVAILABLE', error: e instanceof Error ? e.message : String(e) })
+                } finally {
+                  setRewriting(false)
+                }
+              }}
+            >
+              {rewriting ? 'Rewriting…' : 'Rewrite my prompt'}
+            </button>
+          </div>
+          <div aria-live="polite">
+            {rewrite?.status === 'SUCCESS' && (
+              <div className="stack">
+                <p className="callout" style={{ whiteSpace: 'pre-wrap' }}>
+                  {rewrite.rewrite}
+                </p>
+                <p className="small">{rewrite.explanation}</p>
+                <p className="small muted">
+                  Added: {rewrite.elementsAdded.join(', ') || 'nothing'} · {rewrite.mock ? 'mock model' : rewrite.model} · rung {rewrite.rung}
+                </p>
+              </div>
+            )}
+            {rewrite?.status === 'DENIED' && (
+              <div className="callout callout-danger" role="status">
+                <strong>Not sent.</strong> Remove the sensitive data first: {rewrite.redFlags.map((f) => f.label).join(', ')}.
+              </div>
+            )}
+            {rewrite?.status === 'UNAVAILABLE' && (
+              <div className="callout callout-warn" role="status">
+                {rewrite.error}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       {done && (
         <section className="card stack" aria-labelledby="pc-exemplar">

@@ -6,7 +6,29 @@ An offline-first portal that teaches **agentic AI system design** with one inter
 
 **Mantle** is the hub: identity, the adaptive engine, progress and telemetry. **Tentacles** are teaching modules that plug into it. You add a tentacle by dropping a folder of JSON into `content/tentacles/`. Mantle's code does not change.
 
-## Status: Phase 1
+## Status: Phase 2 (API mode)
+
+API mode is optional. The web app is complete without it. When the API in [`api/`](api/README.md) is reachable, signing in turns on:
+- **Sync across devices:** offline-first union merge. A second device adopts the account's learner.
+- **AI rubric grading:** each point must quote a verbatim sentence from the answer, or the server drops it.
+- **"Ask the tutor why":** a bounded loop over read-only tools, scoped to this learner, that shows its own trace.
+- **Live prompt coach:** a prompt containing sensitive data is refused before any model call.
+
+| Phase 2 piece | Where |
+| --- | --- |
+| FastAPI service (Python 3.12, uv) | `api/mantle_api` |
+| AI gateway: authorise → validate → timeout → typed result | `api/mantle_api/gateway.py` |
+| Tutor (`claude-sonnet-5-5`), standby `claude-haiku-4-5`, server-side refusal fallback, prompt caching | `api/mantle_api/ai.py`, `models.py` |
+| Cost governor (budget before the call, 3× median alert) and server ladder (rungs 1–3) | `api/mantle_api/governor.py` |
+| Postgres with forced row-level security, plus migrations | `api/migrations/postgres` |
+| Auth: OIDC JWKS (Supabase Auth, PKCE in the browser), HS256, or dev tokens; RBAC (learner, admin) | `api/mantle_api/auth.py`, `src/mantle/api/auth.ts` |
+| OpenTelemetry → OTLP (for example Langfuse), with AI spans synced into the learner trace | `api/mantle_api/telemetry.py` |
+| Grader eval: 18-item golden set; safety gate, sign-test quality gate, cost ratio | `api/evals` |
+| Browser client: degrades to rung 4 in one failed request, re-probes every 30 s | `src/mantle/api/client.ts`, `src/state/useMantle.ts` |
+
+The outage criterion from Phase 0 is now tested end to end. `e2e/api-mode.spec.ts` makes every API request fail, then checks that the badge drops to rung 4, the AI features hide, and the local check still grades.
+
+### Phase 1
 
 | Tentacle | Audience | Concepts | Cards | Checks | Drills | Labs (engine) |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -38,7 +60,7 @@ New tentacles that reuse existing lab engines need no code changes. A new kind o
 | A learner completes the Foundations lab and passes the 80% knowledge check | ✅ The full path works in the UI | `e2e/learner.spec.ts` drives the lab and then the 12-item check to 12/12. The 45-minute target still needs a timed test with a real user. |
 | Works fully offline (no network, no API key) | ✅ | E2E installs the service worker, goes offline, reloads, and runs a lab and Settings |
 | Adding a tentacle needs zero Mantle code changes | ✅ Proven at the registry and engine level | `tests/content.test.ts` plugs in a second tentacle that has cross-tentacle prerequisites |
-| An API outage degrades to offline grading within one request | ⚪ Rung 4 by construction | No API exists in Phase 0. The health probe (1.5 s timeout) defaults every capability flag to off. |
+| An API outage degrades to offline grading within one request | ✅ (Phase 2) | `e2e/api-mode.spec.ts` aborts every API request; one failed request drops the app to rung 4, and the local check still grades |
 | Every learner action emits a telemetry span | ✅ | `tests/runtime.test.ts`; you can see them on the `/trace` page |
 | Accessibility: keyboard-complete, reduced-motion safe, WCAG 2.2 AA | ✅ axe passes on every main page in CI | Lighthouse 95+ has not been measured yet |
 
@@ -52,8 +74,10 @@ npm run dev          # http://localhost:5173
 Run every gate locally, the same way CI does:
 
 ```bash
-npm run ci           # lint → typecheck → content gates → unit → build → e2e (Playwright + axe)
+npm run ci           # lint → typecheck → content gates → unit → build → e2e (Playwright + axe, starts the API too)
 ```
+
+API mode locally (needs [uv](https://docs.astral.sh/uv/)): `cd api && uv sync && uv run uvicorn mantle_api.main:app_factory --factory --port 8318`, then connect from **Settings → API mode**. See [api/README.md](api/README.md).
 
 The npm scripts call `node <tool>` directly instead of going through the `node_modules/.bin` shims. That way they also work in Windows folders whose path contains `&`.
 
@@ -84,10 +108,10 @@ Dependencies point downward only. Every layer above storage runs against the in-
 | Component | In Mantle | Invariant it keeps |
 | --- | --- | --- |
 | Orchestrator | Learning session loop (`session.ts`, `runtime.ts`) | Every session terminates with a typed reason (`step-ceiling`, `wall-clock`, `token-budget`, `no-progress`, `idle`) and emits a trace. A reload resumes the open session, and a stale one is closed first. |
-| Reasoning model | AI tutor and grader (Phase 2, API mode) | Returns a proposal. A proposed plan is accepted only if `validatePlan` keeps prerequisite order. |
-| Tool gateway | AI gateway (Phase 2) | Allowlist, schema validation, timeout, typed result; authorization runs before validation |
+| Reasoning model | AI tutor, grader, coach (`api/mantle_api/ai.py`) | Returns a proposal. Grader points stand only with verbatim citations, and the server computes the total. A proposed plan is accepted only if `validatePlan` keeps prerequisite order. |
+| Tool gateway | `api/mantle_api/gateway.py` | Per-principal allowlist, JSON Schema validation, timeout, typed result. Authorisation runs before validation, so denied callers never see a schema. |
 | Memory | Repository interface, four stores | Every mastery row carries its evidence id, `validFrom` and `recordedAt`. Logs are append-only. |
-| Guardrails | Session bounds, cost governor (Phase 2) | The budget is checked before a step runs, not after |
+| Guardrails | Session bounds, tutor loop bounds, cost governor, red-flag pre-check | The budget is checked before a call runs, not after. A violation lowers the rung instead of failing. |
 | Observability | `TelemetryEvent` spans, `/trace` | One span per learner step, carrying rung, tokens and cost |
 
 ### Adaptive engine (rules-v1, no API)
@@ -116,8 +140,8 @@ A package that fails validation is reported and skipped. It never crashes the po
 | Phase | Scope |
 | --- | --- |
 | 0 ✅ | Mantle shell, offline identity, Dexie store with migrations, tentacle registry, Foundations, adaptive engine v1, progress radar, trace view, CI gates |
-| **1 (this)** | Enablement Basics (non-technical track), Tools, Gateway & MCP tentacle, audience rules, content studio, concept map |
-| 2 | API mode: FastAPI gateway, Postgres with RLS, OAuth 2.1 + PKCE, Claude tutor and grader behind the gateway, golden-set eval harness |
+| 1 ✅ | Enablement Basics (non-technical track), Tools, Gateway & MCP tentacle, audience rules, content studio, concept map |
+| **2 (this)** | API mode: FastAPI gateway, Postgres with RLS, OIDC/PKCE sign-in, sync, Claude tutor, grader and coach behind the gateway, cost governor, golden-set eval harness |
 | 3+ | Remaining tentacles (tools & MCP, memory, multi-agent, evaluation, cost, safety…), capstone, 3D map |
 
 ## Sources and attribution
